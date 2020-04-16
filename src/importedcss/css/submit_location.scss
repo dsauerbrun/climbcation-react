@@ -1,0 +1,188 @@
+#submit-form {
+	h3.title-header {
+		padding: 10px;
+	}
+
+	.form-container {
+		max-width: 1500px;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	.rating-container {
+		margin-right: 10px;
+	}
+
+	label {
+		height: 20px;
+		.required-field {
+			font-size: 20px;
+			vertical-align: -webkit-baseline-middle;
+		}
+	}
+
+	.small-gray {
+		text-align: center;
+		padding: 10px 0;
+		font-weight: normal;
+	}
+	.well {
+		padding: 0;
+		margin-bottom: 0;
+	}
+	.well.forms-container {
+		.well-content {
+			min-height: 300px;
+		}
+	}
+	.text-button {
+		line-height: 2;
+	}
+
+	.tips-container {
+		padding: 10px;
+		margin-top: 20px;
+		margin-bottom: 20px;
+		box-shadow: 0px 4px 15px -5px rgb(130, 130, 130);
+
+	}
+	/* header start */
+	.progress-container {
+		position:relative;
+		padding: 10px 0;
+		box-shadow: 0px 4px 15px -5px rgb(130, 130, 130);
+		margin-bottom: 20px;
+	}
+	.progress-icon-container {
+		position: absolute;
+		display:flex;
+		padding-top: 5px;
+		width: 100%;
+		justify-content: space-around;
+		text-align: center;
+		top: 0px;
+		span {
+			width: 16%;
+		}
+		img {
+			-webkit-filter: drop-shadow(0px 2px 3px #000);
+  			filter: drop-shadow(0px 2px 3px #000);
+		}
+	}
+	.progress-bar-wrapper {
+		border-width: 3px 0 3px 0;
+		border-color: $dark-blue;
+		border-style:solid;
+		width: 100%;
+		margin: 10px 0;
+		box-shadow: 0px 4px 15px -5px rgb(130, 130, 130);
+	}
+	.progress-bar {
+		padding: 10px 0;
+		float: none;
+		background-color: $dark-blue;
+		width: 1%;
+		
+	}
+	.titles {
+		width: 100%;
+		display: flex;
+		justify-content: space-around;
+		text-align: center;
+		span {
+			width: 16%;
+		}
+		a {
+			width: 16%;
+			cursor: pointer;
+		}
+	}
+	/* header end */
+
+	/* drop image start */
+	.drop-box {
+		border-style: dashed;
+		border-width: 3px;
+		border-color: $dark-blue;
+		border-radius: 10px;
+		width: 192px;
+		height: 192px;
+		display: flex;
+		align-items: center;
+		span {
+			margin: 0 auto;
+		}
+		img {
+			max-width: 176px;
+			max-height: 176px;
+			margin: 0 auto;
+		}
+	}
+	/* drop image end */
+
+	/* general start */
+	.border-left {
+		border-style: solid;
+		border-width: 0 0 0 1px;
+		border-color: $light-gray;
+		height: 320px;
+	}
+
+	.month-button {
+		margin-bottom: 5px;
+		padding-right: 5px;
+		padding-left: 5px;
+		.btn-climbcation {
+			width: 90%;
+			background-color: #fff;
+			color: $dark-blue;
+			font-weight: 700;
+			border-color: $dark-blue;
+			border-style: solid;
+			border-width: 2px;
+			border-radius: 3px;
+			padding: 0;
+			
+		}
+		.btn-climbcation:active,
+		.btn-climbcation.active {
+			background-color: $dark-blue;
+			color: #fff;
+			border-color: transparent;
+			border-style: solid;
+			border-width: 2px;
+			border-radius: 3px;
+			box-shadow: none;
+		}
+	}
+
+	.grade-selector {
+		img {
+			display: inline;
+			width: 20px;
+		}
+		select {
+			display: inline;
+			font-size: 12px;
+			min-width: 60%;
+			width: auto;
+			margin-bottom: 5px;
+			margin-left: 5px;
+		}
+	}
+
+	/* general end */
+
+	.email-input {
+		width: auto;
+	}
+	.email-prompt {
+		line-height: 2.5;
+	}
+	.email-btn {
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+
+
+}

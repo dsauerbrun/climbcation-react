@@ -1,0 +1,19 @@
+@import "./_variables.scss";
+@import "./_overrides.scss";
+@import "./defaults.scss";
+@import "css/homepage.scss";
+@import "css/locations.css.scss";
+@import "css/submit_location.scss";
+@import "css/user_management.scss";
+@import "css/external.scss";
+@import "./_mobile.scss";
+
+
+body {
+	font-size: 14px;
+  line-height: 1.42857143;
+	position: relative;
+	color: rgb(60,126,145);
+	-webkit-font-smoothing: inherit;
+	font-family: "museo-sans-rounded", "Myriad Pro", Myriad, "Liberation Sans", "Nimbus Sans L", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}

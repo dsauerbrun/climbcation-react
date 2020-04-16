@@ -1,0 +1,37 @@
+.header{
+	display:block;
+}
+
+.contact-link {
+	margin-left: 3px;
+}
+
+.instagram-badge {
+	width: 20px;
+	height: 20px;
+}
+
+.navbar.home {
+	padding: 1em 0px;
+	margin-bottom: 0;
+	background-color: rgb(13,33,42);
+	.nav-link {
+		a {
+			color: rgb(230,230,230);
+			cursor: pointer;
+		}
+		text-align: center;
+	}
+	.nav-link.text {
+		padding-top: 1em;
+	}
+	.nav-link {
+		padding: 0;
+	}
+	.navbar-logo {
+		display: inline;
+		img {
+			height: 50px;
+		}
+	}
+}

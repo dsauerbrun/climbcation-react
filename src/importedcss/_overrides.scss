@@ -1,0 +1,33 @@
+ul.dropdown-menu {
+	z-index: 10000;
+}
+
+.climbcation-well {
+	border-radius: 0;
+	background-color: #fff;
+	box-shadow: 0px 4px 15px -5px rgb(130, 130, 130);
+}
+
+label {
+	width: 100%;
+}
+
+h3, h4 {
+	padding-top: 0px;
+	margin-top: 0px;
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+.btn-default {
+	background: $input-background-gray;
+	color: $input-text-gray;
+	&.active {
+		background: $input-active-background-gray;
+		color: $input-active-text-gray;
+	}
+}
+
+.navbar {
+	border-radius: 0px;
+}

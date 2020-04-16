@@ -1,0 +1,537 @@
+label {
+	&.control {
+		font-size: 12px;
+	}
+	font-size: 12px;
+	.gray {
+		color: rgb(123,123,123);
+		font-weight: normal;
+	}
+}
+
+.divider {
+	height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+
+.map-info-window {
+	display: block;
+	background-color: #fff;
+	position: absolute;
+	border-radius: 5px;
+	width: 450px;
+	height: 170px;
+	z-index: 100000;
+	.location-card {
+		border-radius: 5px;
+		border-width: 3px;
+		margin-bottom: 0px;
+		.location-card-info{
+			position:relative;
+			border-width: 0px;
+			.location-card-attributes {
+				position: relative;
+				height: 100%;
+				
+			}
+			.location-list-thumb-container{
+				position: relative;
+				.location-list-thumb {
+					width: 100%;
+					height: 11.8em;
+				}
+				.location-list-thumb-title {
+					position: absolute;
+					width: 91%;
+					bottom: .5em;
+					padding-left: 1em;
+					padding-top: 10px;
+					padding-bottom: 10px;
+					background-image: linear-gradient(to right, rgb(188,188,188), rgba(255,255,255,0) 120%);
+					.text-gray {
+						color: #eee;
+					}
+				}
+			}
+		}
+
+		&.map-info-window-arrow-bottom {
+			position: relative;
+			background: #ffffff;
+			border: 3px solid #d6d6d6;
+		}
+		&.map-info-window-arrow-bottom:after, &.map-info-window-arrow-bottom:before {
+			top: 100%;
+			left: 95%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+		}
+
+		&.map-info-window-arrow-bottom:after {
+			border-color: rgba(255, 255, 255, 0);
+			border-top-color: #ffffff;
+			border-width: 10px;
+			margin-left: -10px;
+		}
+		&.map-info-window-arrow-bottom:before {
+			border-color: rgba(214, 214, 214, 0);
+			border-top-color: #d6d6d6;
+			border-width: 14px;
+			margin-left: -14px;
+		}
+
+		&.map-info-window-arrow-bottom {
+			position: relative;
+			background: #ffffff;
+			border: 3px solid #d6d6d6;
+		}
+		&.map-info-window-arrow-bottom:after, &.map-info-window-arrow-bottom:before {
+			top: 100%;
+			left: 95%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+		}
+
+		&.map-info-window-arrow-bottom:after {
+			border-color: rgba(255, 255, 255, 0);
+			border-top-color: #ffffff;
+			border-width: 10px;
+			margin-left: -10px;
+		}
+		&.map-info-window-arrow-bottom:before {
+			border-color: rgba(214, 214, 214, 0);
+			border-top-color: #d6d6d6;
+			border-width: 14px;
+			margin-left: -14px;
+		}
+
+		&.map-info-window-arrow-top {
+			position: relative;
+			background: #ffffff;
+			border: 3px solid #d6d6d6;
+		}
+		&.map-info-window-arrow-top:after, &.map-info-window-arrow-top:before {
+			bottom: 100%;
+			left: 95%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+		}
+
+		&.map-info-window-arrow-top:after {
+			border-color: rgba(255, 255, 255, 0);
+			border-bottom-color: #ffffff;
+			border-width: 10px;
+			margin-left: -10px;
+		}
+		&.map-info-window-arrow-top:before {
+			border-color: rgba(214, 214, 214, 0);
+			border-bottom-color: #d6d6d6;
+			border-width: 14px;
+			margin-left: -14px;
+		}
+
+		&.left-arrow:after, &.left-arrow:before {
+			left: 5%;
+		}
+	}
+}
+
+.climbcation-toast {
+	> div {
+		background: $light-gray;
+		border-color: $light-blue;
+		color: $light-blue;
+		font-weight: bold;
+	}
+}
+
+.display-block {
+	display: block;
+}
+
+.display-inline-block {
+	display: inline-block;
+}
+
+.info-text {
+	font-size: 16px;
+}
+
+.preserve-line-breaks {
+	white-space: pre-wrap;
+}
+
+.text-center {
+	text-align: center !important;
+}
+
+.inline {
+	display: inline;
+}
+
+.small-label {
+	font-size: 12px;
+	color: #000;
+	font-weight: 700;
+}
+
+.small-gray {
+	color: rgb(150,150,150);
+	font-size: 12px;
+}
+
+.dark-blue {
+	color: $dark-blue;
+}
+
+.light-blue {
+	color: $light-blue;
+}
+
+.text-gray {
+	color: $text-gray;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.no-padding {
+	padding: 0;
+}
+
+.bottom-margin {
+	margin-bottom: 10px;
+}
+
+.bottom-padding {
+	padding-bottom: 10px;
+}
+
+.right-padding {
+	padding-right: 10px;
+}
+
+.right-margin {
+	margin-right: 10px;
+}
+
+.border-bottom {
+	border-style: solid;
+	border-width: 0 0 1px 0;
+	border-color: $light-gray;
+}
+
+.multiple-grades {
+	> img {
+		height: 18px;
+		width: 18px;
+	}
+	font-size: 12px;
+	padding-right: 5px;
+}
+
+p.multiple-grades {
+	display: inline-block;
+}
+
+/* wells */
+
+.well-footer {
+	background-color: rgb(224,224,224);
+	padding: 15px 0;
+}
+.well.has-header {
+	padding-top: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+.well.has-footer {
+	padding-top: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+.well-header {
+	background-color: rgb(224,224,224);
+	padding: 20px;
+}
+.well-content {
+	padding: 20px;
+	padding-bottom: 0;
+}
+/* wells end */
+
+/* info container */
+
+.info-container {
+	background-color: $light-gray;
+	border-color: $gray;
+	border-style: solid;
+	border-width: 1px;
+	padding: 10px;
+	padding-top: 20px;
+	display: flex;
+	justify-content: space-between;
+	> div {
+		text-align: left;
+		width: 100%;
+		padding-left: 5px;
+	}
+	> div:not(:first-child) {
+		border-width: 0 0 0 1px;
+		border-color: $gray;
+		border-style: solid;
+	}
+}
+
+/* info container end */
+
+/* buttons start */
+
+.text-button {
+	color: $gray;
+	border-color: $gray;
+	border-width: 0 0 1px 0;
+	border-style: solid;
+	cursor: pointer;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.btn-climbcation {
+	background-color: $dark-blue;
+	color: $light-gray;
+}
+
+.btn-climbcation:hover {
+	background-color: lighten($dark-blue, 20%);
+	color: $light-gray;
+}
+
+.btn-climbcation:active,
+.btn-climbcation.active {
+	background-color: $dark-blue;
+	color: #fff;
+}
+
+.btn-climbcation-negative {
+	background-color: $light-gray;
+	color: $dark-blue;
+}
+
+.btn-climbcation-negative:hover {
+	background-color: lighten($light-gray, 10%);
+	color: $dark-blue;
+}
+
+.btn-climbcation-negative:active,
+.btn-climbcation-negative.active {
+	background-color: $light-gray;
+	color: #fff;
+}
+
+/* buttons end */
+
+/* custom checkbox/radio button start */
+
+.control {
+	font-size: 18px;
+	position: relative;
+	display: block;
+	padding-left: 20px;
+	cursor: pointer;
+	margin-bottom: 0px;
+}
+
+.control input {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+}
+
+.control__indicator {
+	position: absolute;
+	top: 2px;
+	left: 0;
+	width: 15px;
+	height: 15px;
+	background: #fff;
+	border-color: $dark-blue;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 3px;
+}
+
+.control--radio .control__indicator {
+	border-radius: 50%;
+}
+
+/* Hover and focus states */
+.control:hover input ~ .control__indicator,
+.control input:focus ~ .control__indicator {
+	background: #fff;
+}
+
+/* Checked state */
+.control input:checked ~ .control__indicator {
+	background: #fff;
+}
+
+/* Hover state whilst checked */
+.control:hover input:not([disabled]):checked ~ .control__indicator,
+.control input:checked:focus ~ .control__indicator {
+	background: #fff;
+}
+
+/* Disabled state */
+.control input:disabled ~ .control__indicator {
+	pointer-events: none;
+	opacity: .6;
+	background: #e6e6e6;
+}
+
+/* Check mark */
+.control__indicator:after {
+	position: absolute;
+	display: none;
+	content: '';
+}
+
+/* Show check mark */
+.control input:checked ~ .control__indicator:after {
+	display: block;
+}
+
+/* Checkbox tick */
+.control--checkbox .control__indicator:after {
+	top: -6px;
+	left: 4px;
+	width: 7px;
+	height: 17px;
+	transform: rotate(45deg);
+	border: solid $dark-blue;
+	border-width: 0 2px 2px 0;
+}
+
+/* Disabled tick colour */
+.control--checkbox input:disabled ~ .control__indicator:after {
+	border-color: #7b7b7b;
+}
+
+/* Radio button inner circle */
+.control--radio .control__indicator:after {
+	top: 7px;
+	left: 7px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #fff;
+}
+
+/* Disabled circle colour */
+.control--radio input:disabled ~ .control__indicator:after {
+	background: #7b7b7b;
+}
+
+/* custom checkbox/radio button end */
+
+
+/* accommodation start */
+.accommodation-options {
+	display:flex;
+	justify-content: space-around;
+	padding: 10px 0;
+	&.side-pad {
+		padding-left: 100px;
+		padding-right: 100px;
+	}
+}
+
+.accommodation-button-wrapper {
+	display: inline-block;
+	.accommodation-button {
+		position: relative;
+		height: 100px;
+		img {
+			width: 100px;
+		}
+		.accommodation-cost-container {
+			z-index: 10;
+			text-align: left;
+			position: absolute;
+			left: -1px;
+			bottom: -1px;
+			width: 102%;
+			label {
+				font-size: 12px;
+			}
+			input.form-control,
+			select.form-control {
+				height: 25px;
+				font-size: 12px;
+			}
+		}
+	}
+	.accommodation-button.active,
+	.accommodation-button:active {
+		width: 126px;
+		background-color: rgb(215,238,240);
+		img {
+			width: 80px;
+		}
+	}
+}
+/*accommodation end */
+
+/* forms start */
+select.form-control {
+	background: $input-background-gray;
+	color: $input-text-gray;
+}
+
+input.form-control,
+select.form-control {
+	height: 30px;
+	font-size: 16px;
+}
+textarea.form-control {
+	resize: none;
+}
+
+.short-input {
+	width: 15%;
+}
+
+.airport-wrapper {
+	position: relative;
+	.loading-airports {
+		background-color: #fff;
+		border: 1px solid rgba(0,0,0,.15);
+		border-radius: 4px;
+		left: 0;
+		min-width: 160px;
+		padding: 5px 0px;
+		margin: 2px 0 0;
+		position: absolute;
+		z-index: 1000;
+	}
+}
+
+/* forms end */
+
+
+

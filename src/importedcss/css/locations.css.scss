@@ -1,0 +1,220 @@
+// Place all the styles related to the locations controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.location-posts-container {
+	.new-post-container {
+		margin-bottom: 10px;
+		textarea {
+			margin-bottom: 5px;
+			height: 100px;
+			&:placeholder-shown {
+				height: 30px;
+			}
+			&:focus {
+				height: 100px;
+			}
+		}
+		.submit-buttons {
+			text-align: right;
+			.btn {
+				margin-left: 5px;
+			}
+		}
+	}
+	.post {
+		padding: 10px;
+
+		&:nth-child(odd) {
+			background-color: #fff;
+		}
+
+		.post-title {
+			display: flex;
+			justify-content: space-between;
+
+			.user {
+				font-weight: 600;
+			}
+
+		}
+		.post-content {
+			padding-left: 30px;
+			font-size: 18px;
+		}
+		.post-actions {
+			text-align: right;
+			margin-top: 10px;
+
+			a {
+				cursor: pointer;
+			}
+			> span {
+				margin-left: 5px;
+			}
+		}
+	}
+}
+
+.location-info-container {
+	padding-bottom: 5em;
+
+	.misc-container {
+		display:flex;
+		flex-flow: row wrap;
+	}
+
+	.misc-container > .misc-section {
+		width: 45%;
+		padding-right: 20px;
+		p {
+			overflow-wrap: break-word;
+		}
+	}
+
+	h5 {
+		padding-top: 0px;
+		margin-top: 0px;
+		padding-bottom: 0px;
+		margin-bottom: 0px;
+	}
+	h3 {
+		font-size: 20px;
+	}
+	.container-fluid {
+		padding-left: 100px;
+		padding-right: 100px;
+	}
+	.add-section{
+		padding: 40px 0;
+		h3 {
+			padding-bottom: 20px;
+		}
+	}
+
+	.main-header {
+		display: flex;
+		align-items: center;
+		> div {
+			width: 33%;
+		}
+		.location-photo {
+			padding: 0;
+			border-width: 2px;
+			img {
+				height: 270px;
+				width: 100%;
+			}
+			h3 {
+				min-height: 12em;
+				line-height: 1100%;
+			}
+		}
+		.location-map {
+			padding: 0px;
+			position: relative;
+			.nearby-locations {
+				a {
+					font-weight: bold;
+					cursor: pointer;
+				}
+				position:absolute;
+				background-color: rgba(230,230,230,.8);
+				z-index: 10;
+				width: 100%;
+				padding: 10px;
+				bottom: 0px;
+				text-align: right;
+				.toggle {
+					
+				}
+			}
+			.nearby-locations.expanded {
+				max-height: 80%;
+				text-align: right;
+				> div {
+					text-align: left;
+				}
+				.nearby-location {
+					padding-bottom: 5px;
+				}
+				.nearby-display {
+					height: 150px;
+					overflow: scroll;
+				}
+			}
+
+		}
+		#nearby-map{
+			height: 16em;
+			z-index: 1;
+		}
+		.overview-container {
+			> div {
+				padding-top: 10px;
+			}
+			div > div > label {
+				display: block;
+			}
+			padding-bottom: 0px;
+		}
+	}
+
+	.text-button {
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+
+	.misc-section {
+		.pad-top{
+			padding-top: 10px;
+		}
+	}
+
+	
+
+	.climbcation-well {
+		.section-title {
+			padding-bottom: 15px;
+		}
+		> div {
+			padding-bottom: 12px;
+		}
+		> label {
+			padding-top: 20px;
+		}
+		> h3 {
+			padding-top: 0px;
+			margin-top: 0px;
+			input {
+				width: 200px;
+			}
+		}
+	}
+
+	.accommodation-info-section {
+		img {
+			width: 80px;
+			display: block;
+			margin: 0 auto;
+		}
+	}
+
+	.footer-link {
+		font-size: .8em;
+	}
+
+	.info-section:nth-of-type(odd){
+		background-color: #f9f9f9;
+	}
+	.info-section{
+		padding: 1em 0;
+	}
+	
+	.table-contents-list{
+		display: inline-block;
+	}
+
+}
+
+

@@ -1,0 +1,310 @@
+.login-modal {
+	a {
+		cursor: pointer;
+	}
+	.external-sign-in {
+		margin: auto;
+		flex-direction: column;
+		align-items: center;
+		display: flex;
+		.btn {
+			display: block;
+			margin-bottom: 10px;
+			width: 100%;
+			a {
+				color: inherit;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
+		
+	}
+	.password-label {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 10px;
+		label {
+			width: auto;
+		}
+	}
+	.go-row {
+		margin-top: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+}
+
+.icon {
+	height: 32px;
+	width: 32px;
+}
+
+.preset {
+	width: 300px;
+	height: 100px;
+	white-space: normal;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 20px;
+	border: 1px solid rgb(60,126,145);
+	text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000; 
+
+	&.alpine {
+		background: linear-gradient(rgba(60, 126, 145, .2), rgba(60, 126, 145, .2)), url(../../images/alpinerock.jpeg);
+	}
+
+	&.euro-sport {
+		background: linear-gradient(rgba(60, 126, 145, .2), rgba(60, 126, 145, .2)), url(../../images/euroSport.jpg);
+	}
+
+	&.summer-na {
+		background: linear-gradient(rgba(60, 126, 145, .2), rgba(60, 126, 145, .2)), url(../../images/summerNA.jpg);
+	}
+}
+
+.applied-filter {
+	color: #fff;
+	background-color: $light-blue;
+	padding: 5px;
+	border-radius: 5px;
+	width: fit-content;
+	display: inline-block;
+	margin-right: 5px;
+	margin-bottom: 5px;
+	.close-button {
+		cursor: pointer;
+	}
+}
+
+.home-hero {
+	position: relative;
+	height: 20em;
+	background: linear-gradient(rgba(60, 126, 145, .5), rgba(60, 126, 145, .5)), url('../../images/rodellarpano.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	.home-hero-overlay{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		.home-hero-overlay-title {
+			position: relative;
+			> div, h2 {
+				position: absolute;
+				left: 50%;
+				-webkit-transform: translateX(-50%);
+				transform: translateX(-50%);
+				color: #fff;
+				text-align: center;
+				width: 100%;
+			}
+			> div {
+				font-size: 20px;
+				top: 100px;
+			}
+		}
+		img {
+			height: 100%;
+		}
+	}
+}
+
+.fill-height {
+	min-height: 500px;
+}
+
+.icon.button{
+	height: 17px;
+	width: 25px;
+}
+.icon-row{
+	margin: 1em 0;
+}
+
+.grade-filter-button {
+	padding-right: 2px;
+	button {
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+}
+
+.filter{
+	position:relative;
+	margin: 2em 0;
+	padding: 1em 1em;
+	border-color: rgb(13,33,42);
+	border-style: solid;
+	border-top-width: 2px;
+	border-bottom-width: 2px;
+	border-width: 2px 0 2px 0;
+
+	&.fixed {
+	position: fixed;
+	bottom: initial;
+	top: -3px;
+		.filter-banner {
+			padding-top: 2.5em;
+		}
+	}	
+
+	h4:first-child {
+		margin-top: 0;
+	}
+
+	.small-toggles-flex {
+		display: flex;
+		justify-content: space-between;
+		max-width: 300px;
+	}
+}
+
+.location-row:nth-of-type(odd) {
+	background-color: #f9f9f9;
+}
+
+.location-row{
+	padding: 1em 0;
+}
+
+.mapFilter{
+	height:15em;
+	z-index: 1039;
+
+	&.mobile-filter {
+		position: fixed !important;
+		top: 65px !important;
+		left: 0px !important;
+		width: 100% !important;
+		height: 100% !important;
+	}
+
+	&.large-filter {
+		display: inline-block;
+		width: 100%;
+		height: 80vh;
+	}
+}
+.large-map {
+	overflow: scroll;
+	clear: both;
+	height: 80vh;
+	width: 40%;
+	margin: 0px;
+	display: inline-block;
+	.locations-window {
+		clear: both;
+		.location-item {
+			max-width: 100%;
+		}
+	}
+}
+
+.large-map-filter-container {
+	width: 58%;
+	display: inline-block;
+}
+.locations-window {
+	position: relative;
+	width: 90%;
+	margin: 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+
+	
+}
+
+.location-item {
+	flex-grow: 1;
+	display: inline-block;
+	max-width: 48%;
+	margin: 0 10px;
+}
+
+@media (max-width: 1025px) {
+	@media (min-width: 1000px) {
+		.locations-window {
+			width: 98%;
+		}
+	}
+	
+}
+
+.location-card {
+	border-color: rgb(214,214,214);
+	border-style: solid;
+	border-width: 1px;
+	margin-bottom: 1em;
+	
+	.icon {
+		height: auto;
+		width: 25px;
+		padding-right: 5px;
+	}
+	.location-card-info{
+		position:relative;
+		border-color: rgb(214,214,214);
+		border-style: solid;
+		border-width: 0px 0px 1px 0px;
+		.location-card-attributes {
+			position: relative;
+			height: 100%;
+			
+		}
+
+		.list-item-rating-container {
+			font-size: 12px;
+		}
+		.location-list-thumb-container{
+			position: relative;
+			.location-list-thumb {
+				width: 100%;
+				height: 19.5em;
+			}
+			.location-list-thumb-title {
+				position: absolute;
+				width: 93%;
+				bottom: 2em;
+				padding-left: 1em;
+				padding-top: 10px;
+				background-image: linear-gradient(to right, rgb(188,188,188), rgba(255,255,255,0) 120%);
+				.text-gray {
+					color: #eee;
+				}
+			}
+		}
+		.location-card-cost {
+			position: absolute;
+			bottom: 0;
+			right: 10px;
+		}	
+	}
+	.location-airfare {
+		min-height: 124px;
+		.sorry-message {
+			min-height: 124px;
+			padding: 20px;
+			text-align: center;
+		}
+		.loading-quote {
+			display: block;
+			margin: 0 auto;
+			padding-top: 54px;
+		}
+		width: 100%;
+		h4 {
+			display:inline;
+		}
+		h5 {
+			display:inline;
+		}
+	}
+}
