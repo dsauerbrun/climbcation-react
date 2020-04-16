@@ -4,6 +4,12 @@ import Col from 'react-bootstrap/Col';
 import {Row} from 'react-bootstrap';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 
 function Header() {
@@ -30,7 +36,7 @@ function Header() {
 	          <li role="presentation" ><a role="menuitem" tabIndex="-1" href="/api/user/logout" target="_self">Logout</a></li>
 	          <li role="separator" className="divider"></li>
 	          <li><a href="new-location">Submit a New Location</a></li>
-	          <li><a data-toggle="modal" data-target="#aboutModal">What is Climbcation?</a></li>
+	          <li><Link to="/about">What is Climbcation?</Link></li>
 	          <li><a href="mailto:info@climbcation.com">Email Me!</a></li>
 	          <li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
 	          <li><a><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
@@ -42,10 +48,10 @@ function Header() {
 	    <div className="container d-none d-md-block" style={{width: '90%', margin: '0 auto', maxWidth: 'inherit'}}>
 		    <Row>
 		      <Col md={2} className="nav-link text">
-		        <a href="new-location">Submit a New Location</a>
+		        <Link to="/new-location">Submit a New Location</Link>
 		      </Col>
 		      <Col md={2} className="nav-link text">
-		        <a data-toggle="modal" data-target="#aboutModal">What is Climbcation?</a>
+		        <Link to="/about">What is Climbcation?</Link>
 		      </Col>
 		      <Col md={4} className="nav-link">
 		        <a className="navbar-logo" href="home">
