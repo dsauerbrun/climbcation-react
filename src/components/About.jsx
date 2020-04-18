@@ -26,17 +26,17 @@ function About () {
       </p>
 
       <ul>
-        <li><a href="http://boulderrockclub.com/" target="_blank">Boulder Rock Club - Boulder</a></li>
-        <li><a href="http://www.climbcityrock.com/" target="_blank">City Rock Climbing Center - Colorado Springs</a></li>
-        <li><a href="https://www.earthtreksclimbing.com/co/" target="_blank">Earth Treks - Golden</a></li>
-        <li><a href="http://innerstrengthrock.com/" target="_blank">Inner Strength Rock Gym - Fort Collins</a></li>
-        <li><a href="http://movementboulder.com/" target="_blank">Movement Climbing and Fitness - Boulder</a></li>
-        <li><a href="http://movementdenver.com/" target="_blank">Movement Climbing and Fitness - Denver</a></li>
-        <li><a href="http://www.sportclimbingcenter.com/" target="_blank">Sport Climbing Center - Colorado Springs</a></li>
+        <li><a href="http://boulderrockclub.com/" target="_blank" rel="noopener noreferrer">Boulder Rock Club - Boulder</a></li>
+        <li><a href="http://www.climbcityrock.com/" target="_blank" rel="noopener noreferrer">City Rock Climbing Center - Colorado Springs</a></li>
+        <li><a href="https://www.earthtreksclimbing.com/co/" target="_blank" rel="noopener noreferrer">Earth Treks - Golden</a></li>
+        <li><a href="http://innerstrengthrock.com/" target="_blank" rel="noopener noreferrer">Inner Strength Rock Gym - Fort Collins</a></li>
+        <li><a href="http://movementboulder.com/" target="_blank" rel="noopener noreferrer">Movement Climbing and Fitness - Boulder</a></li>
+        <li><a href="http://movementdenver.com/" target="_blank" rel="noopener noreferrer">Movement Climbing and Fitness - Denver</a></li>
+        <li><a href="http://www.sportclimbingcenter.com/" target="_blank" rel="noopener noreferrer">Sport Climbing Center - Colorado Springs</a></li>
       </ul>
 
       <p>
-        I also want to give a thank you to Bryan Zavestoski for lending a hand on the UI. If you like the look and feel of Climbcation and you're looking for a UI/UX guy, you can find his information at <a href="http://zavzen.com/" target="_blank">www.zavzen.com</a>
+        I also want to give a thank you to Bryan Zavestoski for lending a hand on the UI. If you like the look and feel of Climbcation and you're looking for a UI/UX guy, you can find his information at <a href="http://zavzen.com/" target="_blank" rel="noopener noreferrer">www.zavzen.com</a>
       </p>
     </div>
 	);

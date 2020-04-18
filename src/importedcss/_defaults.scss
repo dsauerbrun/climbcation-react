@@ -9,6 +9,22 @@ label {
 	}
 }
 
+.pull-right {
+	float: right;
+}
+
+.pull-left {
+	float: left;
+}
+
+.btn {
+	font-size: 14px;
+}
+
+.btn-xs {
+	font-size: 12px;
+}
+
 .divider {
 	height: 1px;
   margin: 9px 0;
@@ -163,7 +179,7 @@ label {
 	display: block;
 }
 
-.display-inline-block {
+.display-inline-block,.d-inline-block {
 	display: inline-block;
 }
 

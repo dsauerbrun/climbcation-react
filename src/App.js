@@ -3,12 +3,10 @@ import './App.scss';
 import Header from './common/header';
 import './importedcss/main.scss';
 import {
-  BrowserRouter,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
-import Home from './components/Home';
+import Home from './components/Home.tsx';
 import About from './components/About';
 import NewLocation from './components/NewLocation';
 import Location from './components/Location';

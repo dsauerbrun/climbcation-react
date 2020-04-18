@@ -5,9 +5,6 @@ import {Row} from 'react-bootstrap';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
 import {
-  BrowserRouter,
-  Switch,
-  Route,
   Link
 } from "react-router-dom";
 
@@ -22,16 +19,16 @@ function Header() {
 	          <span className="icon-bar"></span>
 	          <span className="icon-bar"></span>
 	        </button>
-	        <a className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} href="home">
+	        <a className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} href="/home">
 	          <img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
 	        </a>
 	      </div>
 
 	      <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 	        <ul className="nav navbar-nav">
-	          <li><a>Welcome username</a></li>
+	          <li><a href="/home">Welcome username</a></li>
 	          <li role="separator" className="divider"></li>
-	          <li role="presentation" ><a role="menuitem" onClick={console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
+	          <li role="presentation" ><a href="home" role="menuitem" onClick={() => console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
 	          <li role="presentation" ><a role="menuitem" tabIndex="-1" href="/profile">Change Username</a></li>
 	          <li role="presentation" ><a role="menuitem" tabIndex="-1" href="/api/user/logout" target="_self">Logout</a></li>
 	          <li role="separator" className="divider"></li>
@@ -39,10 +36,8 @@ function Header() {
 	          <li><Link to="/about">What is Climbcation?</Link></li>
 	          <li><a href="mailto:info@climbcation.com">Email Me!</a></li>
 	          <li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
-	          <li><a><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
-	          
+	          <li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
 	        </ul>
-	        
 	      </div>
 	    </div>
 	    <div className="container d-none d-md-block" style={{width: '90%', margin: '0 auto', maxWidth: 'inherit'}}>
@@ -54,7 +49,7 @@ function Header() {
 		        <Link to="/about">What is Climbcation?</Link>
 		      </Col>
 		      <Col md={4} className="nav-link">
-		        <a className="navbar-logo" href="home">
+		        <a className="navbar-logo" href="/home">
 		          <img src={headerLogo} alt="logo" />
 		        </a>
 		      </Col>
@@ -65,7 +60,7 @@ function Header() {
 		            <span className="caret"></span>
 		          </div>
 		          <ul className="dropdown-menu" role="menu" aria-labelledby="dropdownMenu12" style={{left: '60%'}}>
-		            <li role="presentation"><a role="menuitem" style={{color: 'inherit'}} onClick={console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
+		            <li role="presentation"><a href="home" role="menuitem" style={{color: 'inherit'}} onClick={() => console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
 		            <li role="presentation"><a role="menuitem" tabIndex="-1" style={{color: 'inherit'}} href="/profile">Change Username</a></li>
 		            <li role="presentation"><a role="menuitem" tabIndex="-1" style={{color: 'inherit'}} href="/api/user/logout" target="_self">Logout</a></li>
 		          </ul>
