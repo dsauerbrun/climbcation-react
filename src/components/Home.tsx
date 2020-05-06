@@ -3,6 +3,7 @@ import heroImageLeft from '../images/hero-image-left.png';
 import heroImageRight from '../images/hero-image-right.png';
 import skyscannerinline from '../images/skyscannerinline.png';
 import Filter from './Filter';
+import LocationTilesContainer from './LocationsTilesContainer';
 import useFilterParams, {filterHook} from './useFilterParams';
 
 export const FilterContext = createContext<filterHook>({});
@@ -16,7 +17,7 @@ function Home() {
 				<img src={skyscannerinline} style={{display: 'none'}} alt=""/>
 				<Hero />
 				<Filter />
-      
+				<LocationTilesContainer />
       
 			</section>
 		</FilterContext.Provider>

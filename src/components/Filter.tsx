@@ -7,7 +7,6 @@ import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
 import {filterHook} from './useFilterParams';
 
 function Filter() {
-	// eslint-disable-next-line
 	let {filterState, setFilterState, addCount} = useContext<filterHook>(FilterContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
@@ -18,21 +17,20 @@ function Filter() {
 			let filterOptions = await filterOptionsFetch.json() as any;
 			setClimbTypes(filterOptions.climbTypes);
 
-			
 			let grades: typeGrades[] = filterOptions.grades.map(function(x: any){
 				return {climbingType: x.climbing_type, grades: x.grades.map((y: any) => ({...y, climbingType: y.climbing_type, typeId: x.climbing_type_id})), typeHtml: x.type_html} as typeGrades;
-			})
+			});
 			setTypeGrades(grades);
 		}
 		
 		setOptions();
 	}, []);
+	
 
 	const filterClimbingType = (climbTypeFilter: climbType): void => {
 		let newFilters: FilterParams = new FilterParams(filterState);
 		if (climbTypeFilter.type === 'All') {
 			newFilters.climbingTypesFilter = [climbTypeFilter];
-
 		} else {
 			newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== 'All');
 			newFilters.climbingTypesFilter.push(climbTypeFilter);
@@ -128,11 +126,10 @@ function Filter() {
 					<div className="row bottom-padding">
 						<div className="col-md-5">
 							<label>What do you want to climb?</label>
-
 							<ButtonGroup className="btn-group-sm btn-group-filter">
 								<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType({type: 'All', url: 'none'})}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
 								{
-									climbTypes && climbTypes.map(x => 
+									climbTypes?.map(x => 
 										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
 									)
 								}

@@ -61,7 +61,36 @@ export class FilterParams {
 			Object.assign(this, copy);
 		}
 	}
+
+	get filterUrlObject(): any {
+
+		return {
+			filter: {
+				climbing_types: this.climbingTypesFilter.find(x => x.type === 'All') ? [] : this.climbingTypesFilter.map(x => x.type),
+				grades: {},
+				sort: [],
+				search: this.searchFilter,
+				start_month: this.startMonth.month,
+				end_month: this.endMonth.month,
+				start_month_name: this.startMonth.name,
+				end_month_name: this.endMonth.name,
+				rating: this.ratingsFilter,
+				solo_friendly: this.soloFriendlyFilter,
+				no_car: this.noCarFilter,
+				date: moment().format('YYYY-MM-DD'),
+			},
+			mapFilter: {"northeast":{"longitude":null,"latitude":null},"southwest":{"longitude":null,"latitude":null}},
+			page: 1
+		}
+	};
 }
+/*{"filter":
+	{"climbing_types":[],"grades":{},"accommodations":[],"continents":[],"sort":[],"search":"",
+	"start_month":1,"end_month":12,"start_month_name":"January",
+	"end_month_name":"December","date":"2020-05-03"},
+	"mapFilter":{"northeast":{"longitude":null,"latitude":null},"southwest":{"longitude":null,"latitude":null}},
+	"page":2}
+}*/
 /*
 var LocationsGetter = this;
 	var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

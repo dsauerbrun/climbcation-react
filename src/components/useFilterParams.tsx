@@ -11,7 +11,7 @@ function useFilterParams() {
 	let [filterState, setFilterState] = useState<FilterParams>(new FilterParams());
 	let addCount = () => {
 		// testing function
-		console.log(filterState.startMonth)
+		console.log(filterState ,filterState.startMonth)
 		let newParams = new FilterParams(filterState);
 		newParams.startMonth.month = newParams.startMonth.month+1;
 
