@@ -5,12 +5,14 @@ import classNames from 'classnames';
 import {FilterContext} from './Home';
 import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
 import {filterHook} from './useFilterParams';
+import AirportAutocomplete from '../common/AirportAutocomplete';
+import { allAirports, airport } from '../common/airportsList';
 
 function Filter() {
 	let {filterState, setFilterState, addCount} = useContext<filterHook>(FilterContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
-
+	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === 'DEN') || allAirports[0]);
 	useEffect(() => {
 		async function setOptions() {
 			let filterOptionsFetch = await fetch('/api/filters');
@@ -107,10 +109,6 @@ function Filter() {
 
 	return (
 		<section className="filter hidden-xs">
-			<pre>{JSON.stringify(filterState)}</pre>
-			<button onClick={() => addCount && addCount()}>
-        Click me
-      </button>
 			<div className="container-fluid">		
 				<div className="col-md-9">
 					<div className="row">
@@ -143,13 +141,7 @@ function Filter() {
 						<div className="col-md-4">
 							<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
 							<div className="airport-wrapper">
-								<input className="form-control" type="text" ng-model="helperService.originAirport" ng-click="clearPristine()" ng-trim="true" typeahead-min-length="3" 
-								typeahead-wait-ms="100" uib-typeahead="airport.name for airport in helperService.getAirports($viewValue)"
-								typeahead-popup-template-url="views/airport_autocomplete.tpl.html"
-								typeahead-on-select="selectAirport($item, $model, $label, $event)" />
-								<div className="loading-airports" ng-if="helperService.loadingAirports">
-									<img src="/images/climbcation-loading.gif" alt="loading"/>
-								</div>
+								<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
 							</div>
 						</div>
 						<div className="col-md-3">
