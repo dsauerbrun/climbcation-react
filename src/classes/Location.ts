@@ -34,6 +34,7 @@ export function getRatingName(rating: number): string {
 
 
 export default class Location {
+    id: number;
     name: string | null = null;
     slug: string | null = null;
     home_thumb: string | null = null;
@@ -48,6 +49,22 @@ export default class Location {
     airport_code: string = 'DEN';
     flightPrice: flightPrice | null = null;
     referral: string | null = null;
+
+    constructor(locationObj: any) {
+        this.id = locationObj.id;
+        this.name = locationObj.name;
+        this.slug = locationObj.slug;
+        this.home_thumb = locationObj.home_thumb;
+        this.country = locationObj.country;
+        this.climbing_types = locationObj.climbing_types;
+        this.date_range = locationObj.date_range;
+        this.grades = locationObj.grades;
+        this.walking_distance = locationObj.walking_distance;
+        this.closest_accommodation = locationObj.closest_accommodation;
+        this.rating = locationObj.rating;
+        this.solo_friendly = locationObj.solo_friendly;
+        this.airport_code = locationObj.airport_code;
+    }
 
     ratingName() {
         return getRatingName(this.rating);

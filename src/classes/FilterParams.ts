@@ -40,6 +40,7 @@ export const months: month[] = [
 
 
 export class FilterParams {
+	page: number = 1;
 	startMonth: month = {name: 'January', month: 1};
 	endMonth: month = {name: 'December', month: 12};
 	
@@ -62,6 +63,12 @@ export class FilterParams {
 		}
 	}
 
+	get filterChangedChecker() {
+		let filters = {...this};
+		filters.page = 0;
+		return JSON.stringify(filters);
+	}
+
 	get filterUrlObject(): any {
 
 		return {
@@ -80,7 +87,7 @@ export class FilterParams {
 				date: moment().format('YYYY-MM-DD'),
 			},
 			mapFilter: {"northeast":{"longitude":null,"latitude":null},"southwest":{"longitude":null,"latitude":null}},
-			page: 1
+			page: this.page 
 		}
 	};
 }

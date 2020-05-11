@@ -9,10 +9,11 @@ import AirportAutocomplete from '../common/AirportAutocomplete';
 import { allAirports, airport } from '../common/airportsList';
 
 function Filter() {
-	let {filterState, setFilterState, addCount} = useContext<filterHook>(FilterContext);
+	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
 	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === 'DEN') || allAirports[0]);
+
 	useEffect(() => {
 		async function setOptions() {
 			let filterOptionsFetch = await fetch('/api/filters');
