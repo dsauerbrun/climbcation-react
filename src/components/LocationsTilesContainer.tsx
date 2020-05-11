@@ -139,69 +139,65 @@ function LocationTilesContainer() {
         }
     }
 
-    async function reloadLocations() {
-        setNoMoreLocations(false);
-        let newFilters: FilterParams = new FilterParams(filterState);
-        newFilters.page = 1;
-        setFilterState(newFilters);
-        let objectBody = {...filterState?.filterUrlObject};
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(objectBody)
-            
-        };
-        if (reloadTimeout) {
-            window.clearTimeout(reloadTimeout);
-        }
-        reloadTimeout = window.setTimeout(async () => {
-            let filteredFetch = await fetch('/api/filter_locations', requestOptions);
-            let filtered = await filteredFetch.json() as any
-            setLocations(filtered.paginated);
-            if (filtered.paginated.length === 0) { 
-                setNoMoreLocations(true);
-            }
-        }, 500);            
-    }
 
 	useEffect(() => {
+        async function reloadLocations() {
+            setNoMoreLocations(false);
+            let newFilters: FilterParams = new FilterParams(filterState);
+            newFilters.page = 1;
+            setFilterState(newFilters);
+            let objectBody = {...filterState?.filterUrlObject};
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(objectBody)
+                
+            };
+            if (reloadTimeout) {
+                window.clearTimeout(reloadTimeout);
+            }
+            reloadTimeout = window.setTimeout(async () => {
+                let filteredFetch = await fetch('/api/filter_locations', requestOptions);
+                let filtered = await filteredFetch.json() as any
+                setLocations(filtered.paginated);
+                if (filtered.paginated.length === 0) { 
+                    setNoMoreLocations(true);
+                }
+            }, 500);            
+        }
 
         reloadLocations();
-        console.log('reload triggered')
 	}, [filterState.filterChangedChecker]);
 
    return (
-       <>
-            <pre>{JSON.stringify(locations)}</pre>
-            <div className="row">
-                <div className="locations-window" id="locations-window" ng-if="!largeMapEnabled">
-                    <InfiniteScroll 
-                        dataLength={locations.length}
-                        next={nextLocations}
-                        hasMore={!noMoreLocations}
-                        loader={
-                            <div className="col-md-12 bottom-padding text-center">
-                                <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
-                            </div>
-                        }
-                    >
-                        <div className="locations-window">
-                            {
-                                locations?.map(location => (<LocationTile key={location.id} location={location} />))
-                            }
-
-                        </div>
-
-                    </InfiniteScroll>
-                </div>
-                {noMoreLocations && <div className="col-md-12 bottom-padding text-center" ng-if="LocationsGetter.scrollEnded && !largeMapEnabled">
-                    <h4><strong>No More Crags Available :(</strong></h4>
-                    <h4><strong>Try broadening your filters</strong></h4>
-                </div>
+        <div className="row">
+            <InfiniteScroll 
+                className="locations-window"
+                dataLength={locations.length}
+                next={nextLocations}
+                hasMore={!noMoreLocations}
+                scrollThreshold={.9}
+                loader={
+                    <div className="col-md-12 bottom-padding text-center">
+                        <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
+                    </div>
                 }
-            </div>
-        </>
-);
+                endMessage={
+                    <div className="col-md-12 bottom-padding text-center" ng-if="LocationsGetter.scrollEnded && !largeMapEnabled">
+                        <h4><strong>No More Crags Available :(</strong></h4>
+                        <h4><strong>Try broadening your filters</strong></h4>
+                    </div>
+                }
+            >
+                <div className="locations-window">
+                    {
+                        locations?.map(location => (<LocationTile key={location.id} location={location} />))
+                    }
+                </div>
+            </InfiniteScroll>
+           
+        </div>
+    );
 }
 
 export default LocationTilesContainer;
