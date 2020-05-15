@@ -1,6 +1,6 @@
 import React, {useEffect, useContext, useState} from 'react';
 // eslint-disable-next-line
-import { months, FilterParams, climbType, month, typeGrades, grade} from '../classes/FilterParams';
+import { months, FilterParams, climbType, month, typeGrades, grade, AppliedFilter} from '../classes/FilterParams';
 import classNames from 'classnames';
 import {FilterContext} from './Home';
 import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
@@ -8,6 +8,48 @@ import {filterHook} from './useFilterParams';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import { allAirports, airport } from '../common/airportsList';
 import { IconTooltip } from '../common/HelperComponents';
+
+function FilterCrumbs(props: any) {
+	let filters: FilterParams = props.filterParams;
+	let setFilterState: Function = props.setFilterState;
+
+	const removeAppliedFilter = (appliedFilter: AppliedFilter): void => {
+		let newFilters: FilterParams = new FilterParams(filters);
+		newFilters.removeAppliedFilter(appliedFilter);
+
+		setFilterState(newFilters);
+	}
+
+	const removeAllFilters = (): void => {
+		let newFilters: FilterParams = new FilterParams(filters);
+		newFilters.removeAllFilters();
+
+		setFilterState(newFilters);
+
+	}
+
+	return (
+		<div className="row bottom-padding" style={{width: '90%', margin: '0 auto', height: '45px'}}>
+			<div className="col-md-8">
+				&nbsp;
+				{filters?.appliedFilters.length > 0 && <button className="applied-filter" onClick={() => removeAllFilters()}>Clear All</button>}
+				{
+					filters?.appliedFilters.map(appliedFilter => (
+						<div className="applied-filter" key={appliedFilter.title}>
+							<span className="bold">{appliedFilter.title}<span className="close-button" onClick={() => removeAppliedFilter(appliedFilter)}>&times;</span></span>
+						</div>
+					))
+				}
+			</div>
+			<div className="col-md-4">
+				<span className="hidden-xs hidden-sm text-button right-margin" ng-click="toggleLargeMap();">Toggle Large Map</span>
+				<label className="inline right-margin">Sort By:</label>
+				<div className="text-button right-margin" ng-click="LocationsGetter.setSorting('rating', !LocationsGetter.filter.sort.rating.asc)"><i ng-if="LocationsGetter.filter.sort.rating" className="glyphicon" ng-class="{'glyphicon-sort-by-attributes': LocationsGetter.filter.sort.rating.asc, 'glyphicon-sort-by-attributes-alt': !LocationsGetter.filter.sort.rating.asc}"></i>Rating</div>
+				<div className="text-button" ng-click="LocationsGetter.setSorting('distance', true)"><i ng-if="LocationsGetter.filter.sort.distance" className="glyphicon glyphicon-sort-by-attributes"></i>Distance From Me</div>
+			</div>
+		</div>
+	);
+}
 
 function Filter() {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
@@ -34,10 +76,14 @@ function Filter() {
 	const filterClimbingType = (climbTypeFilter: climbType): void => {
 		let newFilters: FilterParams = new FilterParams(filterState);
 		if (climbTypeFilter.type === 'All') {
-			newFilters.climbingTypesFilter = [climbTypeFilter];
+			newFilters.climbingTypesFilter = [];
 		} else {
 			newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== 'All');
-			newFilters.climbingTypesFilter.push(climbTypeFilter);
+			if (newFilters.climbingTypesFilter.find(x => x.type === climbTypeFilter.type)) {
+				newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== climbTypeFilter.type);
+			} else {
+				newFilters.climbingTypesFilter.push(climbTypeFilter);
+			}
 		}
 		
 		setFilterState && setFilterState(newFilters);
@@ -54,14 +100,18 @@ function Filter() {
 		setFilterState && setFilterState(newFilters);
 	}
 
-	const filterRating = (starRating: number): void => {
+	const filterRating = (starRating: number | 'All'): void => {
 		let newFilters: FilterParams = new FilterParams(filterState);
-		let ratingIndex = newFilters.ratingsFilter.indexOf(starRating);
-
-		if (ratingIndex > -1) {
-			newFilters.ratingsFilter.splice(ratingIndex, 1);
+		if (starRating === 'All') {
+			newFilters.ratingsFilter = [];
 		} else {
-			newFilters.ratingsFilter.push(starRating);
+			let ratingIndex = newFilters.ratingsFilter.indexOf(starRating);
+
+			if (ratingIndex > -1) {
+				newFilters.ratingsFilter.splice(ratingIndex, 1);
+			} else {
+				newFilters.ratingsFilter.push(starRating);
+			}
 		}
 
 		setFilterState && setFilterState(newFilters);
@@ -106,10 +156,19 @@ function Filter() {
 	}
 
 	const isActiveClimbingType = (climbTypeFilter: climbType): boolean => {
-		return Boolean(filterState && filterState.climbingTypesFilter.find(x => x.type === climbTypeFilter.type));
+		if (climbTypeFilter === null ) {
+			if (filterState.climbingTypesFilter.length === 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return Boolean(filterState && filterState.climbingTypesFilter.find(x => x.type === climbTypeFilter.type));
+		}
 	};
 
 	return (
+		<>
 		<section className="filter hidden-xs">
 			<div className="container-fluid">		
 				<div className="col-md-9">
@@ -127,7 +186,7 @@ function Filter() {
 						<div className="col-md-5">
 							<label>What do you want to climb?</label>
 							<ButtonGroup className="btn-group-sm btn-group-filter">
-								<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType({type: 'All', url: 'none'})}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
+								<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
 								{
 									climbTypes?.map(x => 
 										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
@@ -195,17 +254,17 @@ function Filter() {
 						</div>
 						<div className="col-md-3">
 							<div className="small-toggles-flex">
-								
 								<div>
 									<label>Rating</label>
 									<ButtonGroup className="btn-group-sm btn-group-filter">
-										<Button className="filter-button btn btn-lg btn-default">All</Button>
+										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
 										{
 											[1,2,3].map(x => (
 												<IconTooltip
+													key={'rating'+x}
 													tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
 													dom={
-														<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})} key={'rating'+x}>
+														<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
 															<span className="glyphicon glyphicon-star"></span>
 														</Button>
 													}
@@ -213,13 +272,12 @@ function Filter() {
 											))
 										}
 									</ButtonGroup>
-
 								</div>
 								<div>
 									<label></label>
 									<div style={{marginBottom: '5px'}}>
 										<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
-											<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled"  onClick={() => filterSoloFriendly()} />
+											<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onClick={() => filterSoloFriendly()} />
 											<div className="control__indicator"></div>
 											<span>Solo Friendly</span>
 										</label>
@@ -247,6 +305,8 @@ function Filter() {
 				</div>
 			</div>
 		</section>
+		<FilterCrumbs setFilterState={setFilterState} filterParams={filterState}></FilterCrumbs>
+		</>
 	);
 }
 
