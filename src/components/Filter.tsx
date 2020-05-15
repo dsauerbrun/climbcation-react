@@ -7,6 +7,7 @@ import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
 import {filterHook} from './useFilterParams';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import { allAirports, airport } from '../common/airportsList';
+import { IconTooltip } from '../common/HelperComponents';
 
 function Filter() {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
@@ -201,9 +202,14 @@ function Filter() {
 										<Button className="filter-button btn btn-lg btn-default">All</Button>
 										{
 											[1,2,3].map(x => (
-												<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})} key={'rating'+x}>
-													<span className="glyphicon glyphicon-star"></span>
-												</Button>
+												<IconTooltip
+													tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
+													dom={
+														<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})} key={'rating'+x}>
+															<span className="glyphicon glyphicon-star"></span>
+														</Button>
+													}
+												></IconTooltip>
 											))
 										}
 									</ButtonGroup>

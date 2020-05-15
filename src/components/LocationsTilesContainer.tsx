@@ -5,6 +5,7 @@ import Location from '../classes/Location';
 import classNames from 'classnames';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FilterParams } from '../classes/FilterParams';
+import { IconTooltip } from '../common/HelperComponents';
 
 function LocationTile(props: any) {
     let location: Location = new Location(props.location);
@@ -21,7 +22,6 @@ function LocationTile(props: any) {
                                     <h5><strong>{ location.country }</strong></h5>
                                 </div>
                             </a>
-
                         </div>
                         <div className="col-md-4 location-card-attributes">
                             <div className="col-xs-6 col-md-12">
@@ -49,29 +49,37 @@ function LocationTile(props: any) {
                             </div>
                             <div className="col-xs-6 col-md-12">
                                 <label>Vehicle Requirement</label>
-                                {
-                                    location.noCarNeeded() ? <div style={{width: '20px'}} data-template-url="views/tooltips/startooltip.tpl.html" /*data-animation="am-flip-x" bs-tooltip="'You can make a trip work here without a vehicle.'"*/>
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M0 0h24v24H0z" fill="none"/><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
-                                    </div> :
-                                    <div style={{width: '20px'}} data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'Having a vehicle is recommended.'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
-                                    </div>
-                                
-                                }
+                                <IconTooltip 
+                                    tooltip={location.noCarNeeded() ? 'You can make a trip work here without a vehicle.' : 'Having a vehicle is recommended.'}
+                                    dom={
+                                        location.noCarNeeded() ? <div style={{width: '20px'}}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M0 0h24v24H0z" fill="none"/><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
+                                        </div> :
+                                        <div style={{width: '20px'}} >
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+                                        </div>}
+                                ></IconTooltip>
                             </div>
                             <div className="col-xs-6 col-md-5" style={{float: 'left'}}>
                                 <label>Rating</label>
-                                <span className="list-item-rating-container" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="location.ratingName()">
-                                    <span className="glyphicon glyphicon-star" ></span>
-                                    <span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location.rating < 2}])} ></span>
-                                    <span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location.rating < 3}])} ></span>
-                                </span>
+                                <IconTooltip tooltip={location.ratingName()} 
+                                dom={
+                                    <span className="list-item-rating-container">
+                                        <span className="glyphicon glyphicon-star" ></span>
+                                        <span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location.rating < 2}])} ></span>
+                                        <span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location.rating < 3}])} ></span>
+                                    </span>
+                                }
+                                ></IconTooltip>
                             </div>
                             <div className="col-xs-6 col-md-7" style={{float: 'left'}}>
                                 <label>Solo Friendly</label>
-                                {location.solo_friendly ? 
-                                <p className="text-gray info-text" style={{marginBottom: '0'}}>{location.solo_friendly ? 'Yes' : 'No'} <i className="glyphicon glyphicon-info-sign" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="location.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'"></i></p> 
-                                : <p className="text-gray info-text" style={{marginBottom: '0'}}>Maybe <i className="glyphicon glyphicon-info-sign" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one'"></i></p> }
+                                <IconTooltip
+                                    tooltip={location.solo_friendly === null ? 'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one' : (location.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.')}
+                                    dom={location.solo_friendly === null ? 
+                                    <p className="text-gray info-text" style={{marginBottom: '0'}}>Maybe <i className="glyphicon glyphicon-info-sign"></i></p> 
+                                    :  <p className="text-gray info-text" style={{marginBottom: '0'}}>{location.solo_friendly ? 'Yes' : 'No'} <i className="glyphicon glyphicon-info-sign"></i></p>}
+                                ></IconTooltip>
                             </div>
                         </div>
                     </div>
@@ -138,9 +146,8 @@ function LocationTilesContainer() {
             setNoMoreLocations(true);
         }
     }
-
-
-	useEffect(() => {
+   
+    useEffect(() => {
         async function reloadLocations() {
             setNoMoreLocations(false);
             let newFilters: FilterParams = new FilterParams(filterState);
@@ -167,6 +174,7 @@ function LocationTilesContainer() {
         }
 
         reloadLocations();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [filterState.filterChangedChecker]);
 
    return (
