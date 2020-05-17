@@ -67,7 +67,7 @@ function Filter() {
 			setClimbTypes(filterOptions.climbTypes);
 
 			let grades: typeGrades[] = filterOptions.grades.map(function(x: any){
-				return {climbingType: x.climbing_type, grades: x.grades.map((y: any) => ({...y, climbingType: y.climbing_type, typeId: x.climbing_type_id})), typeHtml: x.type_html} as typeGrades;
+				return {climbingType: x.climbing_type, grades: x.grades.map((y: any) => ({...y, climbingType: y.climbing_type, typeId: x.climb_type_id})), typeHtml: x.type_html} as typeGrades;
 			});
 			setTypeGrades(grades);
 		}
@@ -136,12 +136,13 @@ function Filter() {
 
 	const filterGrade = (grade: grade): void => {
 		let newFilters: FilterParams = new FilterParams(filterState);
-		newFilters.gradesFilter = newFilters.gradesFilter.filter(x => x.climbingType !== grade.climbingType || x.id !== grade.id);
+		newFilters.gradesFilter = newFilters.gradesFilter.filter(x => x.climbingType !== grade.climbingType);
 		if (grade.grade === 'All') {
 			setFilterState && setFilterState(newFilters);
 			return;
 		} else {
-			newFilters.gradesFilter.push(grade);
+			let newGrades = typeGrades.find(typeGrade => typeGrade.climbingType === grade.climbingType).grades.filter(typeGrade => typeGrade.order <= grade.order);
+			newFilters.gradesFilter = [...newGrades, ...newFilters.gradesFilter];
 			setFilterState && setFilterState(newFilters);
 		}
 	}
@@ -154,7 +155,7 @@ function Filter() {
 	}
 
 	const getFilterGradeType = (climbTypeName: string): grade | undefined | null => {
-		let foundGradeFilter = filterState && filterState.gradesFilter.find(x => x.climbingType === climbTypeName);
+		let foundGradeFilter = filterState && filterState.gradesFilter.sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.climbingType === climbTypeName);
 		return foundGradeFilter;
 	}
 
@@ -263,7 +264,7 @@ function Filter() {
 											</Dropdown.Toggle>
 
 											<Dropdown.Menu>
-												<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
+												<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType, order: 0})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
 												{	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
 											</Dropdown.Menu>
 											</Dropdown>

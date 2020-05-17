@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState} from 'react';
 import { isEqual, omit, functions } from 'lodash';
 import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
+import Location from '../classes/Location';
 
   Map.defaultProps = {
     options: {
@@ -14,7 +15,6 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
     const marker = new window.google.maps.Marker({
         map,
         position: {lat, lng},
-        //details: {location: location}, 
         title: location.title || location.name,
         icon: isSecondary ? '' : 'https://s3-us-west-2.amazonaws.com/climbcation-front/assets/primary.png',
     });
@@ -78,7 +78,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
             $('.map-info-window > .location-card').removeClass('map-info-window-arrow-bottom');
             $('.map-info-window > .location-card').addClass('map-info-window-arrow-top');
         }*/
-        setHoveredLocation(location);
+        setHoveredLocation(new Location(location));
     })
     marker.addListener('mouseout', (event) => {
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
@@ -109,7 +109,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
     const ref = useRef()
     const [map, setMap] = useState<ClimbcationMap>();
     let [pushedMarkers, setPushedMarkers] = useState<google.maps.Marker[]>([]);
-    let [hoveredLocation, setHoveredLocation] = useState<any>(null);
+    let [hoveredLocation, setHoveredLocation] = useState<Location>(null);
     //let pushedMarkers: google.maps.Marker[] = [];
 
   
@@ -181,7 +181,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
                     <div className="location-card-info">
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
-                                <a href={`/location/${ hoveredLocation?.location?.slug }}`}>
+                                <a href={`/location/${ hoveredLocation?.slug }}`}>
                                     <img className="location-list-thumb" src={hoveredLocation?.home_thumb} alt="location thumbnail" />	
                                     <div className="location-list-thumb-title">
                                         <h3 className="text-gray">{ hoveredLocation?.name }</h3>
@@ -203,12 +203,12 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
                                 <div className="col-xs-12 col-md-12">
                                     <label>Rating</label>
                                         <IconTooltip
-                                                tooltip={hoveredLocation?.location?.rating === 1 ? 'Worth a stop' : (hoveredLocation?.location?.rating === 2 ? 'Worth a detour' : 'Worth its own trip')}
+                                                tooltip={hoveredLocation?.rating === 1 ? 'Worth a stop' : (hoveredLocation?.rating === 2 ? 'Worth a detour' : 'Worth its own trip')}
                                                 dom={
                                                     <span>
                                                         <span className="glyphicon glyphicon-star" ></span>
-                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.location?.rating < 2}])}></span>
-                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.location?.rating < 3}])}></span>
+                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.rating < 2}])}></span>
+                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.rating < 3}])}></span>
                                                     </span>
                                                 }
                                             />
