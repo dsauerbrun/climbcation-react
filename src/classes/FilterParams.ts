@@ -56,11 +56,11 @@ export class FilterParams {
 	soloFriendlyFilter: boolean = false;
 	noCarFilter: boolean = false;
 	date?: moment.Moment;
-
-
-	//filterTimer;
-	//markerMap;
-
+	northEast = {lat: 90, lng: 180};
+	//northEast: google.maps.LatLng = new google.maps.LatLng(90, 180);
+	southWest = {lat: -90, lng: -180};
+	center = {lat: -3.745, lng: -38.523};
+	//southWest: google.maps.LatLng = new google.maps.LatLng(-90, -180);
 
 	constructor(copy?: FilterParams | null) {
 		if (copy) {
@@ -160,7 +160,7 @@ export class FilterParams {
 				no_car: this.noCarFilter,
 				date: moment().format('YYYY-MM-DD'),
 			},
-			mapFilter: {"northeast":{"longitude":null,"latitude":null},"southwest":{"longitude":null,"latitude":null}},
+			mapFilter: {"northeast":{"longitude": this.northEast.lng,"latitude": this.northEast.lat},"southwest":{"longitude": this.southWest.lng,"latitude": this.southWest.lat}},
 			page: this.page 
 		}
 	};

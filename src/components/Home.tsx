@@ -5,21 +5,25 @@ import skyscannerinline from '../images/skyscannerinline.png';
 import Filter from './Filter';
 import LocationTilesContainer from './LocationsTilesContainer';
 import useFilterParams, {filterHook} from './useFilterParams';
+import useLocationsFetcher, { LocationsFetch } from './useLocationsFetcher';
 
 export const FilterContext = createContext<filterHook>({});
+export const LocationsContext = createContext<LocationsFetch>({});
 
 function Home() {
 	let filterParamHook = useFilterParams();
+    let locationsFetchHook = useLocationsFetcher(filterParamHook);
 
 	return (
 		<FilterContext.Provider value={filterParamHook}>
+        <LocationsContext.Provider value={locationsFetchHook}>
 			<section>
 				<img src={skyscannerinline} style={{display: 'none'}} alt=""/>
 				<Hero />
-				<Filter />
-				<LocationTilesContainer />
-      
+				<Filter/>
+				<LocationTilesContainer/>
 			</section>
+		</LocationsContext.Provider>
 		</FilterContext.Provider>
 	);
 }

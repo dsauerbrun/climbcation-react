@@ -1,28 +1,15 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {FilterParams} from '../classes/FilterParams';
 
 export interface filterHook {
 	filterState?: FilterParams | null,
-	setFilterState?(FilterParams: FilterParams): void,
-	addCount?(): void,
+	setFilterState?(FilterParams: FilterParams): void
 }
 
 function useFilterParams() {
 	let [filterState, setFilterState] = useState<FilterParams>(new FilterParams());
-	let addCount = () => {
-		// testing function
-		console.log(filterState ,filterState.startMonth)
-		let newParams = new FilterParams(filterState);
-		newParams.startMonth.month = newParams.startMonth.month+1;
 
-		setFilterState(newParams);
-	}
-
-	useEffect(() => {
-
-	}, [])
-
-	return {filterState, setFilterState, addCount};
+	return {filterState, setFilterState};
 }
 
 export default useFilterParams;

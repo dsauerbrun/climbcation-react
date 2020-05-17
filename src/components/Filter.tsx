@@ -2,12 +2,14 @@ import React, {useEffect, useContext, useState} from 'react';
 // eslint-disable-next-line
 import { months, FilterParams, climbType, month, typeGrades, grade, AppliedFilter} from '../classes/FilterParams';
 import classNames from 'classnames';
-import {FilterContext} from './Home';
+import {FilterContext, LocationsContext} from './Home';
 import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
 import {filterHook} from './useFilterParams';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import { allAirports, airport } from '../common/airportsList';
 import { IconTooltip } from '../common/HelperComponents';
+import Map from './MapFilter';
+import { LocationsFetch } from './useLocationsFetcher';
 
 function FilterCrumbs(props: any) {
 	let filters: FilterParams = props.filterParams;
@@ -53,6 +55,7 @@ function FilterCrumbs(props: any) {
 
 function Filter() {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
+	let {unpaginatedLocations} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
 	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === 'DEN') || allAirports[0]);
@@ -167,141 +170,163 @@ function Filter() {
 		}
 	};
 
+	const mapMoved = (map: google.maps.Map): void => {
+		if (map) {
+			let newFilters: FilterParams = new FilterParams(filterState);
+			let southWest = map.getBounds().getSouthWest();
+			let northEast = map.getBounds().getNorthEast();
+			let center = map.getCenter();
+			newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
+			newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
+			newFilters.center = {lat: center.lat(), lng: center.lng()};
+			newFilters.page = 1;
+			setFilterState(newFilters);
+		}
+	}
+
+	let mapProps = {
+		options: {
+		  center: filterState.center,
+		  zoom: 0,
+		  mapTypeId: 'roadmap'
+		},
+		onDragEnd: mapMoved,
+		onZoomChange: mapMoved,
+		markers: unpaginatedLocations,
+		onMount: null, className: null, onMountProps: null, styles: null
+	};
+
 	return (
 		<>
 		<section className="filter hidden-xs">
 			<div className="container-fluid">		
-				<div className="col-md-9">
-					<div className="row">
-						<div className="row col-md-offset-4 col-md-8">
-							<h4 className="text-center">
+				<div className="row">
+					<div className="col-md-9">
+						<div className="row offset-md-4 col-md-8">
+							<h4 className="text-center" style={{width: '100%'}}>
 								Select the relevant criteria to find your perfect climbing trip
 							</h4>
-							<h5 className="text-center">
+							<h5 className="text-center" style={{width: '100%'}}>
 								<strong>(results will update automatically based on your selection)</strong>
 							</h5>
 						</div>
-					</div>
-					<div className="row bottom-padding">
-						<div className="col-md-5">
-							<label>What do you want to climb?</label>
-							<ButtonGroup className="btn-group-sm btn-group-filter">
-								<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
-								{
-									climbTypes?.map(x => 
-										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
-									)
-								}
-							</ButtonGroup>
-							{/*<div className="btn-group btn-group-sm btn-group-filter"  role="group">
-								<button ng-click="LocationsGetter.toggleFilterButton('climbing_types','All' )" type="button" className="filter-button btn btn-lg btn-default all" ng-className="{'active': LocationsGetter.isButtonActive('climbing_types', 'empty')}">All</button>
-								<button ng-click="LocationsGetter.toggleFilterButton('climbing_types',name )" ng-repeat="(name,climbType) in filter.climbTypes" type="button" className="filter-button btn btn-lg btn-default" ng-className="{'active': LocationsGetter.isButtonActive('climbing_types', name)}" >{'name'}</button>
+						<div className="row bottom-padding">
+							<div className="col-md-5">
+								<label>What do you want to climb?</label>
+								<ButtonGroup className="btn-group-sm btn-group-filter">
+									<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
+									{
+										climbTypes?.map(x => 
+											<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
+										)
+									}
+								</ButtonGroup>
 							</div>
-							*/}
-						</div>
-						<div className="col-md-4">
-							<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
-							<div className="airport-wrapper">
-								<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
-							</div>
-						</div>
-						<div className="col-md-3">
-							<label>When do you want to go?</label>
-							<Dropdown className="d-inline-block">
-							  <Dropdown.Toggle id="monthStart" className="btn btn-default dropdown-toggle">
-							    {filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
-							  </Dropdown.Toggle>
-
-							  <Dropdown.Menu>
-								  {	months.map(x => <Dropdown.Item onClick={() => filterMonth('start', x)} key={'startmonth'+x.name}>{x.name}</Dropdown.Item>)}
-							  </Dropdown.Menu>
-							</Dropdown>
-							<span className="text-gray">To </span>
-							<Dropdown className="d-inline-block">
-							  <Dropdown.Toggle id="monthEnd" className="btn btn-default dropdown-toggle">
-							    {filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
-							  </Dropdown.Toggle>
-
-							  <Dropdown.Menu>
-								  {	months.map(x => <Dropdown.Item onClick={() => filterMonth('end', x)} key={'endmonth'+x.name}>{x.name}</Dropdown.Item>)}
-							  </Dropdown.Menu>
-							</Dropdown>
-						</div>
-					</div>
-					<div className="row">
-						<div className="col-md-5">
-							<label>What is the hardest grade you're looking for?</label>
-							{
-								typeGrades && typeGrades.map(typeGrade => (
-									<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
-										<Dropdown>
-										  <Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-xs btn-default dropdown-toggle">
-										    {Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
-										  </Dropdown.Toggle>
-
-										  <Dropdown.Menu>
-										  	<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
-											  {	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
-										  </Dropdown.Menu>
-										</Dropdown>
-									</ButtonGroup>
-								))
-							}
-						</div>
-						<div className="col-md-4">
-							<label>Keyword Search</label>
-							<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
-						</div>
-						<div className="col-md-3">
-							<div className="small-toggles-flex">
-								<div>
-									<label>Rating</label>
-									<ButtonGroup className="btn-group-sm btn-group-filter">
-										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
-										{
-											[1,2,3].map(x => (
-												<IconTooltip
-													key={'rating'+x}
-													tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
-													dom={
-														<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
-															<span className="glyphicon glyphicon-star"></span>
-														</Button>
-													}
-												></IconTooltip>
-											))
-										}
-									</ButtonGroup>
+							<div className="col-md-4">
+								<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
+								<div className="airport-wrapper">
+									<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
 								</div>
-								<div>
-									<label></label>
-									<div style={{marginBottom: '5px'}}>
-										<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
-											<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onClick={() => filterSoloFriendly()} />
-											<div className="control__indicator"></div>
-											<span>Solo Friendly</span>
-										</label>
+							</div>
+							<div className="col-md-3">
+								<label>When do you want to go?</label>
+								<Dropdown className="d-inline-block">
+								<Dropdown.Toggle id="monthStart" className="btn btn-default dropdown-toggle">
+									{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
+								</Dropdown.Toggle>
+
+								<Dropdown.Menu>
+									{	months.map(x => <Dropdown.Item onClick={() => filterMonth('start', x)} key={'startmonth'+x.name}>{x.name}</Dropdown.Item>)}
+								</Dropdown.Menu>
+								</Dropdown>
+								<span className="text-gray">To </span>
+								<Dropdown className="d-inline-block">
+								<Dropdown.Toggle id="monthEnd" className="btn btn-default dropdown-toggle">
+									{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
+								</Dropdown.Toggle>
+
+								<Dropdown.Menu>
+									{	months.map(x => <Dropdown.Item onClick={() => filterMonth('end', x)} key={'endmonth'+x.name}>{x.name}</Dropdown.Item>)}
+								</Dropdown.Menu>
+								</Dropdown>
+							</div>
+						</div>
+						<div className="row">
+							<div className="col-md-5">
+								<label>What is the hardest grade you're looking for?</label>
+								{
+									typeGrades && typeGrades.map(typeGrade => (
+										<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
+											<Dropdown>
+											<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-xs btn-default dropdown-toggle">
+												{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
+											</Dropdown.Toggle>
+
+											<Dropdown.Menu>
+												<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
+												{	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
+											</Dropdown.Menu>
+											</Dropdown>
+										</ButtonGroup>
+									))
+								}
+							</div>
+							<div className="col-md-4">
+								<label>Keyword Search</label>
+								<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
+							</div>
+							<div className="col-md-3">
+								<div className="small-toggles-flex">
+									<div>
+										<label>Rating</label>
+										<ButtonGroup className="btn-group-sm btn-group-filter">
+											<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+											{
+												[1,2,3].map(x => (
+													<IconTooltip
+														key={'rating'+x}
+														tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
+														dom={
+															<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
+																<span className="glyphicon glyphicon-star"></span>
+															</Button>
+														}
+													></IconTooltip>
+												))
+											}
+										</ButtonGroup>
 									</div>
 									<div>
-										<label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
-											<input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onClick={() => filterNoCar()}/>
-											<div className="control__indicator"></div>
-											<span>No Car?</span>
-										</label>
+										<label></label>
+										<div style={{marginBottom: '5px'}}>
+											<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
+												<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
+												<div className="control__indicator"></div>
+												<span>Solo Friendly</span>
+											</label>
+										</div>
+										<div>
+											<label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
+												<input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
+												<div className="control__indicator"></div>
+												<span>No Car?</span>
+											</label>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<div className="col-md-3" ng-if="!filterMapDisabled">
-				{
-					/*
-<map-filter ng-if="!mobile" filter-type="small">
-					</map-filter>
-					*/
-				}
-					
+					<div className="col-md-3">
+						<Map {...mapProps}></Map>
+					{
+						/*
+	<map-filter ng-if="!mobile" filter-type="small">
+						</map-filter>
+						*/
+					}
+						
+					</div>
 				</div>
 			</div>
 		</section>

@@ -1,13 +1,12 @@
-import React, {useContext, useEffect, useState} from 'react';
-import { filterHook } from './useFilterParams';
-import { FilterContext } from './Home';
+import React, {useContext} from 'react';
+import {LocationsContext } from './Home';
 import Location from '../classes/Location';
 import classNames from 'classnames';
 import InfiniteScroll from "react-infinite-scroll-component";
-import { FilterParams } from '../classes/FilterParams';
 import { IconTooltip } from '../common/HelperComponents';
+import { LocationsFetch } from './useLocationsFetcher';
 
-function LocationTile(props: any) {
+export function LocationTile(props: any) {
     let location: Location = new Location(props.location);
     return (
         <div className="location-item">
@@ -117,76 +116,19 @@ function LocationTile(props: any) {
     );
 }
 
-let reloadTimeout: number = null;
 
 function LocationTilesContainer() {
-    let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
-    let [locations, setLocations] = useState<any[]>([]);
-    let [noMoreLocations, setNoMoreLocations] = useState<boolean>(false);
-
-    async function nextLocations() {
-        if (noMoreLocations || locations.length === 0) {
-            return;
-        }
-        let newFilters: FilterParams = new FilterParams(filterState);
-        newFilters.page = newFilters.page + 1;
-        setFilterState(newFilters);
-        let objectBody = {...newFilters?.filterUrlObject};
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(objectBody)
-            
-        };
-        let filteredFetch = await fetch('/api/filter_locations', requestOptions);
-        let filtered = await filteredFetch.json() as any
-        locations = locations.concat(filtered.paginated);
-        setLocations(locations);
-        if (filtered.paginated.length === 0) {
-            setNoMoreLocations(true);
-        }
-    }
-   
-    useEffect(() => {
-        async function reloadLocations() {
-            setNoMoreLocations(false);
-            let newFilters: FilterParams = new FilterParams(filterState);
-            newFilters.page = 1;
-            setFilterState(newFilters);
-            let objectBody = {...filterState?.filterUrlObject};
-            const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(objectBody)
-                
-            };
-            if (reloadTimeout) {
-                window.clearTimeout(reloadTimeout);
-            }
-            reloadTimeout = window.setTimeout(async () => {
-                let filteredFetch = await fetch('/api/filter_locations', requestOptions);
-                let filtered = await filteredFetch.json() as any
-                setLocations(filtered.paginated);
-                if (filtered.paginated.length === 0) { 
-                    setNoMoreLocations(true);
-                }
-            }, 500);            
-        }
-
-        reloadLocations();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filterState.filterChangedChecker]);
+	let {nextLocations, noMoreLocations, locations} = useContext<LocationsFetch>(LocationsContext);
 
    return (
         <div className="row">
             <InfiniteScroll 
-                className="locations-window"
                 dataLength={locations.length}
                 next={nextLocations}
                 hasMore={!noMoreLocations}
                 scrollThreshold={.9}
                 loader={
-                    <div className="col-md-12 bottom-padding text-center">
+                    <div className="col-md-12 bottom-padding text-center" style={{minHeight: '300px'}}>
                         <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
                     </div>
                 }
@@ -199,7 +141,7 @@ function LocationTilesContainer() {
             >
                 <div className="locations-window">
                     {
-                        locations?.map(location => (<LocationTile key={location.id} location={location} />))
+                        locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} />))
                     }
                 </div>
             </InfiniteScroll>
