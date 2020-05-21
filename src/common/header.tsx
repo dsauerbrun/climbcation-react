@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Col from 'react-bootstrap/Col';
-import {Row} from 'react-bootstrap';
+import {Row, Dropdown} from 'react-bootstrap';
+import {authContext, User} from './useAuth';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
 import {
@@ -10,6 +11,18 @@ import {
 
 
 function Header() {
+	const auth = useContext(authContext);
+	let user: User = auth.user;
+
+	let showSignUp = () => {
+
+	}
+
+	let showLogin = () => {
+		auth.login('dsauerbrun@gmail.com', 'nafmay11').then();
+
+	}
+
 	return (
 		<Nav className="navbar home navbar-inverse">
 	    <div className="d-sm-none">
@@ -29,8 +42,8 @@ function Header() {
 	          <li><a href="/home">Welcome username</a></li>
 	          <li role="separator" className="divider"></li>
 	          <li role="presentation" ><a href="home" role="menuitem" onClick={() => console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
-	          <li role="presentation" ><a role="menuitem" tabIndex="-1" href="/profile">Change Username</a></li>
-	          <li role="presentation" ><a role="menuitem" tabIndex="-1" href="/api/user/logout" target="_self">Logout</a></li>
+	          <li role="presentation" ><a role="menuitem" tabIndex={-1} href="/profile">Change Username</a></li>
+	          <li role="presentation" ><a role="menuitem" tabIndex={-1} href="/api/user/logout" target="_self">Logout</a></li>
 	          <li role="separator" className="divider"></li>
 	          <li><a href="new-location">Submit a New Location</a></li>
 	          <li><Link to="/about">What is Climbcation?</Link></li>
@@ -40,6 +53,12 @@ function Header() {
 	        </ul>
 	      </div>
 	    </div>
+		{/*
+		
+			MOBILE VERSION ABOVE
+		
+		
+		*/}
 	    <div className="container d-none d-md-block" style={{width: '90%', margin: '0 auto', maxWidth: 'inherit'}}>
 		    <Row>
 		      <Col md={2} className="nav-link text">
@@ -54,17 +73,21 @@ function Header() {
 		        </a>
 		      </Col>
 		      <Col md={2} className="nav-link text">
-		        <div className="dropdown">
-		          <div className="dropdown-toggle" type="button" id="dropdownMenu12" data-toggle="dropdown" style={{cursor: 'pointer'}}>
-		            Welcome Daniel Sauerbrun
-		            <span className="caret"></span>
-		          </div>
-		          <ul className="dropdown-menu" role="menu" aria-labelledby="dropdownMenu12" style={{left: '60%'}}>
-		            <li role="presentation"><a href="home" role="menuitem" style={{color: 'inherit'}} onClick={() => console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
-		            <li role="presentation"><a role="menuitem" tabIndex="-1" style={{color: 'inherit'}} href="/profile">Change Username</a></li>
-		            <li role="presentation"><a role="menuitem" tabIndex="-1" style={{color: 'inherit'}} href="/api/user/logout" target="_self">Logout</a></li>
-		          </ul>
-		        </div>
+				{
+					user ? 
+						<Dropdown>
+							<Dropdown.Toggle id="dropdownMenu12" as="div" style={{cursor: 'pointer'}}>
+								Welcome {user?.username}	
+							</Dropdown.Toggle>
+							<Dropdown.Menu>
+								<Dropdown.Item onClick={() => auth.resetPassword(user.email)}>Change Password</Dropdown.Item>
+								<Dropdown.Item href="/profile">Change Username</Dropdown.Item>
+								<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
+							</Dropdown.Menu>	
+						</Dropdown>
+					:
+						<div><a onClick={() => showLogin()}>Login</a> / <a onClick={() => showSignUp()}>Signup</a></div>
+				}
 		      </Col>
 		      <Col md={2} className="nav-link text">
 		        <a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'middle'}}><span className="glyphicon glyphicon-envelope"></span></a>
