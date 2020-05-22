@@ -12,6 +12,7 @@ import NewLocation from './components/NewLocation';
 import Location from './components/Location';
 import ResetPass from './components/ResetPass';
 import Profile from './components/Profile';
+import {Login} from './components/Login';
 import {ProvideAuth} from './common/useAuth';
 
 
@@ -29,6 +30,7 @@ function App() {
 					<Route path='/location/:slug' component={Location} />
 					<Route path='/resetpass' component={ResetPass} />
 					<Route path='/profile' component={Profile} />
+					<Route path='/login' component={Login} />
 
 						{/* TODO: need a solution for GOTO routes: 
 						.when('/', {

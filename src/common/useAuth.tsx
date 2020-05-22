@@ -43,7 +43,7 @@ export default function useProvideAuth(): Auth {
             let userFetch = await axios.post('/api/signup', {email: email, username: username, password: password});
             setUser(userFetch?.data);
         } catch (err) {
-            throw err.data || 'Error signing up.';
+            throw err.response.data || 'Error signing up.';
         }
     };
   
@@ -54,6 +54,7 @@ export default function useProvideAuth(): Auth {
         try {
             await axios.post('/api/resetpassword', {email: email});
         } catch (err) {
+            // eslint-disable-next-line no-throw-literal
             throw 'Error sending reset password email.';
         }
     };
@@ -62,7 +63,7 @@ export default function useProvideAuth(): Auth {
         try {
             await axios.post('/api/changepassword', {password: password, id: id});
         } catch (err) {
-            throw err.data || 'Error changing password';
+            throw err.response.data || 'Error changing password';
         }
     }
 
@@ -73,12 +74,13 @@ export default function useProvideAuth(): Auth {
             newUser.username = username;
             setUser(newUser)
         } catch (err) {
-            throw err.data || 'Error changing username';
+            throw err.response.data || 'Error changing username';
         }
     }
   
     useEffect(() => {
         getUser().then();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     // Return the user object and auth methods

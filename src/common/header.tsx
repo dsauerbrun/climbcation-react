@@ -19,7 +19,6 @@ function Header() {
 	}
 
 	let showLogin = () => {
-		auth.login('dsauerbrun@gmail.com', 'nafmay11').then();
 
 	}
 
@@ -86,7 +85,7 @@ function Header() {
 							</Dropdown.Menu>	
 						</Dropdown>
 					:
-						<div><a onClick={() => showLogin()}>Login</a> / <a onClick={() => showSignUp()}>Signup</a></div>
+						<div><a href="/login">Login</a> / <a onClick={() => showSignUp()}>Signup</a></div>
 				}
 		      </Col>
 		      <Col md={2} className="nav-link text">
