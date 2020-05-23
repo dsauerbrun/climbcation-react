@@ -1,17 +1,17 @@
-interface climbingType {
+interface ClimbingType {
     name: string;
     url: string;
-    type: string;
+    type?: string;
     id: number;
 }
 
-interface grade {
+interface Grade {
     type: any;
     grade: string;
     id: number;
 }
 
-interface flightPrice {
+interface FlightPrice {
     airport_code: string;
     id: number;
     origin_airport: string;
@@ -32,6 +32,24 @@ export function getRatingName(rating: number): string {
     }
 }
 
+export interface Accommodation {
+    cost: string;
+    id: number;
+    name: string;
+    url: string;
+}
+
+export interface Transportation {
+    cost?: string;
+    id: number;
+    name: string;
+}
+
+export interface FoodOption {
+    cost: string;
+    id: number;
+    name: string;
+}
 
 export default class Location {
     id: number;
@@ -39,18 +57,35 @@ export default class Location {
     slug: string | null = null;
     home_thumb: string | null = null;
     country: string | null = null;
-    climbing_types: climbingType[] = [];
+    climbing_types: ClimbingType[] = [];
     date_range: string | null = null;
-    grades: grade[] = [];
+    grades: Grade[] = [];
     walking_distance: boolean | null = null;
     closest_accommodation: string | null = null;
     rating: number = 0;
     solo_friendly: boolean | null = null;
     airport_code: string = 'DEN';
-    flightPrice: flightPrice | null = null;
+    flightPrice: FlightPrice | null = null;
     referral: string | null = null;
+    latitude: number;
+    longitude: number;
+    saving_money_tips: string;
+
+    common_expenses_notes: string = null;
+    continent: string = null;
+    
+
+    nearby: any[] = null;
+    best_transportation: Transportation = null;
+    transportations: Transportation[] = [];
+    getting_in_notes: string = null;
+    accommodation_notes: string = null;
+    accommodations: Accommodation[] = [];
+    active: boolean;
+    food_options: FoodOption[] = [];
 
     constructor(locationObj: any) {
+        Object.assign(this, locationObj);
         this.id = locationObj.id;
         this.name = locationObj.name;
         this.slug = locationObj.slug;
@@ -64,6 +99,9 @@ export default class Location {
         this.rating = locationObj.rating;
         this.solo_friendly = locationObj.solo_friendly;
         this.airport_code = locationObj.airport_code;
+        this.best_transportation = locationObj.best_transportation;
+        this.transportations = locationObj.transportations;
+        this.getting_in_notes = locationObj.getting_in_notes;
     }
 
     ratingName() {

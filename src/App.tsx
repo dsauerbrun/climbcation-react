@@ -9,7 +9,7 @@ import {
 import Home from './components/Home';
 import About from './components/About';
 import NewLocation from './components/NewLocation';
-import Location from './components/Location';
+import LocationComponent from './components/Location';
 import ResetPass from './components/ResetPass';
 import Profile from './components/Profile';
 import {Login} from './components/Login';
@@ -27,10 +27,11 @@ function App() {
 					<Route path='/home' component={Home} />
 					<Route path='/about' component={About} />
 					<Route path='/new-location' component={NewLocation} />
-					<Route path='/location/:slug' component={Location} />
+					<Route path='/location/:slug' component={LocationComponent} />
 					<Route path='/resetpass' component={ResetPass} />
 					<Route path='/profile' component={Profile} />
 					<Route path='/login' component={Login} />
+					<Route path='/signup' component={Login} />
 
 						{/* TODO: need a solution for GOTO routes: 
 						.when('/', {
