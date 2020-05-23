@@ -2,6 +2,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { authContext, User } from '../common/useAuth';
 import { useForm } from "react-hook-form";
+import {
+    useRouteMatch
+} from "react-router-dom";
 
 interface LoginForm {
     email: string;
@@ -110,9 +113,9 @@ export function Login(props) {
 		}
 		
     }
-    
+    let match = useRouteMatch();  
     useEffect(() => {
-        if (props?.signUpEnabled) {
+        if (props?.signUpEnabled ||  match.url === '/signup') {
             setSignUpEnabled(true);
         } else {
             setSignUpEnabled(false);

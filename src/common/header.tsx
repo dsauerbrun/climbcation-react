@@ -31,9 +31,9 @@ function Header() {
 	          <span className="icon-bar"></span>
 	          <span className="icon-bar"></span>
 	        </button>
-	        <a className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} href="/home">
+	        <Link className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} to="/home">
 	          <img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
-	        </a>
+	        </Link>
 	      </div>
 
 	      <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -80,12 +80,12 @@ function Header() {
 							</Dropdown.Toggle>
 							<Dropdown.Menu>
 								<Dropdown.Item onClick={() => auth.resetPassword(user.email)}>Change Password</Dropdown.Item>
-								<Dropdown.Item href="/profile">Change Username</Dropdown.Item>
+								<Dropdown.Item><Link to="/profile">Change Username</Link></Dropdown.Item>
 								<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
 							</Dropdown.Menu>	
 						</Dropdown>
 					:
-						<div><a href="/login">Login</a> / <a onClick={() => showSignUp()}>Signup</a></div>
+						<div><Link to="/login">Login</Link> / <Link to="/signup">Signup</Link></div>
 				}
 		      </Col>
 		      <Col md={2} className="nav-link text">
