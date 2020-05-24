@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { useForceUpdate } from '../common/useForceUpdate';
 import {Thread, PostInput} from './Forum';
 import { Post } from '../classes/Forum';
+import { IconTooltip } from '../common/HelperComponents';
 
 interface AccommodationOption extends Accommodation {
 	ranges: string[];
@@ -112,8 +113,8 @@ function InfoHeader({location}: PropLocation) {
 									<div className="col-md-4 col-xs-4">
 										<label>Solo Traveler Friendly?</label>
 										{
-											location?.solo_friendly === null ? (<p className="text-gray info-text">Maybe <i className="glyphicon glyphicon-info-sign" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one'"></i></p>) : (
-											<p className="text-gray info-text" >{location?.solo_friendly ? 'Yes' : 'No'} <i className="glyphicon glyphicon-info-sign" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="locationData.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'"></i></p>)
+											location?.solo_friendly === null ? (<p className="text-gray info-text">Maybe <IconTooltip tooltip={"'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one'"} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>) : (
+											<p className="text-gray info-text" >{location?.solo_friendly ? 'Yes' : 'No'} <IconTooltip tooltip={location?.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>)
 										}
 									</div>
 								</div>
@@ -130,22 +131,28 @@ function InfoHeader({location}: PropLocation) {
 									<div className="col-xs-3 col-md-3">
 										<label>Vehicle Req.</label>
 										{location?.noCarNeeded() ? (
-											<div style={{width: '20px'}} data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'You can make a trip work here without a vehicle.'">
+											<IconTooltip tooltip={'You can make a trip work here without a vehicle.'} dom={
+											<div style={{width: '20px'}}>
 												<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M0 0h24v24H0z" fill="none"/><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
-											</div>
+											</div>} />
 										) : (
-											<div style={{width: '20px'}} data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'Having a vehicle is recommended.'">
+											<IconTooltip tooltip={'Having a vehicle is recommended.'} dom={
+											<div style={{width: '20px'}}>
 												<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" className="icon" style={{fill: '#3c7e91'}}><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
-											</div>
+											</div>} />
 										)}
 									</div>
 									<div className="col-md-3 col-xs-3">
 										<label>Rating</label>
-										<span data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" ng-bs-tooltip="helperService.getRatingName(locationData.rating)">
-											<span className="glyphicon glyphicon-star"></span>
-											<span className={classNames("glyphicon glyphicon-star", {'glyphicon-star-empty': location?.rating < 2})}></span>
-											<span className={classNames("glyphicon glyphicon-star", {'glyphicon-star-empty': location?.rating < 3})} ng-class="{'glyphicon-star-empty': locationData.rating < 3}"></span>
-										</span>
+										<IconTooltip tooltip={location?.ratingName()} 
+										dom={
+											<span>
+												<span className="glyphicon glyphicon-star" ></span>
+												<span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location?.rating < 2}])} ></span>
+												<span className={classNames(['glyphicon', 'glyphicon-star', {'glyphicon-star-empty': location?.rating < 3}])} ></span>
+											</span>
+										}
+										></IconTooltip>
 									</div>
 								</div>
 							</div>
@@ -240,7 +247,7 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 				</div>
 				{location?.walking_distance === null ? (<p className="text-gray info-text">We're not sure if you need a car/motorbike upon arrival to get to where you need.(eg. crag, food, camping, etc...) Have you been here? Please edit this section if you can help us out!</p>) :
 				(<p className="text-gray info-text">
-					Upon arrival, you <strong>{location?.walking_distance ? 'can' : 'cannot'} {location?.walking_distance && <i className="glyphicon glyphicon-info-sign" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'"></i>}</strong> get to where you need without a car/motorbike. (eg. crag, shelter, food)
+					Upon arrival, you <strong>{location?.walking_distance ? 'can' : 'cannot'} {location?.walking_distance && <IconTooltip tooltip={'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} />}</strong> get to where you need without a car/motorbike. (eg. crag, shelter, food)
 				</p>)}
 				<div className="info-container">
 					<div>
@@ -276,7 +283,7 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 							<label>Upon arrival, can you reliably get to where you need without a car/motorbike?(eg. crag, camping, food, etc...)</label>
 						</div>
 						<div className="col-md-4">
-							<i className="glyphicon glyphicon-info-sign text-gray" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'"></i>
+							<IconTooltip tooltip={'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'} dom={<i className="glyphicon glyphicon-info-sign text-gray"></i>} />
 							<div className="btn-group btn-group-sm center-block btn-group-toggle" style={{paddingLeft: '10px'}} data-toggle="buttons">
 								<input type="radio" name="walking_distance" value="true" ref={register} id={'yesWalking'} style={{display: 'none'}}/> 
 								<label className={classNames("btn btn-sm btn-default")} htmlFor={'yesWalking'} style={{borderTopLeftRadius: '3px', borderBottomLeftRadius: '3px'}}>
@@ -633,7 +640,7 @@ function FlightCostComponent({location}: PropLocation) {
 						typeahead-popup-template-url="views/airport_autocomplete.tpl.html"
 						typeahead-on-select="getAirport($item, $model, $label, $event)"/>
 						<div className="loading-airports" ng-if="helperService.loadingAirports">
-							<img src="/images/climbcation-loading.gif" />
+							<img src="/images/climbcation-loading.gif" alt="loading"/>
 						</div>
 					</div>
 					to {location?.airport_code})</h3>
@@ -729,7 +736,6 @@ function LocationComponent() {
 						<div className="well-content">
 							<div className="misc-container">
 								{location?.miscSections?.map(misc => <React.Fragment key={misc.id || 'newMisc'}><MiscSectionComponent forceUpdate={forceUpdate} location={location} miscSection={misc} /></React.Fragment>)}
-								{/*<locationothersection className="misc-section" location-id="locationData.id" section="section" sections-length="locationObj.sections.length" save-callback="saveSection" ng-repeat="section in sections track by $index" index-iterator="$index" editable="true"></locationothersection>*/}
 							</div>
 						</div>
 					</div>

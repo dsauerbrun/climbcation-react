@@ -34,7 +34,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
 	    setPostingComment(true);
 		try {
 			let postThreadId = threadId || slug;
-            let resp = await axios.post(`/api/threads/${postThreadId}/posts`, {content: newPost});
+            await axios.post(`/api/threads/${postThreadId}/posts`, {content: newPost});
             callBack && callBack();
 			setPostingComment(false);
             clearPost();
