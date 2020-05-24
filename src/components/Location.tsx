@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import {useParams, Link} from "react-router-dom";
 import axios from 'axios';
 import classNames from 'classnames';
-import Location, {Accommodation, FoodOption, Transportation} from '../classes/Location';
+import Location, {Accommodation, FoodOption, Transportation, MiscSection} from '../classes/Location';
 import Linkify from 'react-linkify';
 import { useForm } from "react-hook-form";
+import { useForceUpdate } from '../common/useForceUpdate';
 
 interface AccommodationOption extends Accommodation {
 	ranges: string[];
@@ -24,6 +25,8 @@ interface PropLocation {
 	transportationOptions?: TransportationOption[];
 	accommodationOptions?: AccommodationOption[];
 	foodOptionOptions?: FoodOptionOption[];
+	miscSection?: MiscSection;
+	forceUpdate?: any;
 }
 
 function InfoHeader({location}: PropLocation) {
@@ -512,7 +515,6 @@ function CostComponent({location, foodOptionOptions}: PropLocation) {
 	}, [selectedFoodOptions?.length])
 
 	const onSubmit = async (data) => {
-		console.log('submit data', data);
 		if (!isSubmitting) {
 			let mappedFoodOptions = data.foodOptions.map(x => {
 				x = JSON.parse(x);
@@ -618,10 +620,32 @@ function CostComponent({location, foodOptionOptions}: PropLocation) {
 
 	);
 }
+function FlightCostComponent({location}: PropLocation) {
+	return (
+		<div className="col-md-6">
+			<div className="well climbcation-well">
+				<h3>One way flight cost(
+					<div className="airport-wrapper inline">
+						<input className="form-control inline" ng-model="helperService.originAirport" ng-trim="true"
+						typeahead-wait-ms="100" uib-typeahead="airport.name for airport in helperService.getAirports($viewValue)"
+						typeahead-popup-template-url="views/airport_autocomplete.tpl.html"
+						typeahead-on-select="getAirport($item, $model, $label, $event)"/>
+						<div className="loading-airports" ng-if="helperService.loadingAirports">
+							<img src="/images/climbcation-loading.gif" />
+						</div>
+					</div>
+					to {location?.airport_code})</h3>
+				<div id="highchart{{locationData.airport_code + '-' + locationData.slug + '-' + locationData.id}}">
+				</div>
+			</div>
+		</div>
 
+	);
+}
 function LocationComponent() {
 	let {slug} = useParams();
 	let [location, setLocation] = useState<Location>();
+	let forceUpdate = useForceUpdate();
 	interface AttributeOptions {
 		accommodations?: AccommodationOption[];
 		foodOptions?: FoodOptionOption[];
@@ -639,6 +663,7 @@ function LocationComponent() {
 		axios(`/api/location/${slug}`).then((resp) => {
 			let locationToSet = new Location(resp.data.location);
 			locationToSet.nearby = resp.data.nearby;
+			locationToSet.miscSections = resp.data.sections;
 
 			setLocation(locationToSet);
 			populateEditables(locationToSet);
@@ -647,6 +672,16 @@ function LocationComponent() {
 		});
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	let addMiscSection = () => {
+		if (location?.miscSections?.find(x => !x.id)) {
+			// misc section found... maybe we scroll to it in TODO
+		} else {
+			location?.miscSections.push({title: '', body: ''});
+			forceUpdate();
+		}
+	}
+
 	return (
 		<>
 		<div id="saveSuccessModal" className="modal">
@@ -675,6 +710,35 @@ function LocationComponent() {
 				</div>
 				<div className="row">
 					<CostComponent location={location} foodOptionOptions={foodOptions}></CostComponent>
+					<FlightCostComponent location={location} />
+				</div>
+				<div>
+					<div className="climbcation-well well has-header">
+						<div className="well-header">
+							<h3>{location?.name} Miscellaneous</h3>
+						</div>
+						<div className="well-content">
+							<div className="misc-container">
+								{location?.miscSections?.map(misc => <React.Fragment key={misc.id || 'newMisc'}><MiscSectionComponent forceUpdate={forceUpdate} location={location} miscSection={misc} /></React.Fragment>)}
+								{/*<locationothersection className="misc-section" location-id="locationData.id" section="section" sections-length="locationObj.sections.length" save-callback="saveSection" ng-repeat="section in sections track by $index" index-iterator="$index" editable="true"></locationothersection>*/}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div >
+					<div className="row">
+						<div className="col-md-8">
+						</div>
+						<div className="col-md-4">
+							<div className="info-container add-section">
+								<div className="text-center">
+									<h3 className="text-center">Is something about {location?.name} missing?</h3>
+									<div className="btn btn-climbcation text-center" onClick={() => addMiscSection()}>Add New Misc Category</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -682,6 +746,101 @@ function LocationComponent() {
 
 		</>
 	);
+}
+
+function MiscSectionComponent({location, miscSection, forceUpdate}: PropLocation) {
+	let [preview, setPreview] = useState<boolean>(Boolean(miscSection?.id));
+	let [isSaving, setIsSaving] = useState<boolean>(false);
+	let [miscState, setMiscState] = useState<MiscSection>(miscSection);
+	let [originalBody, setOriginalBody] = useState<string>(miscSection?.body);
+	let [originalTitle, setOriginalTitle] = useState<string>(miscSection?.title);
+	let cancelEdit = () => {
+		if (miscSection.id) {
+			miscSection.body = originalBody;
+			miscSection.title = originalTitle;
+		} else {
+			location.miscSections = location?.miscSections?.filter(x => x !== miscSection);
+		}
+		forceUpdate()
+		setPreview(true);
+	}
+
+	let handleChange = (e, key) => {
+		miscSection[key] = e.target.value;
+		setMiscState(Object.assign({}, miscSection));
+	}
+
+	let saveChanges = async () => {
+		if (!isSaving) {
+			setIsSaving(true);
+			try {
+				let response = await axios.post(`/api/locations/${location?.id}/sections`, {
+					locationId: location?.id,
+					section: {
+						id: miscSection?.id,
+						title: miscSection?.title,
+						body: miscSection?.body,
+					}
+				});
+				if (response.data.new_id && response.data.new_id !== '') {
+					miscSection.id = response.data.new_id;
+					forceUpdate();
+				} else {
+					/*ngToast.create({
+						additionalClasses: 'climbcation-toast',
+						content: 'Your edit has been submitted and will be approved by a moderator shortly!'
+					});*/
+				}
+				setOriginalBody(miscSection.body);
+				setOriginalTitle(miscSection.title);
+				setPreview(true);
+			} catch (err) {
+				alert('error submitting change')
+			}
+			setIsSaving(false);
+		}
+
+	}
+	return (
+		<div className="misc-section">
+			{!preview && <div>
+				<div className="row">
+					<div className={classNames("col-md-11", {'col-md-offset-1': miscSection?.id})}>
+						<div className="form-group">
+							<label>Section Title</label>
+							<input type="text" placeholder="ex. Social Scene" className="form-control" onChange={(e) => handleChange(e, 'title')} value={miscSection.title}/>
+						</div>
+					</div>
+				</div>
+				<div className="row">
+					<div className={classNames("col-md-11", {'col-md-offset-1': miscSection?.id})}>
+						<div className="form-group">
+							{!miscSection?.id && <label>Section Description</label>}
+							<textarea  placeholder="The best place to meet climbers is at the Fatolitis snack bar, this is a great bar for a post climbing spray session as well" className="form-control" rows={miscSection?.id?3:6} onChange={(e) => handleChange(e, 'body')}  value={miscSection.body}></textarea>
+						</div>
+						{
+							location?.id && (<>
+								<div className={classNames("btn btn-default btn-climbcation pull-right", {disabled: isSaving})} onClick={() => saveChanges()}>
+									Save
+								</div>
+								<div className="text-button pull-right pad-top" onClick={() => cancelEdit()}>
+									Cancel
+								</div>
+								</>
+							)
+						}
+					</div>
+				</div>
+			</div>}
+
+
+			{preview && <div> 
+				<h3 className="inline">{miscSection?.title}</h3> <span className="text-button" onClick={() => setPreview(false)}>Edit</span>
+				<p className="text-gray info-text preserve-line-breaks"><Linkify>{miscSection?.body}</Linkify></p>
+			</div>}
+		</div>
+	);
+
 }
 
 export default LocationComponent;

@@ -51,6 +51,12 @@ export interface FoodOption {
     name: string;
 }
 
+export interface MiscSection {
+    id?: number;
+    title: string;
+    body: string;
+}
+
 export default class Location {
     id: number;
     name: string | null = null;
@@ -83,6 +89,7 @@ export default class Location {
     accommodations: Accommodation[] = [];
     active: boolean;
     food_options: FoodOption[] = [];
+    miscSections: MiscSection[] = [];
 
     constructor(locationObj: any) {
         Object.assign(this, locationObj);
