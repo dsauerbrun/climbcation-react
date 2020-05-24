@@ -10,6 +10,7 @@ import { useForceUpdate } from '../common/useForceUpdate';
 import {Thread, PostInput} from './Forum';
 import { Post } from '../classes/Forum';
 import { IconTooltip } from '../common/HelperComponents';
+import Map from './MapFilter';
 
 interface AccommodationOption extends Accommodation {
 	ranges: string[];
@@ -32,7 +33,49 @@ interface PropLocation {
 	forceUpdate?: any;
 }
 
+function NearbyMap({location}: PropLocation) {
+	let height = '16em';
+	let markerClick = (marker) => {
+		// change 
+	}
+	let [mapProps, setMapProps] = useState({
+		options: {
+		  center: {lat: location?.latitude, lng: location?.longitude},
+		  zoom: 6,
+		  mapTypeId: 'roadmap',
+		  id: 'nearby-map'
+		},
+		onDragEnd: () => {},
+		onZoomChange: () => {},
+		markers: [],//location?.nearby || [],
+		markerClickFunc: markerClick, 
+		onMount: null, className: null, onMountProps: null, styles: {height: height, width: '100%'} 
+	});
+
+	useEffect(() => {
+		setMapProps({
+			options: {
+				center: {lat: location?.latitude, lng: location?.longitude},
+				zoom: 6,
+				mapTypeId: 'roadmap',
+				id: 'nearby-map'
+			},
+			onDragEnd: () => {},
+			onZoomChange: () => {},
+			markerClickFunc: markerClick,
+			markers: location?.nearby.concat([location]) || [],
+			onMount: null, className: null, onMountProps: null, styles: {height: height, width: '100%'}
+		});
+	}, [location?.latitude, location?.nearby?.length])
+	return (
+		<>
+			{location?.latitude !== null ? <Map {...mapProps} /> : <div>Loading</div>}
+		</>
+	);
+}
+
 function InfoHeader({location}: PropLocation) {
+
 	let [nearbyShow, setNearbyShow] = useState<boolean>(false);
 		return (
 			<div className="container-fluid">
@@ -41,17 +84,18 @@ function InfoHeader({location}: PropLocation) {
 						<h2 className="text-center"> { location?.name }, { location?.country }</h2>
 						<div className="main-header">
 							<div className="well climbcation-well location-map">
+
+								<div style={{display: 'block'}}>
+									{location?.latitude && <NearbyMap location={location} />}
 								<div className={classNames("nearby-locations", {expanded: nearbyShow})}>
 									{nearbyShow && <div className="nearby-display">
-										{location.nearby?.map((nearbyLoc) => (<div className="nearby-location">
+										{location.nearby?.map((nearbyLoc) => (<div className="nearby-location" key={nearbyLoc.name}>
 											<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> <span className="text-gray bold">({nearbyLoc.distance} mi away)</span>
-											{nearbyLoc?.climbing_types.map(nearbyType => (<img src={nearbyType.url} className="icon" alt="climbing type"/>))}
+											{nearbyLoc?.climbing_types.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
 										</div>))}
 									</div>}
 									<a className="toggle" onClick={() => setNearbyShow(!nearbyShow)}>{ nearbyShow? '[-] Hide Nearby Locations':'[+] Show Nearby Locations' }</a>
 								</div>
-
-								<div className="map-info-window " id="showMapInfoWindow" style={{display: 'none'}}>
 									{/*
 									<div className="location-card map-info-window-arrow-bottom">
 										<div className="location-card-info">
@@ -87,10 +131,6 @@ function InfoHeader({location}: PropLocation) {
 										</div>
 									</div>
 									*/}
-								</div>
-
-								<div id="nearby-map" className="">
-									
 								</div>
 							</div>
 							<div className="location-photo well climbcation-well">
@@ -679,6 +719,7 @@ function LocationComponent() {
 	useEffect(() => {
 		axios(`/api/location/${slug}`).then((resp) => {
 			let locationToSet = new Location(resp.data.location);
+			locationToSet.isPrimary = true;
 			locationToSet.nearby = resp.data.nearby;
 			locationToSet.miscSections = resp.data.sections;
 

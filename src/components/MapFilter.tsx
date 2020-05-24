@@ -11,12 +11,12 @@ import Location from '../classes/Location';
     },
   }
 
-export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,location,isSecondary, clickFunc: Function = null, setHoveredLocation): google.maps.Marker {
+export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,location,isSecondary, clickFunc: Function = null, setHoveredLocation, mapName): google.maps.Marker {
     const marker = new window.google.maps.Marker({
         map,
         position: {lat, lng},
         title: location.title || location.name,
-        icon: isSecondary ? '' : 'https://s3-us-west-2.amazonaws.com/climbcation-front/assets/primary.png',
+        icon: isSecondary ? 'https://s3-us-west-2.amazonaws.com/climbcation-front/assets/primary.png': '',
     });
     marker.addListener('mouseover', function(event) {
         var isInViewport = function (elem) {
@@ -28,36 +28,43 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
                 bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
             );
         };
+        setHoveredLocation(new Location(location));
         let point = map.overlay.getProjection().fromLatLngToContainerPixel(this.getPosition());
         //let point = map.overlay.getProjection().fromLatLngToContainerPixel(this.position);
         var offsetCalcY = 0;
         var offsetCalcX = 0;
         var bottomOffset = 0;
         let locationCard: HTMLElement = document.querySelector('.map-info-window > .location-card');
-        if (map.getDiv().id === 'mapFilterLarge') {
+        //debugger;
+        //if (map.getDiv().id === 'mapFilterLarge') {
+            //debugger;
+        if (mapName === 'mapFilterLarge') {
             offsetCalcY = 50;
             offsetCalcX = 24;
             bottomOffset = 50;
-        } else if (map.getDiv().id === 'mapFilter') {
+        } else if (mapName === 'mapFilter') {
             offsetCalcY = 45;
             offsetCalcX = -39;
             bottomOffset = 50;
-        } else if (map.getDiv().id === 'nearby-map') {
+        } else if (mapName === 'nearby-map') {
             offsetCalcY = 60;
             offsetCalcX = 425;
+            bottomOffset = 50;
+            offsetCalcY = 45;
+            offsetCalcX = -387;
             bottomOffset = 50;
             //$('.map-info-window > .location-card').addClass('left-arrow');
             locationCard.classList.add('left-arrow');
         }
         
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
+        mapInfoWindow.style.display = 'block';
         //let infoWindowWidth = $('.map-info-window').outerWidth();
         //let infoWindowHeight = $('.map-info-window').outerHeight();
-        let infoWindowWidth = 450;//mapInfoWindow.offsetWidth;
-        let infoWindowHeight = 170;//mapInfoWindow.offsetHeight;
+        let infoWindowWidth = mapInfoWindow.offsetWidth;
+        let infoWindowHeight = mapInfoWindow.offsetHeight;
 
         //$('.map-info-window').show();
-        mapInfoWindow.style.display = 'block';
         locationCard.classList.add('map-info-window-arrow-bottom');
         locationCard.classList.remove('map-info-window-arrow-top');
         mapInfoWindow.style.top = (point.y - infoWindowHeight - offsetCalcY) + 'px';
@@ -78,7 +85,6 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
             $('.map-info-window > .location-card').removeClass('map-info-window-arrow-bottom');
             $('.map-info-window > .location-card').addClass('map-info-window-arrow-top');
         }*/
-        setHoveredLocation(new Location(location));
     })
     marker.addListener('mouseout', (event) => {
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
@@ -105,18 +111,20 @@ class ClimbcationMap extends google.maps.Map {
     overlay: google.maps.OverlayView;
 }
 
-function Map({ options, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange }) {
+function Map({ options, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange, markerClickFunc }) {
     const ref = useRef()
     const [map, setMap] = useState<ClimbcationMap>();
+    const [mapId, setMapId] = useState<string>(options.id || 'mapFilter');
     let [pushedMarkers, setPushedMarkers] = useState<google.maps.Marker[]>([]);
     let [hoveredLocation, setHoveredLocation] = useState<Location>(null);
     //let pushedMarkers: google.maps.Marker[] = [];
 
   
     useEffect(() => {
-      const onLoad = () => {
+        setMapId(options.id);
+        const onLoad = () => {
             setMap(new ClimbcationMap(ref.current, options))
-      }
+        }
         if (!window.google) {
             const script = document.createElement(`script`)
             script.src =
@@ -151,7 +159,9 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
     }, [map])
 
     useEffect(() => {
+        console.log('updating markers', markers)
         // remove markers that are no longer used
+
         let removeMarkers = pushedMarkers.filter(marker => !markers.find(newMarker => newMarker.latitude === marker.getPosition().lat()))
         removeMarkers.forEach((marker) => {
             removeMarker(marker);
@@ -160,7 +170,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
 
         let markersToAdd = markers.filter(newMarker => !pushedMarkers.find(pushedMarker => pushedMarker.getPosition().lat() === newMarker.latitude));
         markersToAdd?.forEach(function(marker) {
-            newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, true, null, setHoveredLocation));
+            newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, marker.isPrimary ? true : false, markerClickFunc, setHoveredLocation, options.id));
         })
         setPushedMarkers(newMarkerSet);
         
@@ -172,11 +182,11 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
     return (
         <>
         <div
-            id="mapFilter"
+            id={mapId}
             style={{ height: styles?.height || `210px`, width: styles?.width || '345px' }}
             {...{ ref, className }}
         />
-        <div className="map-info-window " id="showMapInfoWindow" style={{display: "none"}}>
+        <div className="map-info-window" id="showMapInfoWindow" style={{display: 'none'}}>
             <div className="location-card map-info-window-arrow-bottom">
                     <div className="location-card-info">
                         <div className="row">

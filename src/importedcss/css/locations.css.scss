@@ -111,6 +111,7 @@
 			}
 		}
 		.location-map {
+			height: 16em;
 			padding: 0px;
 			position: relative;
 			.nearby-locations {
@@ -120,7 +121,7 @@
 				}
 				position:absolute;
 				background-color: rgba(230,230,230,.8);
-				z-index: 10;
+				z-index: 1000000;
 				width: 100%;
 				padding: 10px;
 				bottom: 0px;

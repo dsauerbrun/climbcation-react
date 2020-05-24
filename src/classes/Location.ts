@@ -76,6 +76,7 @@ export default class Location {
     latitude: number;
     longitude: number;
     saving_money_tips: string;
+    isPrimary: boolean = false;
 
     common_expenses_notes: string = null;
     continent: string = null;

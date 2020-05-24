@@ -64,9 +64,8 @@ input:checked + label.btn {
 	background-color: #fff;
 	position: absolute;
 	border-radius: 5px;
-	width: 450px;
-	height: 170px;
-	z-index: 100000;
+	width: 410px;
+	z-index: 1000001;
 	.location-card {
 		border-radius: 5px;
 		border-width: 3px;

@@ -189,11 +189,13 @@ function Filter() {
 		options: {
 		  center: filterState.center,
 		  zoom: 0,
-		  mapTypeId: 'roadmap'
+		  mapTypeId: 'roadmap',
+		  id: 'mapFilter'
 		},
 		onDragEnd: mapMoved,
 		onZoomChange: mapMoved,
 		markers: unpaginatedLocations,
+		markerClickFunc: null,
 		onMount: null, className: null, onMountProps: null, styles: null
 	};
 
