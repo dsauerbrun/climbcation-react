@@ -46,7 +46,6 @@ export function Login(props) {
 	let { register, handleSubmit, watch, errors, formState, setValue } = useForm<LoginForm>({});
 	let {dirty, isSubmitting, touched, submitCount} = formState;
 	const onSubmit = async (data: LoginForm) => {
-        debugger;
         if (signUpEnabled) {
             await signUp(data.email, data.password, data.username);
         } else if (forgotPasswordEnabled) {

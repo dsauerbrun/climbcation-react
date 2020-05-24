@@ -7,6 +7,8 @@ import Location, {Accommodation, FoodOption, Transportation, MiscSection} from '
 import Linkify from 'react-linkify';
 import { useForm } from "react-hook-form";
 import { useForceUpdate } from '../common/useForceUpdate';
+import {Thread, PostInput} from './Forum';
+import { Post } from '../classes/Forum';
 
 interface AccommodationOption extends Accommodation {
 	ranges: string[];
@@ -645,6 +647,7 @@ function FlightCostComponent({location}: PropLocation) {
 function LocationComponent() {
 	let {slug} = useParams();
 	let [location, setLocation] = useState<Location>();
+	let [posts, setPosts] = useState<Post[]>([]);
 	let forceUpdate = useForceUpdate();
 	interface AttributeOptions {
 		accommodations?: AccommodationOption[];
@@ -652,6 +655,13 @@ function LocationComponent() {
 		transportations?: TransportationOption[];
 	}
 	let [{accommodations, foodOptions, transportations}, setEditables] = useState<AttributeOptions>({});
+
+	let regetPosts = () => {
+		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
+			setPosts(resp.data);
+		});
+	}
+
 
 	let populateEditables = (location: Location) => {
 		axios.get('/api/get_attribute_options').then(function(data){
@@ -668,8 +678,7 @@ function LocationComponent() {
 			setLocation(locationToSet);
 			populateEditables(locationToSet);
 		});
-		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
-		});
+		regetPosts();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -728,6 +737,10 @@ function LocationComponent() {
 				<div >
 					<div className="row">
 						<div className="col-md-8">
+							<div className="well location-posts-container">	
+								<PostInput threadId={posts && posts[0]?.forum_thread_id} slug={location?.slug} callBack={regetPosts} />
+								<Thread posts={posts} />
+							</div>
 						</div>
 						<div className="col-md-4">
 							<div className="info-container add-section">
