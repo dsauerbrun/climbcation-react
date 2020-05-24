@@ -343,23 +343,138 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 }
 function Accommodations({location, accommodationOptions}: PropLocation) {
 	interface AccommodationForm {
-		walking_distance: string;
-		transportations: string[];
-		bestTransportation: string;
-		gettingInNotes: string;
-		bestTransportationCost: string;
+		closestAccommodation: string;
+		accommodations: string[];
+		accommodationCosts: any;
+		accommodationNotes: string;
 	}
 
 	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<GettingInForm>({});
+	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<AccommodationForm>({});
 	let {dirty, isSubmitting, touched, submitCount} = formState
-	let [editingGettingIn, setEditingGettingIn] = useState<boolean>(false);
-	let walkingDistance = watch('walking_distance');
-	let transportations: string[] = watch('transportations');
-	let bestTransportation: string = watch('bestTransportation');
-	let bestTransportationCost: string = watch('bestTransportationCost');
+	let [editingAccommodation, setEditingAccommodation] = useState<boolean>(false);
+	let accommodations: string[] = watch('accommodations');
+	let accommodationCosts: any = watch('accommodationCosts');
+
+	const toggleEdit = (shouldEdit: boolean) => {
+		if (shouldEdit) {
+			let costsObj = {Hotel: location?.accommodations.find(x => x.name === 'Hotel')?.cost, Hostel: location?.accommodations.find(x => x.name === 'Hostel')?.cost, Camping: location?.accommodations.find(x => x.name === 'Camping')?.cost};
+			setValue([
+				{closestAccommodation: location?.closest_accommodation},
+				{accommodationNotes: location?.accommodation_notes},
+				{accommodations: accommodationOptions.filter(acc => location?.accommodations.find(x => x.id === acc.id)).map(x => JSON.stringify(x))},
+				{accommodationCosts: costsObj}
+			]);
+		}
+		setEditingAccommodation(shouldEdit);
+	}
+
+
+	const onSubmit = async (data) => {
+		console.log(data);
+		if (!isSubmitting) {
+			let mappedAccommodations = data.accommodations.map(x => {
+				x = JSON.parse(x);
+				let newObj = {id: x.id, name: x.name, cost: null};
+				newObj.cost = data.accommodationCosts[x.name];
+				return newObj;
+			});
+			axios.post('/api/locations/' + location?.id +'/accommodations',
+				{location: {
+					accommodationNotes: data.accommodationNotes,
+					closestAccommodation: data.closestAccommodation,
+					accommodations: mappedAccommodations	
+				}} 
+			).then(function(response) {
+				console.log('responding here', response)
+				if (response.status === 200) {
+						setEditingAccommodation(false);
+						/*ngToast.create({
+							additionalClasses: 'climbcation-toast',
+							content: editMessage
+						});*/
+				}
+			});
+		}
+	};
+
 	return (
-		<div></div>
+		<div className="col-md-6">
+			<div className="well climbcation-well" style={{display: !editingAccommodation ? '' : 'none'}}>
+				<div className="col-md-12 row section-title">
+					<h3 className="inline">Accommodation</h3>
+					<span className="text-button" onClick={() => toggleEdit(true)}>Edit Category</span>
+				</div>
+				{!location?.closest_accommodation ? 
+				(<p className="text-gray info-text">We're not sure how close the accommodation is from the crags... have you been here? Please edit this section if you can help us out!</p>) :
+				(<p className="text-gray info-text">Closest accommodation is <strong>{location?.closest_accommodation}</strong> from the crags.</p>)
+				}
+				<div className="info-container">
+					{location?.accommodations?.map(accommodation => (<div key={`accomdisplay${accommodation.id}`} className="accommodation-info-section">
+						<h4 className="text-gray text-center">{accommodation.name}</h4>
+						<img src={accommodation.url} alt="accommodation"/>
+						<h5 className="text-gray text-center">{accommodation.cost}</h5>
+					</div>))}
+				</div>
+				<label>Any additional tips for staying in {location?.name}?</label>
+				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.accommodation_notes || 'No Details Available'}</Linkify></p>
+			</div>
+			<div className="well climbcation-well" style={{display: editingAccommodation ? '' : 'none'}}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div className="row section-title">
+						<h3 className="col-md-7 col-xs-5">Accommodation</h3>
+						<div className="col-md-5 col-xs-7">
+							<span className="text-button" onClick={() => toggleEdit(false)}>Cancel</span>
+							<button className="btn btn-sm btn-climbcation submit-button" disabled={isSubmitting}>Submit Changes</button>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-md-8">
+							<label>How close is the closest accommodation to the crag(s)?</label>
+							
+						</div>
+						<div className="col-md-4">
+							<select name="closestAccommodation" ref={register} className="form-control">
+								<option value="<1 mile">&lt;1 mile</option>
+								<option value="1-2 miles">1-2 miles</option>
+								<option value="2-5 miles">2-5 miles</option>
+								<option value="5+ miles">5+ miles</option>
+							</select>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-md-12">
+							<label className="center-block">Select all available options for accommodation in {location?.name}</label>
+							<div className="accommodation-options">
+								{accommodationOptions?.map(accommodation => (<div key={`accommodationOptions${accommodation.id}`} className="accommodation-button-wrapper">
+									<input name="accommodations" className="accommodation-checkbox" ref={register} type="checkbox" id={ accommodation.name } value={JSON.stringify(accommodation)} style={{display: 'none'}} />
+									<label htmlFor={accommodation.name} className="btn btn-default accommodation-button">
+										<img src={accommodation.url} alt="accommodation" />
+										<div className="accommodation-cost-container">
+											<label className="light-blue">Cost</label>
+											<select name={`accommodationCosts.${accommodation.name}`} ref={register} className="form-control" >
+												<option value={null}></option>
+												{accommodation?.ranges.map(range => (<option key={range} value={range}>{range}</option>))}
+											</select>
+										</div>
+									</label>
+								</div>))}	
+							</div>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-md-12">
+							<label>Any Additional Tips on staying in {location?.name}?</label>
+							<div className="form-group">
+								<textarea placeholder="ex. campground doesnt have water, bring your own. The most fun place to stay is JOSITO! campground has a communal kitchenand communal fridge" ref={register} className="form-control" rows={3} name="accommodationNotes"></textarea>
+							</div>
+						</div>
+						
+					</div>
+				</form>
+			</div>
+		</div>
+
 	);
 }
 
@@ -377,27 +492,6 @@ function LocationComponent() {
 		axios.get('/api/get_attribute_options').then(function(data){
 			var respData = data.data
 			setEditables({accommodations: respData.accommodations, foodOptions: respData.food_options, transportations: respData.transportations})
-		}).then(function() {
-			/*_.forEach(location.accommodations, function(accommodation) {
-				$scope.locationObj.accommodations[accommodation.id] = { id: accommodation.id, cost: accommodation.cost};
-			})
-			$scope.locationObj.accommodationNotes = location.accommodation_notes;
-			$scope.locationObj.closestAccommodation = location.closest_accommodation;
-
-			_.forEach(location.transportations, function(transportation) {
-				$scope.locationObj.transportations[transportation.id] = true;
-			});
-			location.best_transportation.id && $scope.selectBestTransportation(location.best_transportation.id);
-			location.best_transportation.cost && $scope.selectBestTransportationCost(location.best_transportation.cost)
-			$scope.locationObj.gettingInNotes = location.getting_in_notes;
-			$scope.locationObj.walkingDistance = location.walking_distance;
-
-			_.forEach(location.food_options, function(foodOption) {
-				$scope.locationObj.foodOptions[foodOption.id] = true;
-				foodOption.cost && $scope.selectFoodOptionDetail(foodOption.id, foodOption.cost);
-			});
-			$scope.locationObj.commonExpensesNotes = location.common_expenses_notes
-			$scope.locationObj.savingMoneyTips = location.saving_money_tip;*/
 		});
 	}
 	useEffect(() => {
@@ -437,7 +531,8 @@ function LocationComponent() {
 			<InfoHeader location={location}></InfoHeader>
 			<div className="container-fluid">
 				<div className="row">
-					<GettingIn location={location} transportationOptions={transportations}></GettingIn>
+					<GettingIn location={location} transportationOptions={transportations} />
+					<Accommodations location={location} accommodationOptions={accommodations} />
 				</div>
 			</div>
 
