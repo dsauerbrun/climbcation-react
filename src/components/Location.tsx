@@ -170,7 +170,6 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 	let bestTransportationCost: string = watch('bestTransportationCost');
 
 	const onSubmit = async (data) => {
-		console.log(data, data.walking_distance, Boolean(data.walking_distance));
 		if (!isSubmitting) {
 			
 			axios.post('/api/locations/' + location?.id +'/gettingin',
@@ -182,7 +181,6 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 					gettingInNotes: data.gettingInNotes
 				}} 
 			).then(function(response) {
-				console.log('responding here', response)
 				if (response.status === 200) {
 					axios.get('/api/location/' + location?.slug).then(function(response) {
 						location.transportations = response?.data?.location?.transportations;
@@ -204,7 +202,6 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 		if (shouldEdit) {
 			let filteredTransportationOptions = transportationOptions?.filter(x => location?.transportations.find(y => y.id === x.id));
 			let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.best_transportation.id);
-			console.log('val checker', filteredTransportationOptions, location?.walking_distance, bestTransportation)
 			let walkingDistanceSet = location?.walking_distance === null ? 'null' : (location?.walking_distance ? 'true' : 'false');
 			setValue([
 				{walking_distance: walkingDistanceSet},
@@ -371,7 +368,6 @@ function Accommodations({location, accommodationOptions}: PropLocation) {
 
 
 	const onSubmit = async (data) => {
-		console.log(data);
 		if (!isSubmitting) {
 			let mappedAccommodations = data.accommodations.map(x => {
 				x = JSON.parse(x);
@@ -386,7 +382,6 @@ function Accommodations({location, accommodationOptions}: PropLocation) {
 					accommodations: mappedAccommodations	
 				}} 
 			).then(function(response) {
-				console.log('responding here', response)
 				if (response.status === 200) {
 						setEditingAccommodation(false);
 						/*ngToast.create({
@@ -478,6 +473,152 @@ function Accommodations({location, accommodationOptions}: PropLocation) {
 	);
 }
 
+function CostComponent({location, foodOptionOptions}: PropLocation) {
+	interface CostForm {
+		foodOptions: string[];
+		foodOptionCosts: any;
+		commonExpensesNotes: string;
+		savingMoneyTips: string;
+	}
+
+	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
+	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<CostForm>({});
+	let {dirty, isSubmitting, touched, submitCount} = formState
+	let [editingCost, setEditingCost] = useState<boolean>(false);
+	let selectedFoodOptions: string[] = watch('foodOptions');
+	let currentFoodCostValues = watch('foodOptionCosts');
+
+	const toggleEdit = (shouldEdit: boolean) => {
+		if (shouldEdit) {
+			setValue([
+				{commonExpensesNotes: location?.common_expenses_notes},
+				{savingMoneyTips: location?.saving_money_tips},
+				{foodOptions: foodOptionOptions.filter(food => location?.food_options.find(x => x.id === food.id)).map(x => JSON.stringify(x))},
+			]);
+		}
+		setEditingCost(shouldEdit);
+	}
+
+	useEffect(() => {
+		let farmerMarketCost = (!currentFoodCostValues || !currentFoodCostValues["Farmer's Market"] || currentFoodCostValues["Farmer's Market"] === "") ? location?.food_options?.find(x => x.name === "Farmer's Market")?.cost : currentFoodCostValues["Farmer's Market"];
+		let restaurantCost = (!currentFoodCostValues || !currentFoodCostValues["Restaurant"] || currentFoodCostValues["Restaurant"] === "") ? location?.food_options?.find(x => x.name === "Restaurant")?.cost : currentFoodCostValues["Restaurant"];
+		let groceryCost = (!currentFoodCostValues || !currentFoodCostValues["Grocery"] || currentFoodCostValues["Grocery"] === "") ? location?.food_options?.find(x => x.name === "Grocery")?.cost : currentFoodCostValues["Grocery"];
+		let costsObj = {"Farmer's Market": farmerMarketCost, Grocery: groceryCost, Restaurant: restaurantCost};
+
+		setValue([
+			{foodOptionCosts: costsObj}
+		]);
+
+	}, [selectedFoodOptions?.length])
+
+	const onSubmit = async (data) => {
+		console.log('submit data', data);
+		if (!isSubmitting) {
+			let mappedFoodOptions = data.foodOptions.map(x => {
+				x = JSON.parse(x);
+				let newObj = {id: x.id, name: x.name, cost: null};
+				newObj.cost = data.foodOptionCosts[x.name];
+				return newObj;
+			});
+			axios.post('/api/locations/' + location?.id +'/foodoptions',
+				{location: {
+					savingMoneyTips: data.savingMoneyTips,
+					commonExpensesNotes: data.commonExpensesNotes,
+					foodOptionDetails: mappedFoodOptions	
+				}} 
+			).then(function(response) {
+				if (response.status === 200) {
+						setEditingCost(false);
+						/*ngToast.create({
+							additionalClasses: 'climbcation-toast',
+							content: editMessage
+						});*/
+				}
+			});
+		}
+	};
+	return (
+		<div className="col-md-6">
+			<div className="well climbcation-well" style={{display: !editingCost ? '' : 'none'}}>
+				<div className="col-md-12 row section-title">
+					<h3 className="inline">Cost</h3>
+					<span className="text-button" onClick={() => toggleEdit(true)}>Edit Category</span>
+				</div>
+				<label>Food options (cost per meal)</label>
+				<div className="info-container">
+					{location?.food_options?.map(food_option => (<div key={food_option.id}>
+						<h3 className="text-gray text-center">{food_option.name}</h3>
+						<h4 className="text-gray text-center">{food_option.cost}</h4>
+					</div>))}
+				</div>
+				<label>Any other common expenses in {location?.name}?</label>
+				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.common_expenses_notes || 'No Details Available'}</Linkify></p>
+				<label>Any tips on saving money around {location?.name}?</label>
+				<p className="text-gray info-text preserve-line-breaks"><Linkify>{location?.saving_money_tips || 'No Details Available'}</Linkify></p>
+			</div>
+			<div className="well climbcation-well" style={{display: editingCost ? '' : 'none'}}>
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div className="row section-title">
+						<h3 className="col-md-7 col-xs-5">Cost</h3>
+						<div className="col-md-5 col-xs-7">
+							<span className="text-button" onClick={() => toggleEdit(false)}>Cancel</span>
+							<button className="btn btn-sm btn-climbcation submit-button" disabled={isSubmitting}>Submit Changes</button>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-md-5">
+							<label>What food options are available in {location?.name}?</label>
+							{foodOptionOptions?.map((foodOption: FoodOptionOption, index) => (<div key={foodOption.id}>
+								<input name="foodOptions" className="control-input-checkbox" ref={register} type="checkbox" id={ foodOption.name } value={JSON.stringify(foodOption)} />
+								<label className={classNames(["control control--checkbox"])} htmlFor={foodOption.name}>
+									<div className="control__indicator"></div>
+									<span className="gray">{foodOption.name}</span>
+								</label>
+							</div>))
+							}	
+						</div>
+						<div className="col-md-7">
+							<div className="row">
+								<label>Cost for a single meal?</label>
+								<div className="row">
+									{selectedFoodOptions?.map(x => JSON.parse(x)).map(foodOption => (<div key={`selectedfood${foodOption.id}`} className="col-md-6">
+										<label className="center-block gray">{foodOption.name}</label>
+										<div className="btn-group btn-group-sm center-block btn-group-toggle">
+											{foodOption.ranges.map((costRange: string, index) => (
+												<React.Fragment key={costRange}>
+													<input type="radio" name={`foodOptionCosts.${foodOption.name}`} value={costRange} ref={register} id={`foodCost${foodOption.name}${costRange}`} style={{display: 'none'}}/> 
+													<label className={classNames("btn btn-sm btn-default")} htmlFor={`foodCost${foodOption.name}${costRange}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
+														{costRange}	
+													</label>
+												</React.Fragment>
+											))}
+										</div>
+									</div>))}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="row">
+						<div className="col-md-6">
+							<label>Any other common expenses in {location?.name}?</label>
+							<div className="form-group">
+								<textarea placeholder="ex. red rock requires entrance fee" className="form-control" rows={3} ref={register} name="commonExpensesNotes"></textarea>
+							</div>
+						</div>
+						<div className="col-md-6">
+							<label>Any tips on saving money in {location?.name}?</label>
+							<div className="form-group">
+								<textarea placeholder="ex. Mama's chicken is a great restaurant that is very cheap, and trader joes is a cheap but healthy grocery store... you should also hitchhike a bunch since it's easy here" className="form-control" rows={3} ref={register} name="savingMoneyTips"></textarea>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	);
+}
+
 function LocationComponent() {
 	let {slug} = useParams();
 	let [location, setLocation] = useState<Location>();
@@ -496,7 +637,6 @@ function LocationComponent() {
 	}
 	useEffect(() => {
 		axios(`/api/location/${slug}`).then((resp) => {
-			console.log(resp)	
 			let locationToSet = new Location(resp.data.location);
 			locationToSet.nearby = resp.data.nearby;
 
@@ -504,7 +644,6 @@ function LocationComponent() {
 			populateEditables(locationToSet);
 		});
 		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
-			console.log(resp)	
 		});
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -533,6 +672,9 @@ function LocationComponent() {
 				<div className="row">
 					<GettingIn location={location} transportationOptions={transportations} />
 					<Accommodations location={location} accommodationOptions={accommodations} />
+				</div>
+				<div className="row">
+					<CostComponent location={location} foodOptionOptions={foodOptions}></CostComponent>
 				</div>
 			</div>
 
