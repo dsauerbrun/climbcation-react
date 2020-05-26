@@ -11,18 +11,8 @@ import {Thread, PostInput} from './Forum';
 import { Post } from '../classes/Forum';
 import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
+import { useEditables, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
 
-interface AccommodationOption extends Accommodation {
-	ranges: string[];
-}
-
-interface FoodOptionOption extends FoodOption {
-	ranges: string[];
-}
-
-interface TransportationOption extends Transportation {
-	ranges: string[];
-}
 
 interface PropLocation {
 	location: Location;
@@ -696,12 +686,7 @@ function LocationComponent() {
 	let [location, setLocation] = useState<Location>();
 	let [posts, setPosts] = useState<Post[]>([]);
 	let forceUpdate = useForceUpdate();
-	interface AttributeOptions {
-		accommodations?: AccommodationOption[];
-		foodOptions?: FoodOptionOption[];
-		transportations?: TransportationOption[];
-	}
-	let [{accommodations, foodOptions, transportations}, setEditables] = useState<AttributeOptions>({});
+	let {accommodations, foodOptions, transportations} = useEditables();
 
 	let regetPosts = () => {
 		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
@@ -710,12 +695,6 @@ function LocationComponent() {
 	}
 
 
-	let populateEditables = (location: Location) => {
-		axios.get('/api/get_attribute_options').then(function(data){
-			var respData = data.data
-			setEditables({accommodations: respData.accommodations, foodOptions: respData.food_options, transportations: respData.transportations})
-		});
-	}
 	useEffect(() => {
 		axios(`/api/location/${slug}`).then((resp) => {
 			let locationToSet = new Location(resp.data.location);
@@ -724,7 +703,6 @@ function LocationComponent() {
 			locationToSet.miscSections = resp.data.sections;
 
 			setLocation(locationToSet);
-			populateEditables(locationToSet);
 		});
 		regetPosts();
 	// eslint-disable-next-line react-hooks/exhaustive-deps

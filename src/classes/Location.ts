@@ -1,11 +1,11 @@
-interface ClimbingType {
+export interface ClimbingType {
     name: string;
     url: string;
     type?: string;
     id: number;
 }
 
-interface Grade {
+export interface Grade {
     type: any;
     grade: string;
     id: number;
