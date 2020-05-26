@@ -48,15 +48,19 @@ input:checked + label.btn {
 	font-size: 14px;
 }
 
+.btn-sm, .btn-group-sm > .btn {
+	font-size: 12px;
+}
+
 .btn-xs {
 	font-size: 12px;
 }
 
 .divider {
 	height: 1px;
-  margin: 9px 0;
-  overflow: hidden;
-  background-color: #e5e5e5;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
 }
 
 .map-info-window {
