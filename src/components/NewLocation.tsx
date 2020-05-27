@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Location, {Accommodation, FoodOption, Transportation, MiscSection, ClimbingType, Grade} from '../classes/Location';
 import { useForm } from 'react-hook-form';
@@ -9,6 +9,8 @@ import AirportAutocomplete from '../common/AirportAutocomplete';
 import { airport, allAirports } from '../common/airportsList';
 import { useEditables, Month } from '../common/useEditables';
 import _ from 'lodash';
+import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
+import cljFuzzy from 'clj-fuzzy';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -32,6 +34,9 @@ function NewLocation () {
 	const onSubmit = async (data) => {
 		console.log('here is data')
 		console.log(data);
+		if (page !== 5) {
+			setPage(page + 1);
+		}
 	}
 
 	return (<div id="submit-form">
@@ -76,7 +81,7 @@ function NewLocation () {
 							<div className="col-md-12 well-footer">
 								<div className="row">
 									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" ng-click="prevPage()">
-										{page !== 1 && page !== 6 && <span className="text-button" >Back</span>}
+										{page !== 1 && page !== 6 && <span className="text-button" onClick={() => setPage(page - 1)} >Back</span>}
 									</div>}
 									{page < 5 && <div className="col-xs-2 btn btn-climbcation" ng-click="nextPage()">
 										<div className=" ">Next</div>
@@ -131,6 +136,33 @@ function GeneralSection({location, register, setValue, getValues, watch, months,
 	let locationName: string = watch('name');
 	let selectedMonths: Month[] = watch('months');
 	let selectedGrades: Grade[] = watch('grades');
+	let [existingLocation, setExistingLocation] = useState<string[]>();
+	let [locationNames, setLocationNames] = useState([]);
+
+
+	useEffect(() => {
+		axios.get('api/location/name/all').then(function(locationList){
+			setLocationNames(locationList.data);
+		});
+	}, [])
+	const DICE_THRESHOLD = 0.75;
+
+	let diceCalc = () => {
+		let diceDistanceNum = 0;
+		let similarLocation;
+		_.forEach(locationNames, function(location) {
+			var newDiceCalc = cljFuzzy.metrics.dice(location[0].toLowerCase(), locationName?.toLowerCase());
+			if (newDiceCalc > diceDistanceNum) {
+				diceDistanceNum = newDiceCalc;
+				similarLocation = location;
+			}
+		});
+		if (diceDistanceNum > DICE_THRESHOLD) {
+			setExistingLocation(similarLocation);
+		} else {
+			existingLocation && setExistingLocation(null);
+		}
+	}
 
 	let setSelectedAirport = (airport: airport) => {
 		setValue([{airport: airport}]);
@@ -188,13 +220,29 @@ function GeneralSection({location, register, setValue, getValues, watch, months,
 		return Boolean(selectedMonths?.find(x => x.id === month.id));
 	}
 
+	let overlayTarget = useRef(null);
 	return (
 		<div className="row" style={style}>
 			<div className="col-md-12">
 				<div className="row"> {/*ng-className="{ 'has-success': locationForm.name.$valid && locationForm.name.$dirty, 'has-error': locationForm.name.$invalid && locationForm.name.$dirty }"*/}
 					<span className={classNames("form-group col-md-4", {'has-success': 1, 'has-error': 0})}  >
 						<label>Location Name<span className="text-danger required-field">*</span></label>
-						<input name="name" ref={register} ng-model-options="{'allowInvalid': true, debounce: 500}" tooltip-validation="hello" ng-model="locationObj.name" location-exists="{{existingLocations}}" placeholder="ex. Yosemite" className="form-control"  popover-placement="bottom" uib-popover-html="existsMessage()" popover-trigger="{none: ''}" popover-is-open="(!locationForm.name.$valid && locationForm.name.$viewValue != '') || diceDistanceNum > DICE_THRESHOLD" ng-change="diceCalc()" />
+						<div ref={overlayTarget}>
+							<input name="name" ref={register}  placeholder="ex. Yosemite" className="form-control"  onChange={() => diceCalc()} />
+						</div>
+						<Overlay
+							placement="bottom"
+							target={overlayTarget.current}
+							show={Boolean(existingLocation)}
+						>
+							<Popover id="button-tooltip">
+								<Popover.Content>
+									<div style={{fontSize: '12px'}}>
+										Did you mean {existingLocation && existingLocation[0]}? <a className="btn btn-climbcation" href={'/location/'+ (existingLocation && existingLocation[1])}>Click here to edit it!</a>
+									</div>
+								</Popover.Content>
+							</Popover>
+						</Overlay>
 					</span>
 					{/*ng-className="{ 'has-success': locationForm.country.$valid && locationForm.country.$dirty, 'has-error': locationForm.country.$invalid && locationForm.country.$dirty }"*/}	
 					<span className="form-group col-md-4" >
@@ -254,7 +302,7 @@ function GeneralSection({location, register, setValue, getValues, watch, months,
 					</div>
 				</div>
 				<div className="row">
-					<div className="col-md-3 row">
+					<div className="col-md-3">
 						<label className="col-xs-12">What should I climb?<span className="text-danger required-field">*</span></label>
 						{climbingTypes?.map(climbingType => (
 							<div className="col-xs-4 col-md-12" key={climbingType.name}>
