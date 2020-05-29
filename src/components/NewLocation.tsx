@@ -41,12 +41,13 @@ interface LocationForm {
 
 function NewLocation () {
 	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<LocationForm>({});
+	let { register, handleSubmit, watch, errors, formState, setValue, getValues, reset } = useForm<LocationForm>({});
 	let {dirty, isSubmitting, touched, submitCount} = formState
 	let [page, setPage] = useState<number>(1);
 	let [location, setLocation] = useState<Location>((new Location({})));
 	let {accommodations, climbingTypes, months, grades, foodOptions, transportations} = useEditables();
 	let locationName = watch('name');
+	let [slug, setSlug] = useState<string>();
 
 	let getMissingFields = (): string[] => {
 		let missingFields: string[] = []
@@ -83,6 +84,12 @@ function NewLocation () {
 
 		return foodOptions && foodOptions.length > 0;
 	}
+
+	let startNewLocation = () => {
+		reset();
+		setPage(1);
+	}
+
 	const onSubmit = async (data) => {
 		console.log('here is data')
 		console.log(data);
@@ -92,8 +99,52 @@ function NewLocation () {
 			//submit
 			if (!generalComplete()) {
 				setShowError(true);
-			} else {
-				alert('completed!')
+			} else if (!isSubmitting) {
+				let accommodationsWithRanges = data.accommodations?.map(accommodation => {
+					let accommodationWithRange = {id: accommodation.id, name: accommodation.name, cost: data.accommodationCosts && data.accommodationCosts[accommodation.name]};
+					return accommodationWithRange;
+				});
+
+				let climbingTypesWithGrades = data.climbTypes?.map(climbType => {
+					let typeGrade = data.grades?.find(x => x.type.id === climbType.id)?.id;
+					let climbTypeWithGrade = {id: climbType.id, name: climbType.name, grade_id: typeGrade};
+					return climbTypeWithGrade;
+				})
+
+				let foodOptionsWithCosts = data.foodOptions?.map(foodOption => {
+					let foodOptionWithCost = {id: foodOption.id, name: foodOption.name, cost: data.foodOptionCosts && data.foodOptionCosts[foodOption.name]}
+					return foodOptionWithCost;
+				})
+
+				let reqObj = {
+					name: data.name,
+					country: data.country,
+					airport: data.airport?.iata_code,
+					months: data.months,
+					accommodations: accommodationsWithRanges || [],
+					climbingTypes: climbingTypesWithGrades || [],
+					sections: data.miscSections || [],
+					closestAccommodation: data.closestAccommodation,
+					foodOptionDetails: foodOptionsWithCosts || [],
+					soloFriendly: data.soloFriendly,
+					rating: data.rating,
+					transportations: data.transportations?.map(x => x.id) || [],
+					bestTransportationId: data.bestTransportation?.id,
+					bestTransportationCost: data.bestTransportationCost,
+					walkingDistance: data.walkingDistance,
+					gettingInNotes: data.gettingInNotes,
+					accommodationNotes: data.accommodationNotes,
+					commonExpensesNotes: data.commonExpensesNotes,
+					savingMoneyTips: data.savingMoneyTips  
+				};
+
+				try {
+					let resp = await axios.post(`/api/submit_new_location`, reqObj)
+					setSlug(resp.data.slug);
+					setPage(page + 1);
+				} catch (err) {
+					alert(`error ${err}`);
+				}
 			}
 		}
 	}
@@ -144,17 +195,17 @@ function NewLocation () {
 									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" ng-click="prevPage()">
 										{page !== 1 && page !== 6 && <span className="text-button" onClick={() => setPage(page - 1)} >Back</span>}
 									</div>}
-									{page < 5 && <div className="col-xs-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
-										<div className=" ">Next</div>
+									{page < 5 && <div className="col-md-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
+										<div>Next</div>
 									</div>}
-									<button className="col-xs-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" ng-click="submitLocation()">
+									<button className="col-md-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" ng-click="submitLocation()">
 										{!isSubmitting && (<div>Publish</div>)}
 										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
 									</button>
-									{page === 6 && <><div className="offset-xs-7 col-xs-1 right-margin">
-										<div className="text-button"><a ng-href="/location/{{locationSlug}}" target="_blank">Preview</a></div>
+									{page === 6 && <><div className="offset-md-7 col-md-1 right-margin">
+										<div className="text-button"><a href={`/location/${slug}`} target="_blank">Preview</a></div>
 									</div>
-									<div className="col-xs-3 btn btn-climbcation" ng-click="startNewLocation()">
+									<div className="col-md-3 btn btn-climbcation" onClick={() => startNewLocation()}>
 										Submit Another Location
 									</div></>}
 								</div>
@@ -258,13 +309,13 @@ function SuccessSection({locationName, register, setValue, getValues, watch, sty
 
 	return (
 		<div className="row" ng-if="currentPage == 6">
-			<div className="row text-center">
+			<div className="text-center" style={{width: '100%'}}>
 				<h3 className="bottom-padding">Congrats!</h3>
 				<h4>You've added all the necessary content.</h4>
 				<h4 className="bottom-padding">You should see your location available in a day after an admin reviews the content</h4>
 				<img src="/images/success-icon.png" alt="success" />
 			</div>
-			{!user && <div className="row bottom-padding">
+			{!user && <div className="col-md-12 row bottom-padding" style={{paddingBottom: '25px'}}>
 				<label className="col-md-8 email-prompt">
 					Thanks for contributing! An admin might have questions, mind lending us your email?
 				</label>
@@ -332,7 +383,7 @@ function MiscSections({locationName, register, setValue, getValues, watch, style
 			</div>
 		</div>
 		<hr />
-		<div className="btn btn-primary" onClick={() => addSection()} style={{margin: '10px 0'}}>
+		<div className="btn btn-primary btn-climbcation" onClick={() => addSection()} style={{margin: '10px 0'}}>
 			Add Another Section
 		</div>
 		</>
@@ -510,10 +561,10 @@ function AccommodationSection({locationName, register, setValue, getValues, watc
 					<label>How close is the closest accommodation to the crag(s)?</label>
 					<select name="closestAccommodation" onChange={(e) => setValue([{closestAccommodation: e.currentTarget.value}])} value={closestAccommodation} className="form-control">
 						<option value=""></option>
-						<option value="'<1 mile'">&lt;1 mile</option>
-						<option value="'1-2 miles'">1-2 miles</option>
-						<option value="'2-5 miles'">2-5 miles</option>
-						<option value="'5+ miles'">5+ miles</option>
+						<option value="<1 mile">&lt;1 mile</option>
+						<option value="1-2 miles">1-2 miles</option>
+						<option value="2-5 miles">2-5 miles</option>
+						<option value="5+ miles">5+ miles</option>
 					</select>
 				</div>
 			</div>
