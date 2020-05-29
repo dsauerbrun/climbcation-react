@@ -122,6 +122,16 @@ function NewLocation () {
 							</div>
 						</div>
 					</div>
+					<div className="row">
+							<div className="offset-md-3 col-md-6 well climbcation-well tips-container">
+								<h4>Tips for adding locations</h4>
+								<ul>
+									<li>Focus on world class crags, Climbcation is primarily for finding climbing vacation destinations. Do you really want all of us crowding your local crag?</li>
+									<li>Sections with an asterisk (*) are required, but the more info you provide the better!</li>
+									<li>Excellent location examples with multiple categories: <a href="/location/bishop" target="_blank">Bishop</a>, <a href="/location/baile-herculane" target="_blank">Baile Herculane</a></li>
+								</ul>
+							</div>
+					</div>
 				</div>
 			</div>
 		</form>
