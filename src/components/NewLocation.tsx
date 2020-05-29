@@ -188,32 +188,34 @@ function CostSection({locationName, register, setValue, getValues, watch, foodOp
 	return (
 		<div className="row">
 			<div className="col-md-12 border-bottom bottom-padding bottom-margin">
-				<div className="col-md-6 row">
-					<label className="col-xs-12">What food options are available in {locationName}?</label>
-					{foodOptions?.map(food => <div className="col-xs-3 col-md-12" key={food.id}>
-						<label className="control control--checkbox" htmlFor={ food.name }>
-							<input name={food.name} type="checkbox" id={ food.name } onChange={() => toggleFood(food)} checked={foodSelected(food)} />
-							<div className="control__indicator"></div>
-							<span className="gray">{food.name}</span>
-						</label>
-					</div>)}
-				</div>
-				<div className="col-md-6">
-					<div className="row" ng-if="locationObj.foodOptions">
-						<label>Cost for a single meal?</label>
-						<div className="row">
-							{selectedFoodOptions?.map(foodOption => <div className="col-md-6 col-xs-6" key={foodOption.id}>
-								<label className="center-block gray">{foodOption.name}</label>
-								<div className="btn-group btn-group-sm">
-									
-									{foodOption.ranges.map((range, index) => <React.Fragment key={range}>
-										<input type="radio" name={`foodOptionCosts.${foodOption.name}`} onChange={() => changeFoodCost(foodOption, range)} checked={foodOptionCosts && foodOptionCosts[foodOption.name] === range}  id={`foodOptionCost${foodOption.id}${range}`} style={{display: 'none'}}/>
-										<label className="btn btn-sm btn-default" htmlFor={`foodOptionCost${foodOption.id}${range}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
-											{range}
-										</label>
-									</React.Fragment>)}
-								</div>
-							</div>)}
+				<div className="row">
+					<div className="col-md-6">
+						<label className="col-xs-12">What food options are available in {locationName}?</label>
+						{foodOptions?.map(food => <div className="col-xs-3 col-md-12" key={food.id}>
+							<label className="control control--checkbox" htmlFor={ food.name }>
+								<input name={food.name} type="checkbox" id={ food.name } onChange={() => toggleFood(food)} checked={foodSelected(food)} />
+								<div className="control__indicator"></div>
+								<span className="gray">{food.name}</span>
+							</label>
+						</div>)}
+					</div>
+					<div className="col-md-6">
+						<div className="row" ng-if="locationObj.foodOptions">
+							<label>Cost for a single meal?</label>
+							<div className="row">
+								{selectedFoodOptions?.map(foodOption => <div className="col-md-6 col-xs-6" key={foodOption.id}>
+									<label className="center-block gray">{foodOption.name}</label>
+									<div className="btn-group btn-group-sm">
+										
+										{foodOption.ranges.map((range, index) => <React.Fragment key={range}>
+											<input type="radio" name={`foodOptionCosts.${foodOption.name}`} onChange={() => changeFoodCost(foodOption, range)} checked={foodOptionCosts && foodOptionCosts[foodOption.name] === range}  id={`foodOptionCost${foodOption.id}${range}`} style={{display: 'none'}}/>
+											<label className="btn btn-sm btn-default" htmlFor={`foodOptionCost${foodOption.id}${range}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
+												{range}
+											</label>
+										</React.Fragment>)}
+									</div>
+								</div>)}
+							</div>
 						</div>
 					</div>
 				</div>
