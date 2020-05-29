@@ -39,6 +39,12 @@ a, .dropdown-item {
 input:checked + label.btn {
 	background: #d0d0d0;
 	color: #7c7c7c;
+	border-color: #adadad;
+	background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+	box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+	z-index: 1;
 }
 .pull-left {
 	float: left;
@@ -50,6 +56,7 @@ input:checked + label.btn {
 
 .btn-sm, .btn-group-sm > .btn {
 	font-size: 12px;
+	border-color: #adadad;
 }
 
 .btn-xs {

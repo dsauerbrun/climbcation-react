@@ -21,6 +21,7 @@ interface PropLocation {
 	foodOptionOptions?: FoodOptionOption[];
 	miscSection?: MiscSection;
 	forceUpdate?: any;
+	className?: string;
 }
 
 function NearbyMap({location}: PropLocation) {
@@ -786,7 +787,7 @@ function LocationComponent() {
 	);
 }
 
-function MiscSectionComponent({location, miscSection, forceUpdate}: PropLocation) {
+export function MiscSectionComponent({location, miscSection, forceUpdate, className}: PropLocation) {
 	let [preview, setPreview] = useState<boolean>(Boolean(miscSection?.id));
 	let [isSaving, setIsSaving] = useState<boolean>(false);
 	let [miscState, setMiscState] = useState<MiscSection>(miscSection);
@@ -840,7 +841,7 @@ function MiscSectionComponent({location, miscSection, forceUpdate}: PropLocation
 
 	}
 	return (
-		<div className="misc-section">
+		<div className={classNames("misc-section", className)}>
 			{!preview && <div>
 				<div className="row">
 					<div className={classNames("col-md-11", {'col-md-offset-1': miscSection?.id})}>

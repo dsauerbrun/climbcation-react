@@ -11,6 +11,7 @@ import { useEditables, Month, TransportationOption, AccommodationOption, FoodOpt
 import _ from 'lodash';
 import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
+import { MiscSectionComponent } from './Location';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -34,6 +35,7 @@ interface LocationForm {
 	foodOptionCosts: {"Farmer's Market"?: string, "Restaurant"?: string, Grocery?: string},
 	commonExpensesNotes: string,
 	savingMoneyTips: string,
+	miscSections: MiscSection[],
 }
 
 function NewLocation () {
@@ -96,6 +98,7 @@ function NewLocation () {
 								{page === 2 && <GettingInSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} transportationOptions={transportations} style={{display: page === 2 ? '' : 'none'}}/>}
 								{page === 3 && <AccommodationSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} accommodationOptions={accommodations} style={{display: page === 3 ? '' : 'none'}}/>}
 								{page === 4 && <CostSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} foodOptions={foodOptions} style={{display: page === 4 ? '' : 'none'}}/>}
+								{page === 5 && <MiscSections locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 5 ? '' : 'none'}}/>}
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
@@ -106,8 +109,8 @@ function NewLocation () {
 										<div className=" ">Next</div>
 									</div>}
 									<button className="col-xs-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" ng-click="submitLocation()">
-										<div className=" " ng-if="!loading">Publish</div>
-										<img ng-src="/images/climbcation-loading.gif" ng-if="loading" alt="loading"/>
+										{!isSubmitting && (<div>Publish</div>)}
+										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
 									</button>
 									{page === 6 && <><div className="offset-xs-7 col-xs-1 right-margin">
 										<div className="text-button"><a ng-href="/location/{{locationSlug}}" target="_blank">Preview</a></div>
@@ -141,6 +144,58 @@ interface SectionProps {
 	accommodationOptions?: AccommodationOption[],
 	foodOptions?: FoodOptionOption[],
 	style?: any	
+}
+function MiscSections({locationName, register, setValue, getValues, watch, style}: SectionProps) {
+	useEffect(() => {
+		if (!getValues().miscSections) {
+			register({ name: 'miscSections' });
+			setValue([{miscSections: [{title: '', body: ''}]}])
+		}
+	}, [register]);
+
+
+	let addSection = () => {
+		let newMiscSections = _.cloneDeep(miscSections);
+		newMiscSections.push({title: '', body: ''});
+		setValue([{miscSections: newMiscSections}])
+	}
+
+	let removeSection = (section: MiscSection) => {
+		let newMiscSections = _.cloneDeep(miscSections);
+		newMiscSections = newMiscSections.filter(x => x.title !== section.title && x.body !== section.body);
+
+		setValue([{miscSections: newMiscSections}])
+	}
+
+	let miscSections: MiscSection[] = watch('miscSections');
+	return (
+		<>
+		<div className="row">
+			{miscSections?.map((misc,index) => 
+				<div className="col-md-6" key={misc.title+index}>
+					<MiscSectionComponent location={(new Location({}))} miscSection={misc} />
+					<div className="text-button" onClick={() => removeSection(misc)} >
+						Remove Section
+					</div>
+				</div>
+			)}
+			<div className="col-md-6">
+				<h4>Suggestions</h4>
+				<ul>
+					<li>Connectivity(wifi/cell reception)</li>
+					<li>Rest Day Activities</li>
+					<li>Rock Type</li>
+					<li>Social Scene(bars, where to find partners, etc...)</li>
+					<li>Safety(eg. watch out for theft/scams)</li>
+				</ul>
+			</div>
+		</div>
+		<hr />
+		<div className="btn btn-primary" onClick={() => addSection()} style={{margin: '10px 0'}}>
+			Add Another Section
+		</div>
+		</>
+	);
 }
 
 function CostSection({locationName, register, setValue, getValues, watch, foodOptions, style}: SectionProps) {
