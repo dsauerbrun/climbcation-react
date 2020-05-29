@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { useForceUpdate } from '../common/useForceUpdate';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import { airport, allAirports } from '../common/airportsList';
-import { useEditables, Month, TransportationOption, AccommodationOption } from '../common/useEditables';
+import { useEditables, Month, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
 import _ from 'lodash';
 import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
@@ -27,9 +27,13 @@ interface LocationForm {
 	gettingInNotes: string;
 	walkingDistance: boolean;
 	accommodations: AccommodationOption[],
-	accommodationCosts: {range: string}[],
+	accommodationCosts: {Hostel?: string, Hotel?:string, Camping?: string},
 	closestAccommodation: string,
 	accommodationNotes: string,
+	foodOptions: FoodOptionOption[],
+	foodOptionCosts: {"Farmer's Market"?: string, "Restaurant"?: string, Grocery?: string},
+	commonExpensesNotes: string,
+	savingMoneyTips: string,
 }
 
 function NewLocation () {
@@ -91,6 +95,7 @@ function NewLocation () {
 								<GeneralSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} grades={grades} months={months} climbingTypes={climbingTypes} style={{display: page === 1 ? '' : 'none'}} />
 								{page === 2 && <GettingInSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} transportationOptions={transportations} style={{display: page === 2 ? '' : 'none'}}/>}
 								{page === 3 && <AccommodationSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} accommodationOptions={accommodations} style={{display: page === 3 ? '' : 'none'}}/>}
+								{page === 4 && <CostSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} foodOptions={foodOptions} style={{display: page === 4 ? '' : 'none'}}/>}
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
@@ -134,7 +139,102 @@ interface SectionProps {
 	climbingTypes?: ClimbingType[],
 	transportationOptions?: TransportationOption[],
 	accommodationOptions?: AccommodationOption[],
+	foodOptions?: FoodOptionOption[],
 	style?: any	
+}
+
+function CostSection({locationName, register, setValue, getValues, watch, foodOptions, style}: SectionProps) {
+	useEffect(() => {
+		if (!getValues().foodOptions && !getValues().foodOptionCosts && !getValues().commonExpensesNotes && !getValues().savingMoneyTips) {
+			register({ name: 'foodOptions' });
+			register({ name: 'foodOptionCosts' });
+			register({ name: 'commonExpensesNotes' });
+			register({name: 'savingMoneyTips'});
+		}
+	}, [register]);
+	let selectedFoodOptions: FoodOptionOption[] = watch('foodOptions');
+	let foodOptionCosts = watch('foodOptionCosts');
+	let commonExpensesNotes = watch('commonExpensesNotes');
+	let savingMoneyTips = watch('savingMoneyTips');
+
+	let toggleFood = (food: FoodOptionOption) => {
+		let newFoods: FoodOptionOption[] = _.cloneDeep(selectedFoodOptions) || [];
+		if (newFoods.find(x => x.id === food.id)) {
+			newFoods = newFoods.filter(x => x.id !== food.id);
+			changeFoodCost(food, '')
+		} else {
+			newFoods.push(food);
+
+		}
+
+		setValue([{foodOptions: newFoods}]);
+	}
+
+	let changeFoodCost = (food: FoodOptionOption, range: string) => {
+		if (foodOptionCosts) {
+			foodOptionCosts[food.name] = range;
+		} else {
+			foodOptionCosts = {};
+			foodOptionCosts[food.name] = range;
+		}
+
+		setValue([{foodOptionCosts: foodOptionCosts}]);
+	}
+
+	let foodSelected = (food: FoodOptionOption): boolean => {
+		return Boolean(selectedFoodOptions?.find(x => x.id === food.id));
+	}
+
+	return (
+		<div className="row">
+			<div className="col-md-12 border-bottom bottom-padding bottom-margin">
+				<div className="col-md-6 row">
+					<label className="col-xs-12">What food options are available in {locationName}?</label>
+					{foodOptions?.map(food => <div className="col-xs-3 col-md-12" key={food.id}>
+						<label className="control control--checkbox" htmlFor={ food.name }>
+							<input name={food.name} type="checkbox" id={ food.name } onChange={() => toggleFood(food)} checked={foodSelected(food)} />
+							<div className="control__indicator"></div>
+							<span className="gray">{food.name}</span>
+						</label>
+					</div>)}
+				</div>
+				<div className="col-md-6">
+					<div className="row" ng-if="locationObj.foodOptions">
+						<label>Cost for a single meal?</label>
+						<div className="row">
+							{selectedFoodOptions?.map(foodOption => <div className="col-md-6 col-xs-6" key={foodOption.id}>
+								<label className="center-block gray">{foodOption.name}</label>
+								<div className="btn-group btn-group-sm">
+									
+									{foodOption.ranges.map((range, index) => <React.Fragment key={range}>
+										<input type="radio" name={`foodOptionCosts.${foodOption.name}`} onChange={() => changeFoodCost(foodOption, range)} checked={foodOptionCosts && foodOptionCosts[foodOption.name] === range}  id={`foodOptionCost${foodOption.id}${range}`} style={{display: 'none'}}/>
+										<label className="btn btn-sm btn-default" htmlFor={`foodOptionCost${foodOption.id}${range}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
+											{range}
+										</label>
+									</React.Fragment>)}
+								</div>
+							</div>)}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="col-md-12 row">
+				<div className="col-md-6">
+					<label>Any other common expenses in {locationName}?</label>
+					<div className="form-group">
+						<textarea placeholder="ex. red rock requires entrance fee" className="form-control" rows={4} value={commonExpensesNotes} onChange={(e) => setValue([{commonExpensesNotes: e.target.value}])}></textarea>
+					</div>
+				</div>
+				<div className="col-md-6">
+					<label>Any tips on saving money in {locationName}?</label>
+					<div className="form-group">
+						<textarea placeholder="ex. Mama's chicken is a great restaurant that is very cheap, and trader joes is a cheap but healthy grocery store... you should also hitchhike a bunch since it's easy here" className="form-control" rows={4} value={savingMoneyTips} onChange={(e) => setValue([{savingMoneyTips: e.target.value}])}></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	);
 }
 
 function AccommodationSection({locationName, register, setValue, getValues, watch, accommodationOptions, style}: SectionProps) {
@@ -162,7 +262,6 @@ function AccommodationSection({locationName, register, setValue, getValues, watc
 		}
 
 		setValue([{accommodations: newAccommodations}]);
-
 	}
 
 	let changeAccommodationCost = (accommodation: AccommodationOption, event) => {
