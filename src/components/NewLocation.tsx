@@ -47,8 +47,42 @@ function NewLocation () {
 	let [location, setLocation] = useState<Location>((new Location({})));
 	let {accommodations, climbingTypes, months, grades, foodOptions, transportations} = useEditables();
 	let locationName = watch('name');
-	let completeFunc = () => {
 
+	let getMissingFields = (): string[] => {
+		let missingFields: string[] = []
+		let values = getValues();
+		console.log(values, 'are values');
+		let types = getValues('climbTypes')?.length; 
+		!types && missingFields.push('types');
+		!getValues('months')?.length && missingFields.push('months');
+		(!values.name || values.name === '') && missingFields.push('name');
+		(!values.rating || values.rating < 1 || values.rating > 3) && missingFields.push('rating');
+		(values.soloFriendly !== true && values.soloFriendly !== false && values.soloFriendly !== null) && missingFields.push('soloFriendly');
+		(!values.grades || getValues('grades')?.length !== types) && missingFields.push('grades');
+
+		return missingFields;
+	}
+
+	let generalComplete = (): boolean => {
+		if (getMissingFields().length) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	let gettingInComplete = (): boolean => {
+		let transportCost = getValues('bestTransportationCost'); 
+		return transportCost && transportCost !== '';
+	}
+	let accommodationComplete = (): boolean => {
+		let accommodations = getValues('accommodations');
+
+		return accommodations && accommodations.length > 0;
+	}
+	let costComplete = (): boolean => {
+		let foodOptions = getValues('foodOptions');
+
+		return foodOptions && foodOptions.length > 0;
 	}
 	const onSubmit = async (data) => {
 		console.log('here is data')
@@ -80,7 +114,7 @@ function NewLocation () {
 		<div className="text-center">
 			<h3 className="title-header">Climbcation Location Creation</h3>
 		</div>
-		<NewLocationHeader currentPage={page} generalComplete={completeFunc} gettingInComplete={completeFunc} accommodationComplete={completeFunc} costComplete={completeFunc} changePage={setPage} />
+		<NewLocationHeader currentPage={page} generalComplete={generalComplete} gettingInComplete={gettingInComplete} accommodationComplete={accommodationComplete} costComplete={costComplete} changePage={setPage} />
 		<form onSubmit={handleSubmit(onSubmit)} >
 			<div className="form-container">
 				<div >
@@ -123,7 +157,7 @@ function NewLocation () {
 								</div>
 							</div>
 						</div>
-						<CompletionProgress getValues={getValues} />
+						<CompletionProgress generalComplete={generalComplete} getMissingFields={getMissingFields}/>
 					</div>
 					<div className="row">
 							<div className="offset-md-3 col-md-6 well climbcation-well tips-container">
@@ -159,29 +193,7 @@ interface SectionProps {
 	style?: any	
 }
 
-function CompletionProgress({getValues}) {
-	let getMissingFields = (): string[] => {
-		let missingFields: string[] = []
-		let values = getValues();
-		let types = values.climbTypes?.length; 
-		!values.climbTypes?.length && missingFields.push('types');
-		!values.months?.length && missingFields.push('months');
-		(!values.name || values.name === '') && missingFields.push('name');
-		(!values.rating || values.rating < 1 || values.rating > 3) && missingFields.push('rating');
-		(values.soloFriendly !== true && values.soloFriendly !== false && values.soloFriendly !== null) && missingFields.push('soloFriendly');
-		(!values.grades || values.grades.length !== types) && missingFields.push('grades');
-
-		return missingFields;
-
-	}
-
-	let generalComplete = () => {
-		if (getMissingFields().length) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+function CompletionProgress({generalComplete, getMissingFields}: HeaderProps) {
 
 	let incompletedSectionMessages = (): string[] => {
 		let messages = [];
@@ -831,12 +843,13 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 }
 
 interface HeaderProps {
-	currentPage: number; 
+	currentPage?: number; 
 	generalComplete: Function;
-	gettingInComplete: Function;
-	accommodationComplete: Function;
-	costComplete: Function;
-	changePage: Function;
+	gettingInComplete?: Function;
+	accommodationComplete?: Function;
+	costComplete?: Function;
+	changePage?: Function;
+	getMissingFields?: Function;
 }
 
 function NewLocationHeader({currentPage, generalComplete, gettingInComplete, accommodationComplete, costComplete, changePage}: HeaderProps) {
