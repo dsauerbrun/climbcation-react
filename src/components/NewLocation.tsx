@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { useForceUpdate } from '../common/useForceUpdate';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import { airport, allAirports } from '../common/airportsList';
-import { useEditables, Month } from '../common/useEditables';
+import { useEditables, Month, TransportationOption, AccommodationOption } from '../common/useEditables';
 import _ from 'lodash';
 import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
@@ -18,6 +18,18 @@ interface LocationForm {
 	country: string;
 	rating: number;
 	airport: airport;
+	climbTypes: ClimbingType[];
+	months: Month[];
+	grades: Grade[];
+	transportations: TransportationOption[];
+	bestTransportation: TransportationOption;
+	bestTransportationCost: string;
+	gettingInNotes: string;
+	walkingDistance: boolean;
+	accommodations: AccommodationOption[],
+	accommodationCosts: {range: string}[],
+	closestAccommodation: string,
+	accommodationNotes: string,
 }
 
 function NewLocation () {
@@ -27,7 +39,7 @@ function NewLocation () {
 	let [page, setPage] = useState<number>(1);
 	let [location, setLocation] = useState<Location>((new Location({})));
 	let {accommodations, climbingTypes, months, grades, foodOptions, transportations} = useEditables();
-	watch('name');
+	let locationName = watch('name');
 	let completeFunc = () => {
 
 	}
@@ -76,19 +88,21 @@ function NewLocation () {
 					<div className="row">
 						<div className="offset-md-3 offset-xs-1 col-xs-10 col-md-6 well climbcation-well forms-container">
 							<div className="well-content">
-								<GeneralSection location={location} register={register} watch={watch} getValues={getValues} setValue={setValue} grades={grades} months={months} climbingTypes={climbingTypes} style={{display: page === 1 ? '' : 'none'}} />
+								<GeneralSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} grades={grades} months={months} climbingTypes={climbingTypes} style={{display: page === 1 ? '' : 'none'}} />
+								{page === 2 && <GettingInSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} transportationOptions={transportations} style={{display: page === 2 ? '' : 'none'}}/>}
+								{page === 3 && <AccommodationSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} accommodationOptions={accommodations} style={{display: page === 3 ? '' : 'none'}}/>}
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
 									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" ng-click="prevPage()">
 										{page !== 1 && page !== 6 && <span className="text-button" onClick={() => setPage(page - 1)} >Back</span>}
 									</div>}
-									{page < 5 && <div className="col-xs-2 btn btn-climbcation" ng-click="nextPage()">
+									{page < 5 && <div className="col-xs-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
 										<div className=" ">Next</div>
 									</div>}
 									<button className="col-xs-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" ng-click="submitLocation()">
 										<div className=" " ng-if="!loading">Publish</div>
-										<img ng-src="/images/climbcation-loading.gif" ng-if="loading" />
+										<img ng-src="/images/climbcation-loading.gif" ng-if="loading" alt="loading"/>
 									</button>
 									{page === 6 && <><div className="offset-xs-7 col-xs-1 right-margin">
 										<div className="text-button"><a ng-href="/location/{{locationSlug}}" target="_blank">Preview</a></div>
@@ -110,7 +124,7 @@ function NewLocation () {
 }
 
 interface SectionProps {
-	location: Location,
+	locationName: string,
 	register: any,
 	watch: any,
 	getValues: any,
@@ -118,22 +132,210 @@ interface SectionProps {
 	months?: Month[],
 	grades?: Grade[],
 	climbingTypes?: ClimbingType[],
+	transportationOptions?: TransportationOption[],
+	accommodationOptions?: AccommodationOption[],
 	style?: any	
 }
 
-function GeneralSection({location, register, setValue, getValues, watch, months, grades, climbingTypes, style}: SectionProps) {
+function AccommodationSection({locationName, register, setValue, getValues, watch, accommodationOptions, style}: SectionProps) {
 	useEffect(() => {
-		register({ name: "soloFriendly" });
-		register({ name: 'airport'});
-		register({ name: 'climbTypes'});
-		register({ name: 'grades'});
-		register({ name: 'months'});
+		if (!getValues().accommodations && !getValues().accommodationCosts && !getValues().closestAccommodation && !getValues().accommodationNotes) {
+			register({ name: 'accommodations' });
+			register({ name: 'accommodationCosts' });
+			register({ name: 'closestAccommodation' });
+			register({name: 'accommodationNotes'});
+		}
+	}, [register]);
+	let selectedAccommodations: AccommodationOption[] = watch('accommodations');
+	let accommodationCosts = watch('accommodationCosts');
+	let accommodationNotes = watch('accommodationNotes');
+	let closestAccommodation = watch('closestAccommodation');
+
+	let toggleAccommodation = (accommodation: AccommodationOption) => {
+		let newAccommodations: AccommodationOption[] = _.cloneDeep(selectedAccommodations) || [];
+		if (newAccommodations.find(x => x.id === accommodation.id)) {
+			newAccommodations = newAccommodations.filter(x => x.id !== accommodation.id);
+			changeAccommodationCost(accommodation, {currentTarget: {value: ''}})
+		} else {
+			newAccommodations.push(accommodation);
+
+		}
+
+		setValue([{accommodations: newAccommodations}]);
+
+	}
+
+	let changeAccommodationCost = (accommodation: AccommodationOption, event) => {
+		if (accommodationCosts) {
+			accommodationCosts[accommodation.name] = event.currentTarget.value;
+		} else {
+			accommodationCosts = {};
+			accommodationCosts[accommodation.name] = event.currentTarget.value;
+		}
+
+		setValue([{accommodationCosts: accommodationCosts}]);
+	}
+
+	let accommodationSelected = (accommodation: AccommodationOption): boolean => {
+		return Boolean(selectedAccommodations?.find(x => x.id === accommodation.id));
+	}
+
+	return (
+		<div className="row">
+			<div className="col-md-12 row">
+				<div className="col-md-12">
+					<label className="center-block">Select all available options for accommodation in {locationName}</label>
+					<div className="accommodation-options side-pad border-bottom bottom-margin">
+						{accommodationOptions?.map(accommodation => (<div key={`accommodationOptions${accommodation.id}`} className="accommodation-button-wrapper">
+							<input name="accommodations" className="accommodation-checkbox" type="checkbox" id={ accommodation.name } onChange={() => toggleAccommodation(accommodation)} checked={accommodationSelected(accommodation)} style={{display: 'none'}} />
+							<label htmlFor={accommodation.name} className="btn btn-default accommodation-button">
+								<img src={accommodation.url} alt="accommodation" />
+								<div className="accommodation-cost-container">
+									<label className="light-blue">Cost</label>
+									<select name={`accommodationCosts.${accommodation.name}`} onChange={(e) => changeAccommodationCost(accommodation, e)} value={accommodationCosts && accommodationCosts[accommodation.name]} className="form-control" >
+										<option value={null}></option>
+										{accommodation?.ranges.map(range => (<option key={range} value={range}>{range}</option>))}
+									</select>
+								</div>
+							</label>
+						</div>))}	
+					</div>
+				</div>
+			</div>
+			<div className="col-md-12 row">
+				<div className="col-md-6">
+					<label>Any Additional Tips on staying in {locationName}?</label>
+					<div className="form-group">
+						<textarea placeholder="ex. campground doesnt have water, bring your own. The most fun place to stay is JOSITO! campground has a communal kitchenand communal fridge" className="form-control" rows={4} name="accommodationNotes" onChange={(e) => setValue([{accommodationNotes: e.target.value}])} value={accommodationNotes}></textarea>
+					</div>
+				</div>
+				<div className="col-md-6">
+					<label>How close is the closest accommodation to the crag(s)?</label>
+					<select name="closestAccommodation" onChange={(e) => setValue([{closestAccommodation: e.currentTarget.value}])} value={closestAccommodation} className="form-control">
+						<option value=""></option>
+						<option value="'<1 mile'">&lt;1 mile</option>
+						<option value="'1-2 miles'">1-2 miles</option>
+						<option value="'2-5 miles'">2-5 miles</option>
+						<option value="'5+ miles'">5+ miles</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+	);
+}
+
+function GettingInSection({locationName, register, setValue, getValues, watch, transportationOptions, style}: SectionProps) {
+	useEffect(() => {
+		if (!getValues().transportations && !getValues().bestTransportation && !getValues().bestTransportationCost && !getValues().walkingDistance && !getValues().gettingInNotes) {
+			register({ name: 'transportations' });
+			register({ name: 'bestTransportation' });
+			register({ name: 'bestTransportationCost' });
+			register({name: 'walkingDistance'});
+			register({name: 'gettingInNotes'});
+		}
+	}, [register]);
+	let selectedTransportations: TransportationOption[] = watch('transportations');
+	let bestTransportation: TransportationOption = watch('bestTransportation');
+	let bestTransportationCost: string = watch('bestTransportationCost');
+	let walkingDistance: boolean = watch('walkingDistance');
+	let gettingInNotes = watch('gettingInNotes');
+
+	let toggleTransportation = (transportation: TransportationOption) => {
+		let newTransportations: TransportationOption[] = _.cloneDeep(selectedTransportations) || [];
+		if (newTransportations.find(x => x.id === transportation.id)) {
+			newTransportations = newTransportations.filter(x => x.id !== transportation.id);
+		} else {
+			newTransportations.push(transportation);
+
+		}
+
+		setValue([{transportations: newTransportations}]);
+
+	}
+
+	let transportationIsChecked = (transportationIter: TransportationOption): boolean => {
+		return Boolean(selectedTransportations?.find(x => x.id === transportationIter.id));
+	}
+
+	return (
+		<div className="row">
+			<div className="col-md-12 bottom-padding border-bottom bottom-margin">
+				<div className="row">
+					<div className="col-md-6">
+						<label className="col-md-12">Select all available options for getting to {locationName}</label>
+						{transportationOptions?.map(transportation => (<div className="col-md-12 col-xs-4" key={transportation.id}>
+							<label className="control control--checkbox" htmlFor={ transportation.name }>
+								<input name={transportation.name} type="checkbox" id={ transportation.name } onChange={() => toggleTransportation(transportation)} checked={transportationIsChecked(transportation)} />
+								<div className="control__indicator"></div>
+								<span className="gray">{transportation.name}</span>
+							</label>
+						</div>))
+						}
+					</div>
+					<div className="col-md-6">
+						{selectedTransportations?.length > 0 && <div className="row">
+							<label>What is the best option for getting to {locationName}</label>
+							<div className="btn-group btn-group-sm center-block">
+								{selectedTransportations?.map((bestTransportationOption, index) => (<React.Fragment key={bestTransportationOption.id}><input type="radio" name="bestTransportation" onChange={() => setValue([{bestTransportation: bestTransportationOption}])} checked={bestTransportationOption?.id === bestTransportation?.id}  id={`bestTransOption${bestTransportationOption.id}`} style={{display: 'none'}}/> 
+								<label className={classNames("btn btn-sm btn-default")} htmlFor={`bestTransOption${bestTransportationOption.id}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
+									{bestTransportationOption.name}	
+								</label></React.Fragment>))}
+							</div>
+						</div>}
+						{bestTransportation && <div className="row">
+							<label>How much does a {bestTransportation?.name} cost?</label>
+							<div className="btn-group btn-group-sm center-block">
+								{bestTransportation?.ranges?.map((range, index) => (<React.Fragment key={range}><input type="radio" name="bestTransportationCost" onChange={() => setValue([{bestTransportationCost: range}])} checked={bestTransportationCost === range}  id={`bestTransOptionCost${range}`} style={{display: 'none'}}/> 
+								<label className={classNames("btn btn-sm btn-default")} htmlFor={`bestTransOptionCost${range}`} style={{borderTopLeftRadius: index === 0 ? '3px' : '', borderBottomLeftRadius: index === 0 ? '3px' : ''}}>
+									{range}	
+								</label></React.Fragment>))}
+							</div>
+						</div>}
+					</div>
+				</div>
+			</div>
+			<div className="col-md-12 row">
+				<div className="col-md-6">
+					<label>Any Additional Tips for getting to and around {locationName}?</label>
+					<div className="form-group">
+						<textarea placeholder="ex. Need to take flight to kos, then take a ferry from kos to kalymnos, once you're there you can hitchhike to get groceries easily or you can rent a scooter for $5 a day" className="form-control" rows={4} name="gettingInNotes" onChange={(e) => setValue([{gettingInNotes: e.target.value}])} value={gettingInNotes}></textarea>
+					</div>
+				</div>
+				<div className="col-md-6">
+					<label>Upon arrival, can you reliably get to where you need without a car/motorbike?(eg. crag, camping, food, etc...)</label>
+					<i className="glyphicon glyphicon-info-sign text-gray" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'"></i>
+					<div className="btn-group btn-group-sm center-block btn-group-toggle" data-toggle="buttons" style={{width: '100%'}}>
+						<input type="radio" name="walkingDistance" onChange={() => setValue([{walkingDistance: true}])} checked={walkingDistance === true}  id="walkingDistanceYes" style={{display: 'none'}}/> 
+						<label className={classNames("btn btn-sm btn-default")} htmlFor={`walkingDistanceYes`} style={{borderTopLeftRadius: '3px', borderBottomLeftRadius: '3px' }}>
+							Yes	
+						</label>
+						<input type="radio" name="walkingDistance" onChange={() => setValue([{walkingDistance: false}])} checked={walkingDistance === false}  id="walkingDistanceNo" style={{display: 'none'}}/> 
+						<label className={classNames("btn btn-sm btn-default")} htmlFor={`walkingDistanceNo`} >
+							No
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	);
+}
+
+function GeneralSection({locationName, register, setValue, getValues, watch, months, grades, climbingTypes, style}: SectionProps) {
+	useEffect(() => {
+		if (!getValues().soloFriendly && !getValues().airport && !getValues().climbTypes && !getValues().grades && !getValues().months) {
+			register({ name: "soloFriendly" });
+			register({ name: 'airport'});
+			register({ name: 'climbTypes'});
+			register({ name: 'grades'});
+			register({ name: 'months'});
+		}
 	}, [register]);
 
 	let soloFriendly: boolean = watch('soloFriendly');
 	let airport: airport = watch('airport');
 	let climbTypes: ClimbingType[] = watch('climbTypes');
-	let locationName: string = watch('name');
 	let selectedMonths: Month[] = watch('months');
 	let selectedGrades: Grade[] = watch('grades');
 	let [existingLocation, setExistingLocation] = useState<string[]>();
