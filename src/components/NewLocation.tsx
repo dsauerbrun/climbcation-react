@@ -9,7 +9,7 @@ import AirportAutocomplete from '../common/AirportAutocomplete';
 import { airport, allAirports } from '../common/airportsList';
 import { useEditables, Month, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
 import _ from 'lodash';
-import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
+import { Tooltip, OverlayTrigger, Overlay, Popover, Modal } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
 import { MiscSectionComponent } from './Location';
 import { authContext, User } from '../common/useAuth';
@@ -51,7 +51,6 @@ function NewLocation () {
 	let getMissingFields = (): string[] => {
 		let missingFields: string[] = []
 		let values = getValues();
-		console.log(values, 'are values');
 		let types = getValues('climbTypes')?.length; 
 		!types && missingFields.push('types');
 		!getValues('months')?.length && missingFields.push('months');
@@ -89,26 +88,30 @@ function NewLocation () {
 		console.log(data);
 		if (page !== 5) {
 			setPage(page + 1);
+		} else {
+			//submit
+			if (!generalComplete()) {
+				setShowError(true);
+			} else {
+				alert('completed!')
+			}
 		}
 	}
 
+	let [showError, setShowError] = useState<boolean>(false);
+
 	return (<div id="submit-form">
-		<div id="errorModal" className="modal">
-			<div className="modal-dialog">
-				<div className="modal-content">
-					<div className="modal-header">
-						<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 className="modal-title">Woops!</h4>
-					</div>
-					<div className="modal-body">
-						<p>Looks like you forgot to fill something out in the general section. We're gonna need you to fill out all the starred fields in order to accept this location.</p>
-					</div>
-					<div className="modal-footer">
-						<button type="button" data-dismiss="modal" className="btn btn-default">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<Modal show={showError} id="errorModal" className="modal">
+			<Modal.Header>
+				<Modal.Title>Woops!</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				<p>Looks like you forgot to fill something out in the general section. We're gonna need you to fill out all the starred fields in order to accept this location.</p>
+			</Modal.Body>
+			<Modal.Footer>
+				<div className="btn btn-default" onClick={() => setShowError(false)}>Close</div>
+			</Modal.Footer>
+		</Modal>
 
 
 		<div className="text-center">
