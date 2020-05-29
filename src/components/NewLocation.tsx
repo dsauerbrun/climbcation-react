@@ -44,10 +44,10 @@ function NewLocation () {
 	let { register, handleSubmit, watch, errors, formState, setValue, getValues, reset } = useForm<LocationForm>({});
 	let {dirty, isSubmitting, touched, submitCount} = formState
 	let [page, setPage] = useState<number>(1);
-	let [location, setLocation] = useState<Location>((new Location({})));
 	let {accommodations, climbingTypes, months, grades, foodOptions, transportations} = useEditables();
 	let locationName = watch('name');
 	let [slug, setSlug] = useState<string>();
+	let [locationId, setLocationId] = useState<number>();
 
 	let getMissingFields = (): string[] => {
 		let missingFields: string[] = []
@@ -87,6 +87,8 @@ function NewLocation () {
 
 	let startNewLocation = () => {
 		reset();
+		setLocationId(null);
+		setSlug(null);
 		setPage(1);
 	}
 
@@ -139,8 +141,9 @@ function NewLocation () {
 				};
 
 				try {
-					let resp = await axios.post(`/api/submit_new_location`, reqObj)
+					let resp = await axios.post(`/api/submit_new_location`, reqObj);
 					setSlug(resp.data.slug);
+					setLocationId(resp.data.id);
 					setPage(page + 1);
 				} catch (err) {
 					alert(`error ${err}`);
@@ -177,7 +180,7 @@ function NewLocation () {
 						{page === 2 && <h4 className="offset-md-3 col-md-9" >2. Getting In <span className="small-gray">(How do you get to the crag?)</span></h4>}
 						{page === 3 && <h4 className="offset-md-3 col-md-9" >3. Accommodation <span className="small-gray">(Where will you stay when you get there?)</span></h4>}
 						{page === 4 && <h4 className="offset-md-3 col-md-9" >4. Cost <span className="small-gray">(How much should you expect to spend on this trip?)</span></h4>}
-						{page === 5 && <h4 className="offset-md-3 col-md-9" >5. Other <span className="small-gray">(Anything else you know about { location?.name}?)</span></h4>}
+						{page === 5 && <h4 className="offset-md-3 col-md-9" >5. Other <span className="small-gray">(Anything else you know about { locationName}?)</span></h4>}
 						{page === 6 && <h4 className="offset-md-3 col-md-9" >6. Done</h4>}
 					</div>
 					<div className="row">
@@ -188,7 +191,7 @@ function NewLocation () {
 								{page === 3 && <AccommodationSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} accommodationOptions={accommodations} style={{display: page === 3 ? '' : 'none'}}/>}
 								{page === 4 && <CostSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} foodOptions={foodOptions} style={{display: page === 4 ? '' : 'none'}}/>}
 								{page === 5 && <MiscSections locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 5 ? '' : 'none'}}/>}
-								{page === 6 && <SuccessSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 6 ? '' : 'none'}}/>}
+								{page === 6 && <SuccessSection locationName={locationName} locationId={locationId} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 6 ? '' : 'none'}}/>}
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
@@ -234,6 +237,7 @@ function NewLocation () {
 
 interface SectionProps {
 	locationName: string,
+	locationId?: number,
 	register: any,
 	watch: any,
 	getValues: any,
@@ -298,14 +302,22 @@ function CompletionProgress({generalComplete, getMissingFields}: HeaderProps) {
 	);
 }
 
-function SuccessSection({locationName, register, setValue, getValues, watch, style}: SectionProps) {
+function SuccessSection({locationName, locationId, register, setValue, getValues, watch, style}: SectionProps) {
 	const auth = useContext(authContext);
 	let user: User = auth.user;
 	let [emailThankYou, setEmailThankYou] = useState(false);
+	let [submitterEmail, setSubmitterEmail] = useState<string>();
 
 	let submitEmail = () => {
-		setEmailThankYou(true);
+		axios.post('api/locations/' + locationId + '/email', {email: submitterEmail})
+			.then(function(response) {
+				setEmailThankYou(true);
+			})
 	}
+
+	useEffect(() => {
+		setEmailThankYou(false);
+	}, [locationId])
 
 	return (
 		<div className="row" ng-if="currentPage == 6">
@@ -319,7 +331,7 @@ function SuccessSection({locationName, register, setValue, getValues, watch, sty
 				<label className="col-md-8 email-prompt">
 					Thanks for contributing! An admin might have questions, mind lending us your email?
 				</label>
-				{!emailThankYou && (<><input name="submitterEmail" placeholder="joe@example.com" className="form-control email-input col-md-3"/>
+				{!emailThankYou && (<><input name="submitterEmail" placeholder="joe@example.com" className="form-control email-input col-md-3" onChange={(e) => setSubmitterEmail(e.target.value)} value={submitterEmail} />
 				<div className="col-md-1">
 					<div className="btn btn-climbcation email-btn" onClick={() => submitEmail()}>
 						Submit
