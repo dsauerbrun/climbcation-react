@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import axios from 'axios';
 import Location, {Accommodation, FoodOption, Transportation, MiscSection, ClimbingType, Grade} from '../classes/Location';
 import { useForm } from 'react-hook-form';
@@ -12,6 +12,7 @@ import _ from 'lodash';
 import { Tooltip, OverlayTrigger, Overlay, Popover } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
 import { MiscSectionComponent } from './Location';
+import { authContext, User } from '../common/useAuth';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -99,6 +100,7 @@ function NewLocation () {
 								{page === 3 && <AccommodationSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} accommodationOptions={accommodations} style={{display: page === 3 ? '' : 'none'}}/>}
 								{page === 4 && <CostSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} foodOptions={foodOptions} style={{display: page === 4 ? '' : 'none'}}/>}
 								{page === 5 && <MiscSections locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 5 ? '' : 'none'}}/>}
+								{page === 6 && <SuccessSection locationName={locationName} register={register} watch={watch} getValues={getValues} setValue={setValue} style={{display: page === 6 ? '' : 'none'}}/>}
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
@@ -121,6 +123,7 @@ function NewLocation () {
 								</div>
 							</div>
 						</div>
+						<CompletionProgress getValues={getValues} />
 					</div>
 					<div className="row">
 							<div className="offset-md-3 col-md-6 well climbcation-well tips-container">
@@ -154,6 +157,119 @@ interface SectionProps {
 	accommodationOptions?: AccommodationOption[],
 	foodOptions?: FoodOptionOption[],
 	style?: any	
+}
+
+function CompletionProgress({getValues}) {
+	let getMissingFields = (): string[] => {
+		let missingFields: string[] = []
+		let values = getValues();
+		let types = values.climbTypes?.length; 
+		!values.climbTypes?.length && missingFields.push('types');
+		!values.months?.length && missingFields.push('months');
+		(!values.name || values.name === '') && missingFields.push('name');
+		(!values.rating || values.rating < 1 || values.rating > 3) && missingFields.push('rating');
+		(values.soloFriendly !== true && values.soloFriendly !== false && values.soloFriendly !== null) && missingFields.push('soloFriendly');
+		(!values.grades || values.grades.length !== types) && missingFields.push('grades');
+
+		return missingFields;
+
+	}
+
+	let generalComplete = () => {
+		if (getMissingFields().length) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	let incompletedSectionMessages = (): string[] => {
+		let messages = [];
+		let missingFields = getMissingFields();
+		if (missingFields.length) {
+			if (missingFields.indexOf('name') > -1) {
+				messages.push('Please enter a location name.');
+			}
+
+			if (missingFields.indexOf('types') > -1) {
+				messages.push('Please choose at least one climbing discipline.');
+			}
+
+			if (missingFields.indexOf('grades') > -1) {
+				messages.push('Please choose a grade for all selected climbing disciplines.');
+			}
+
+			if (missingFields.indexOf('rating') > -1) {
+				messages.push('Please enter a location rating.');
+			}
+
+			if (missingFields.indexOf('months') > -1) {
+				messages.push('Please choose the months this location is in season.');
+			}
+
+			if (missingFields.indexOf('soloFriendly') > -1) {
+				messages.push('Please let us know if this is a solo friendly or not.')
+			}
+		} else {
+			messages.push('You\'re all done with the required information and can submit your location NOW! We appreciate any other info you can provide us on the other pages!');
+		}
+
+		return messages;
+	}
+	return (
+		<div className="col-md-3 hidden-xs">
+			<div className="well climbcation-well forms-container">
+				<div className="well-content">
+					<h4>{ generalComplete() ? 'Form Completed!' : 'Form Incomplete'}</h4>
+					<ul>
+						{incompletedSectionMessages()?.map(incompleted => <li key={incompleted}>
+							{incompleted}
+						</li>)}
+					</ul>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function SuccessSection({locationName, register, setValue, getValues, watch, style}: SectionProps) {
+	const auth = useContext(authContext);
+	let user: User = auth.user;
+	let [emailThankYou, setEmailThankYou] = useState(false);
+
+	let submitEmail = () => {
+		setEmailThankYou(true);
+	}
+
+	return (
+		<div className="row" ng-if="currentPage == 6">
+			<div className="row text-center">
+				<h3 className="bottom-padding">Congrats!</h3>
+				<h4>You've added all the necessary content.</h4>
+				<h4 className="bottom-padding">You should see your location available in a day after an admin reviews the content</h4>
+				<img src="/images/success-icon.png" alt="success" />
+			</div>
+			{!user && <div className="row bottom-padding">
+				<label className="col-md-8 email-prompt">
+					Thanks for contributing! An admin might have questions, mind lending us your email?
+				</label>
+				{!emailThankYou && (<><input name="submitterEmail" placeholder="joe@example.com" className="form-control email-input col-md-3"/>
+				<div className="col-md-1">
+					<div className="btn btn-climbcation email-btn" onClick={() => submitEmail()}>
+						Submit
+					</div>
+				</div></>)}
+				{emailThankYou && <label className="col-md-4 email-prompt">
+					Thank you!
+				</label>}
+			</div>}
+			<div className="row bottom-padding">
+				<h4 className="col-md-12">Forget some information? Just click on the preview link and edit your location page there!</h4>
+			</div>
+		</div>
+
+	);
+
 }
 function MiscSections({locationName, register, setValue, getValues, watch, style}: SectionProps) {
 	useEffect(() => {
