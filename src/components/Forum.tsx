@@ -63,10 +63,10 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     return (
         <>
         <LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
-        {!user?.user_id && <div ng-show="!authService.user" className="text-gray">
+        {!user?.user_id && <div className="text-gray">
             Please <div className="anchor" onClick={() => showLogin()} style={{display: 'inline', cursor: 'pointer'}}>Login</div> to post a comment. Don't have an account? <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline', cursor: 'pointer'}}>Signup</div> here
         </div>}
-        <div className="new-post-container" ng-show="authService.user">
+        <div className="new-post-container">
             {commentError && <div className="alert alert-danger alert-dismissable">
                 <button type="button" className="close" onClick={() => setCommentError(null)}>&times;</button>
                 {commentError}
@@ -91,18 +91,19 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     );
 }
 
-export function Thread({posts}: {posts: Post[]}) {
+export function Thread({posts, editCallback}: {posts: Post[], editCallback: Function}) {
     return (
         <>
-        {posts.map(post => <React.Fragment key={post.id}><PostComponent post={post} /></React.Fragment>)}
+        {posts.map(post => <React.Fragment key={post.id}><PostComponent editCallback={editCallback} post={post} /></React.Fragment>)}
         </>
     );
 }
 
-export function PostComponent({post}: {post: Post}) {
+export function PostComponent({post, editCallback}: {post: Post, editCallback?: Function}) {
     let [isEditing, setIsEditing] = useState<boolean>(false);
     let [commentError, setCommentError] = useState<string>(null);
     let [originalContent, setOriginalContent] = useState<string>(post?.content);
+    let [editedContent, setEditedContent] = useState<string>(post?.content);
 	const auth = useContext(authContext);
     let user: User = auth.user;
 
@@ -116,9 +117,23 @@ export function PostComponent({post}: {post: Post}) {
         setIsEditing(false);
     }
 
-    let editComment = (post: Post) => {
+    let editComment = async (post: Post) => {
+		if (!editedContent || editedContent.length < 3) {
+			setCommentError("Your post must be at least 3 characters long");
+			return;
+		}
 
+		setCommentError(null);
+		try {
+            await axios.post(`/api/posts/${post.id}`, {newContent: editedContent});
+            setIsEditing(false);
+            editCallback && editCallback()
+		} catch (err) {
+			console.log(err.response);
+			setCommentError(err.response.data);
+		}
     }
+
     return (
         <div className="post">
             <div className="post-title">
@@ -136,9 +151,9 @@ export function PostComponent({post}: {post: Post}) {
                 </div>
             }
             {isEditing && <textarea 
-                ng-model="post.editedContent" 
                 className="form-control"
-                ng-show="post.editing"
+                onChange={(e) => setEditedContent(e.target.value)}
+                value={editedContent}
             ></textarea>}
             {user?.user_id === post.user_id && <div className="post-actions">
                 {!isEditing && <a onClick={() => startEditing()}>Edit</a>}

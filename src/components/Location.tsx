@@ -793,7 +793,7 @@ function LocationComponent() {
 						<div className="col-md-8">
 							<div className="well location-posts-container">	
 								<PostInput threadId={posts && posts[0]?.forum_thread_id} slug={location?.slug} callBack={regetPosts} />
-								<Thread posts={posts} />
+								<Thread posts={posts} editCallback={regetPosts} />
 							</div>
 						</div>
 						<div className="col-md-4">
