@@ -12,6 +12,7 @@ import { Post } from '../classes/Forum';
 import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { useEditables, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
+import { useHistory } from 'react-router-dom';
 
 
 interface PropLocation {
@@ -26,8 +27,9 @@ interface PropLocation {
 
 function NearbyMap({location}: PropLocation) {
 	let height = '16em';
-	let markerClick = (marker) => {
-		// change 
+	const history = useHistory();
+	let markerClick = (location) => {
+		history.push(`/location/${location.slug}`)
 	}
 	let [mapProps, setMapProps] = useState({
 		options: {
@@ -78,50 +80,15 @@ function InfoHeader({location}: PropLocation) {
 
 								<div style={{display: 'block'}}>
 									{location?.latitude && <NearbyMap location={location} />}
-								<div className={classNames("nearby-locations", {expanded: nearbyShow})}>
-									{nearbyShow && <div className="nearby-display">
-										{location.nearby?.map((nearbyLoc) => (<div className="nearby-location" key={nearbyLoc.name}>
-											<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> <span className="text-gray bold">({nearbyLoc.distance} mi away)</span>
-											{nearbyLoc?.climbing_types.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
-										</div>))}
-									</div>}
-									<a className="toggle" onClick={() => setNearbyShow(!nearbyShow)}>{ nearbyShow? '[-] Hide Nearby Locations':'[+] Show Nearby Locations' }</a>
-								</div>
-									{/*
-									<div className="location-card map-info-window-arrow-bottom">
-										<div className="location-card-info">
-											<div className="row">
-												<div className="col-md-8 location-list-thumb-container">
-													<a ng-href="/location/{{ hoveredLocation.location.slug }}">
-														<img className="location-list-thumb" ng-src="{{ hoveredLocation.location['home_thumb'] }}">	
-														<div className="location-list-thumb-title">
-															<h3 className="text-gray">{{ hoveredLocation.location['name'] }}</h3>
-														</div>
-													</a>
-
-												</div>
-												<div className="col-md-4 location-card-attributes">
-													<div className="col-xs-12 col-md-12">
-														<label>Climbing Types</label>
-														<img ng-repeat="type in hoveredLocation.location['climbing_types']" ng-src="{{ type['url'] }}" className='icon' title="{{ type['name'] }}">
-													</div>
-													<div className="col-xs-12 col-md-12">
-														<label>Best Seasons</label>
-														<p className="text-gray info-text">{{ hoveredLocation.location['date_range']}}</p>
-													</div>
-													<div className="col-xs-12 col-md-12">
-														<label>Rating</label>
-														<span data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="helperService.getRatingName(hoveredLocation.location.rating)">
-															<span className="glyphicon glyphicon-star" ></span>
-															<span className="glyphicon glyphicon-star" ng-class="{'glyphicon-star-empty': hoveredLocation.location.rating < 2}"></span>
-															<span className="glyphicon glyphicon-star" ng-class="{'glyphicon-star-empty': hoveredLocation.location.rating < 3}"></span>
-														</span>
-													</div>
-												</div>
-											</div>
-										</div>
+									<div className={classNames("nearby-locations", {expanded: nearbyShow})}>
+										{nearbyShow && <div className="nearby-display">
+											{location.nearby?.map((nearbyLoc) => (<div className="nearby-location" key={nearbyLoc.name}>
+												<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> <span className="text-gray bold">({nearbyLoc.distance} mi away)</span>
+												{nearbyLoc?.climbing_types.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
+											</div>))}
+										</div>}
+										<a className="toggle" onClick={() => setNearbyShow(!nearbyShow)}>{ nearbyShow? '[-] Hide Nearby Locations':'[+] Show Nearby Locations' }</a>
 									</div>
-									*/}
 								</div>
 							</div>
 							<div className="location-photo well climbcation-well">
@@ -707,7 +674,7 @@ function LocationComponent() {
 		});
 		regetPosts();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [slug]);
 
 	let addMiscSection = () => {
 		if (location?.miscSections?.find(x => !x.id)) {

@@ -10,6 +10,7 @@ import { allAirports, airport } from '../common/airportsList';
 import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { LocationsFetch } from './useLocationsFetcher';
+import { useHistory } from 'react-router-dom';
 
 function FilterCrumbs(props: any) {
 	let filters: FilterParams = props.filterParams;
@@ -183,6 +184,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 			setFilterState(newFilters);
 		}
 	}
+	const history = useHistory();
 
 	let mapProps = {
 		options: {
@@ -194,7 +196,9 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 		onDragEnd: mapMoved,
 		onZoomChange: mapMoved,
 		markers: unpaginatedLocations,
-		markerClickFunc: null,
+		markerClickFunc: (location) => {
+			history.push(`/location/${location.slug}`)
+		},
 		onMount: null, className: null, onMountProps: null, styles: null
 	};
 
