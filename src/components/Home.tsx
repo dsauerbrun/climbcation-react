@@ -9,6 +9,8 @@ import useLocationsFetcher, { LocationsFetch } from './useLocationsFetcher';
 import { FilterParams } from '../classes/FilterParams';
 import Map from './MapFilter';
 import classNames from 'classnames';
+import axios from 'axios';
+import { animateScroll } from "react-scroll";
 
 export const FilterContext = createContext<filterHook>({});
 export const LocationsContext = createContext<LocationsFetch>({});
@@ -49,7 +51,9 @@ function Home() {
 			onDragEnd: mapMoved,
 			onZoomChange: mapMoved,
 			markers: locationsFetchHook.unpaginatedLocations,
-			markerClickFunc: null,
+			markerClickFunc: (location) => {
+				locationsFetchHook.addSingleLocation(location);
+			},
 			onMount: null, className: null, onMountProps: null
 		};
 	}
@@ -71,7 +75,7 @@ function Home() {
 				<Hero />
 				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} />
 				<div className="row">
-					<div className={classNames({'large-map': largeMapEnabled})}>
+					<div id="locations-window" className={classNames({'large-map': largeMapEnabled})}>
 						<LocationTilesContainer setHoveredLocation={setHoveredLocation} />
 					</div>
 					{largeMapEnabled && (<div>

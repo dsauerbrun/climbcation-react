@@ -10,7 +10,7 @@ export function LocationTile(props: any) {
     let location: Location = new Location(props.location);
     let setHoveredLocation = props.setHoveredLocation;
     return (
-        <div className="location-item" onMouseOver={() => setHoveredLocation(location)} onMouseOut={() => setHoveredLocation(null)}>
+        <div className={`location-item locationscroller${props.id}`} data-name={`locationscroller${props.id}`} onMouseEnter={() => setHoveredLocation(location)} onMouseLeave={() => setHoveredLocation(null)}>
             <div className="location-card">
                 <div className="location-card-info">
                     <div className="row">
@@ -141,7 +141,7 @@ function LocationTilesContainer({setHoveredLocation}) {
         >
             <div className="locations-window">
                 {
-                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} setHoveredLocation={setHoveredLocation}/>))
+                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} id={location.id} location={location} setHoveredLocation={setHoveredLocation}/>))
                 }
             </div>
         </InfiniteScroll>

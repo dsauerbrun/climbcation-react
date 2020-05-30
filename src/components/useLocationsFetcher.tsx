@@ -1,11 +1,15 @@
 import {useState, useEffect} from 'react';
 import { FilterParams } from '../classes/FilterParams';
+import axios from 'axios';
+import { animateScroll } from "react-scroll";
+import { useForceUpdate } from '../common/useForceUpdate';
 
 export interface LocationsFetch {
     nextLocations?: any,
     locations?: any[],
     noMoreLocations?: boolean,
-    unpaginatedLocations?: any[]
+    unpaginatedLocations?: any[],
+    addSingleLocation?: Function,
 }
 
 let reloadTimeout: number = null;
@@ -35,6 +39,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         };
         let filteredFetch = await fetch('/api/filter_locations', requestOptions);
         let filtered = await filteredFetch.json() as any
+        filtered.paginated = filtered.paginated.filter(x => !locations.find(y => y.id === x.id));
         locations = locations.concat(filtered.paginated);
         setLocations(locations);
         if (filtered.paginated.length === 0) {
@@ -78,7 +83,34 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
 	// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterState.filterChangedChecker]);
 
-    return {nextLocations, locations, noMoreLocations, unpaginatedLocations};
+    let forceUpdate = useForceUpdate();
+
+    let addSingleLocation = (location) => {
+            var exists = locations?.find(function(locationIter) {
+                return locationIter.id === location.id;
+            });
+            if (!exists) {
+                axios.get('/api/location/' + location.slug).then(function(resp) {
+                    let newLocation = resp.data.location;
+                        locations?.unshift(newLocation);
+                        setLocations(locations);
+                        animateScroll.scrollToTop({
+                            containerId: "locations-window"
+                        });
+                        forceUpdate();
+                    }
+                );
+            } else {
+                locations = locations.filter(x => x.id !== exists.id);
+                locations?.unshift(exists);
+                setLocations(locations);
+                animateScroll.scrollToTop({
+                    containerId: "locations-window"
+                });
+                forceUpdate();
+            }
+    }
+    return {nextLocations, addSingleLocation, locations, noMoreLocations, unpaginatedLocations};
 }
 
 export default useLocationsFetcher;

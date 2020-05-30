@@ -72,7 +72,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
     })
     if (clickFunc) {
         marker.addListener(`click`, (e) => {
-            clickFunc(e);
+            clickFunc(location);
         })
     }
 
