@@ -4,6 +4,7 @@ import {useParams, Link} from "react-router-dom";
 import axios from 'axios';
 import classNames from 'classnames';
 import Location, {Accommodation, FoodOption, Transportation, MiscSection} from '../classes/Location';
+import AirportAutocomplete from '../common/AirportAutocomplete';
 import Linkify from 'react-linkify';
 import { useForm } from "react-hook-form";
 import { useForceUpdate } from '../common/useForceUpdate';
@@ -13,6 +14,9 @@ import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { useEditables, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
 import { useHistory } from 'react-router-dom';
+import { airport, allAirports } from '../common/airportsList';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { transformQuotesToChartData } from './LocationsTilesContainer';
 
 
 interface PropLocation {
@@ -628,22 +632,79 @@ function CostComponent({location, foodOptionOptions}: PropLocation) {
 	);
 }
 function FlightCostComponent({location}: PropLocation) {
+	let storedIataCode = localStorage.getItem('airport') ? JSON.parse(localStorage.getItem('airport'))?.iata_code : 'DEN';
+	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === storedIataCode) || allAirports[0]);
+	let airportCode = selectedAirport?.iata_code;
+	let forceUpdate = useForceUpdate();
+    let lowPrice: {date: string, cost: number} = {date: '11/11', cost: 999999999999999999999999};
+
+    let getFlightQuotes = async (originAirportCode: string) => {
+		if (selectedAirport && location?.slug) {
+			return axios.post('/api/collect_locations_quotes', {slugs: [location?.slug], origin_airport: selectedAirport.iata_code}).then(function(response){
+				let flightQuotes = response.data;
+				let locationQuote = flightQuotes.find(x => x.id === location.id);
+				location.flightPrice = locationQuote;
+				location.referral = locationQuote?.referral;
+				forceUpdate();
+			});
+
+		}
+	}
+	
+	useEffect(() => {
+		getFlightQuotes(airportCode);
+	}, [location])
+	useEffect(() => {
+		getFlightQuotes(airportCode);
+	}, [selectedAirport])
 	return (
 		<div className="col-md-6">
 			<div className="well climbcation-well">
 				<h3>One way flight cost(
 					<div className="airport-wrapper inline">
-						<input className="form-control inline" ng-model="helperService.originAirport" ng-trim="true"
-						typeahead-wait-ms="100" uib-typeahead="airport.name for airport in helperService.getAirports($viewValue)"
-						typeahead-popup-template-url="views/airport_autocomplete.tpl.html"
-						typeahead-on-select="getAirport($item, $model, $label, $event)"/>
-						<div className="loading-airports" ng-if="helperService.loadingAirports">
-							<img src="/images/climbcation-loading.gif" alt="loading"/>
-						</div>
+						<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} style={{display: 'inline-block'}}/>
 					</div>
-					to {location?.airport_code})</h3>
-				<div id="highchart{{locationData.airport_code + '-' + locationData.slug + '-' + locationData.id}}">
-				</div>
+					to {location?.airport_code})
+				</h3>
+                <div className="location-airfare">
+                    {airportCode === location?.airport_code ? 
+                        <div className="sorry-message" ng-if="helperService.originAirport == location.airport_code">
+                            <h4>This Destination's airport is the same as the one you are flying out of.</h4>
+                        </div>
+                        :
+                    (location?.flightPrice === undefined ? <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading" /> :
+                    (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
+                    <>
+                        <div>
+                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
+                        </div>
+                        <ResponsiveContainer width="95%" height={125}>
+                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} margin={'0 auto'}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="cost" stroke="#3c7e91" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </>
+                    : 
+                    <div className="sorry-message">
+                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airport_code }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
+                    </div>))}
+                    {
+                        lowPrice?.cost !== 999999999999999999999999 && <div>
+                            <div className="row">
+                                <span className="col-md-6">
+                                <label>Airline Prices(hover to see prices) </label>
+                                </span>
+                                <span className="col-md-6 text-right">
+                                    <a href={location?.referral}><h4 className="text-gray">Low of ${lowPrice.cost} on {lowPrice.date}</h4></a>
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
 			</div>
 		</div>
 

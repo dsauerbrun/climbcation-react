@@ -95,7 +95,7 @@ export default function AirportAutocomplete(props: any) {
     });
 
 	return (
-		<div>
+		<div style={props.style}>
 			<div {...getRootProps()}>
 			<input className="form-control" {...getInputProps()} />
 			</div>

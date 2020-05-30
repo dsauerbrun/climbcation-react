@@ -6,30 +6,35 @@ import classNames from 'classnames';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { IconTooltip } from '../common/HelperComponents';
 import { LocationsFetch } from './useLocationsFetcher';
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
+    let data = [];
+    if (flightQuotes) {
+        let months = Object.keys(flightQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1);
+        months.forEach(month => {
+            let monthQuotes = flightQuotes[month];
+            Object.keys(monthQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1).forEach(day => {
+                data.push({name: `${month}/${day}`, cost: flightQuotes[month][day]})
+                if (!lowPrice || lowPrice.cost > parseInt(flightQuotes[month][day])) {
+                    if (!lowPrice) {
+                        throw 'Error setting low price';
+                    }
+                    lowPrice.date = `${month}/${day}`;
+                    lowPrice.cost = parseInt(flightQuotes[month][day]);
+                }
+            })
+        })
+    }
+    return data;
+}
 
 export function LocationTile(props: {location: Location, setHoveredLocation: Function, airportCode: string}) {
     let location: Location = props.location;
     let setHoveredLocation = props.setHoveredLocation;
     let airportCode = props.airportCode; 
-    let lowPrice: {date: string, cost: number} = null;
+    let lowPrice: {date: string, cost: number} = {date: '11/11', cost: 999999999999999999999999};
 
-    let transformQuotesToChartData = (flightQuotes) => {
-        let data = [];
-        if (flightQuotes) {
-            let months = Object.keys(flightQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1);
-            months.forEach(month => {
-                let monthQuotes = flightQuotes[month];
-                Object.keys(monthQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1).forEach(day => {
-                    data.push({name: `${month}/${day}`, cost: flightQuotes[month][day]})
-                    if (!lowPrice || lowPrice.cost > parseInt(flightQuotes[month][day])) {
-                        lowPrice = {date: `${month}/${day}`, cost: parseInt(flightQuotes[month][day])};
-                    }
-                })
-            })
-        }
-        return data;
-    }
     return (
         <div className={`location-item`} onMouseEnter={() => setHoveredLocation(location)} onMouseLeave={() => setHoveredLocation(null)}>
             <div className="location-card">
@@ -112,13 +117,13 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                         </div>
                         :
                     (location?.flightPrice === undefined ? <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading" /> :
-                    (transformQuotesToChartData(location?.flightPrice?.quotes).length ? 
+                    (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
                             <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
-                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes)} margin={'0 auto'}>
+                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} margin={'0 auto'}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" />
                                 <YAxis />
@@ -132,7 +137,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                         <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airport_code }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
                     </div>))}
                     {
-                        lowPrice && <div>
+                        lowPrice?.cost !== 999999999999999999999999 && <div>
                             <div className="row">
                                 <span className="col-md-6">
                                 <label>Airline Prices(hover to see prices) </label>
