@@ -39,10 +39,12 @@ function Home() {
 	let getNewMapProps = () => {
 		return {
 			options: {
-			center: filterParamHook.filterState.center,
-			zoom: 2,
-			mapTypeId: 'roadmap',
-			id: 'mapFilterLarge',
+				center: filterParamHook.filterState.center,
+				zoom: 2,
+				mapTypeId: 'roadmap',
+				id: 'mapFilterLarge',
+				gestureHandling: 'greedy',
+				scrollWheel: false
 			},
 			styles: {
 				width: '58vw',
@@ -57,15 +59,7 @@ function Home() {
 			onMount: null, className: null, onMountProps: null
 		};
 	}
-	let [mapProps, setMapProps] = useState(getNewMapProps());
-
-	useEffect(() => {
-		setMapProps(getNewMapProps());
-	}, [largeMapEnabled])
-
-	useEffect(() => {
-		setMapProps(getNewMapProps());
-	}, [locationsFetchHook.unpaginatedLocations])
+	let mapProps = getNewMapProps();
 
 	return (
 		<FilterContext.Provider value={filterParamHook}>

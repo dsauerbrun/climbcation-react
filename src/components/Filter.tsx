@@ -193,7 +193,9 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 		  center: filterState.center,
 		  zoom: filterState.zoom,
 		  mapTypeId: 'roadmap',
-		  id: 'mapFilter'
+		  id: 'mapFilter',
+		  gestureHandling: 'greedy',
+		  scrollWheel: false
 		},
 		onDragEnd: mapMoved,
 		onZoomChange: mapMoved,
