@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Col from 'react-bootstrap/Col';
-import {Row, Dropdown} from 'react-bootstrap';
+import {Row, Dropdown, Navbar, NavDropdown, Form, FormControl, Button} from 'react-bootstrap';
 import {authContext, User} from './useAuth';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
@@ -28,41 +28,37 @@ function Header() {
 
 	return (
 		<>
-		<Nav className="navbar home navbar-inverse">
-	    <div className="d-sm-none">
-	      <div className="navbar-header">
-	        <button type="button" className="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-	          <span className="icon-bar"></span>
-	          <span className="icon-bar"></span>
-	          <span className="icon-bar"></span>
-	        </button>
-	        <Link className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} to="/home">
-	          <img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
-	        </Link>
-	      </div>
+		<Navbar className="navbar home navbar-inverse" expand="lg">
+			<div className="d-sm-none">
+				<Link className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} to="/home">
+				<img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
+				</Link>
+				<Navbar.Toggle aria-controls="basic-navbar-nav" bsPrefix="mobile-toggler navbar-toggler" />
+				<Navbar.Collapse id="basic-navbar-nav">
+						<ul className="nav navbar-nav">
+							{user?.username && <li>Welcome {user?.username}</li>}
+							<li role="separator" className="divider"></li>
+							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => auth.resetPassword(user.email)}>Change Password</a></li>
+							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
+							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
+							<li><a onClick={() => showLogin()} style={{display: 'inline'}}>Login</a> / <a onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</a></li>
+							}
+							<li role="separator" className="divider"></li>
+							<li><Link to="/new-location">Submit a New Location</Link></li>
+							<li><Link to="/about">What is Climbcation?</Link></li>
+							<li><a href="mailto:info@climbcation.com">Email Me!</a></li>
+							<li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
+							<li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
+						</ul>
 
-	      <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	        <ul className="nav navbar-nav">
-	          <li><a href="/home">Welcome username</a></li>
-	          <li role="separator" className="divider"></li>
-	          <li role="presentation" ><a href="home" role="menuitem" onClick={() => console.log('reset')/*resetPassword('email@email.com')*/}>Change Password</a></li>
-	          <li role="presentation" ><a role="menuitem" tabIndex={-1} href="/profile">Change Username</a></li>
-	          <li role="presentation" ><a role="menuitem" tabIndex={-1} href="/api/user/logout" target="_self">Logout</a></li>
-	          <li role="separator" className="divider"></li>
-	          <li><a href="new-location">Submit a New Location</a></li>
-	          <li><Link to="/about">What is Climbcation?</Link></li>
-	          <li><a href="mailto:info@climbcation.com">Email Me!</a></li>
-	          <li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
-	          <li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
-	        </ul>
-	      </div>
-	    </div>
-		{/*
-		
-			MOBILE VERSION ABOVE
-		
-		
-		*/}
+				</Navbar.Collapse>
+
+			</div>
+
+
+
+
+
 	    <div className="container d-none d-md-block" style={{width: '90%', margin: '0 auto', maxWidth: 'inherit'}}>
 		    <Row>
 		      <Col md={2} className="nav-link text">
@@ -95,13 +91,12 @@ function Header() {
 		      </Col>
 		      <Col md={2} className="nav-link text">
 		        <a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'middle'}}><span className="glyphicon glyphicon-envelope"></span></a>
-		        {/*instagram badge script*/}
 		        <a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a>
 		        <div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
 		      </Col>
 	      </Row>
-	    </div>
-	  </Nav>
+		</div>
+	  </Navbar>
 				<LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
 	</>
 	);
