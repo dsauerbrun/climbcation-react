@@ -12,7 +12,7 @@ import _ from 'lodash';
     },
   }
 
-export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,location,isSecondary, clickFunc: Function = null, setHoveredLocation, mapName): google.maps.Marker {
+export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,location,isSecondary, clickFunc: Function = null, setTooltipLocation, mapName): google.maps.Marker {
     const marker = new window.google.maps.Marker({
         map,
         position: {lat, lng},
@@ -29,7 +29,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
                 bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
             );
         };
-        setHoveredLocation(new Location(location));
+        setTooltipLocation(new Location(location));
         let point = map.overlay.getProjection().fromLatLngToContainerPixel(this.getPosition());
         var offsetCalcY = 0;
         var offsetCalcX = 0;
@@ -90,12 +90,12 @@ class ClimbcationMap extends google.maps.Map {
     overlay: google.maps.OverlayView;
 }
 
-function Map({ options, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange, markerClickFunc }) {
+function Map({ options, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange, markerClickFunc, hoveredLocation}) {
     const ref = useRef()
     const [map, setMap] = useState<ClimbcationMap>();
     const [mapId, setMapId] = useState<string>(options.id || 'mapFilter');
     let [pushedMarkers, setPushedMarkers] = useState<google.maps.Marker[]>([]);
-    let [hoveredLocation, setHoveredLocation] = useState<Location>(null);
+    let [tooltipLocation, setTooltipLocation] = useState<Location>(null);
   
     useEffect(() => {
         setMapId(options.id);
@@ -147,7 +147,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
 
             let markersToAdd = markers.filter(newMarker => !pushedMarkers.find(pushedMarker => pushedMarker.getPosition().lat() === newMarker.latitude));
             markersToAdd?.forEach(function(marker) {
-                newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, marker.isPrimary ? true : false, markerClickFunc, setHoveredLocation, options.id));
+                newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, marker.isPrimary ? true : false, markerClickFunc, setTooltipLocation, options.id));
             })
             setPushedMarkers(newMarkerSet);
         }
@@ -164,6 +164,21 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
         refreshMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [markers])
+
+    useEffect(() => {
+        let primaryUrl = 'https://s3-us-west-2.amazonaws.com/climbcation-front/assets/primary.png';
+        pushedMarkers.forEach(marker => {
+            if (marker.getPosition().lat() === hoveredLocation?.latitude) {
+                marker.setIcon(primaryUrl);
+                marker.setZIndex(19999999999);
+            } else {
+                if (marker.getIcon() === primaryUrl) {
+                    marker.setIcon('');
+                    marker.setZIndex(1)
+                }
+            }
+        });
+    }, [hoveredLocation])
   
     if (map && typeof onMount === `function`) onMount(map, onMountProps)
   
@@ -179,10 +194,10 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
                     <div className="location-card-info">
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
-                                <a href={`/location/${ hoveredLocation?.slug }}`}>
-                                    <img className="location-list-thumb" src={hoveredLocation?.home_thumb} alt="location thumbnail" />	
+                                <a href={`/location/${ tooltipLocation?.slug }}`}>
+                                    <img className="location-list-thumb" src={tooltipLocation?.home_thumb} alt="location thumbnail" />	
                                     <div className="location-list-thumb-title">
-                                        <h3 className="text-gray">{ hoveredLocation?.name }</h3>
+                                        <h3 className="text-gray">{ tooltipLocation?.name }</h3>
                                     </div>
                                 </a>
 
@@ -190,23 +205,23 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
                             <div className="col-md-4 location-card-attributes">
                                 <div className="col-xs-12 col-md-12">
                                     <label>Climbing Types</label>
-                                    {hoveredLocation?.climbing_types?.map(type => (
+                                    {tooltipLocation?.climbing_types?.map(type => (
                                         <img src={ type?.url } className='icon' title={ type?.name } alt={type?.name} key={type?.name} />
                                     ))}
                                 </div>
                                 <div className="col-xs-12 col-md-12">
                                     <label>Best Seasons</label>
-                                    <p className="text-gray info-text">{ hoveredLocation?.date_range}</p>
+                                    <p className="text-gray info-text">{ tooltipLocation?.date_range}</p>
                                 </div>
                                 <div className="col-xs-12 col-md-12">
                                     <label>Rating</label>
                                         <IconTooltip
-                                                tooltip={hoveredLocation?.rating === 1 ? 'Worth a stop' : (hoveredLocation?.rating === 2 ? 'Worth a detour' : 'Worth its own trip')}
+                                                tooltip={tooltipLocation?.rating === 1 ? 'Worth a stop' : (hoveredLocation?.rating === 2 ? 'Worth a detour' : 'Worth its own trip')}
                                                 dom={
                                                     <span>
                                                         <span className="glyphicon glyphicon-star" ></span>
-                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.rating < 2}])}></span>
-                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': hoveredLocation?.rating < 3}])}></span>
+                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': tooltipLocation?.rating < 2}])}></span>
+                                                        <span className={classNames(["glyphicon glyphicon-star", {'glyphicon-star-empty': tooltipLocation?.rating < 3}])}></span>
                                                     </span>
                                                 }
                                             />

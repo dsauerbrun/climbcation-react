@@ -44,7 +44,6 @@ function FilterCrumbs(props: any) {
 				}
 			</div>
 			<div className="col-md-4">
-				<span className="hidden-xs hidden-sm text-button right-margin" ng-click="toggleLargeMap();">Toggle Large Map</span>
 				<label className="inline right-margin">Sort By:</label>
 				<div className="text-button right-margin" ng-click="LocationsGetter.setSorting('rating', !LocationsGetter.filter.sort.rating.asc)"><i ng-if="LocationsGetter.filter.sort.rating" className="glyphicon" ng-class="{'glyphicon-sort-by-attributes': LocationsGetter.filter.sort.rating.asc, 'glyphicon-sort-by-attributes-alt': !LocationsGetter.filter.sort.rating.asc}"></i>Rating</div>
 				<div className="text-button" ng-click="LocationsGetter.setSorting('distance', true)"><i ng-if="LocationsGetter.filter.sort.distance" className="glyphicon glyphicon-sort-by-attributes"></i>Distance From Me</div>
@@ -53,7 +52,7 @@ function FilterCrumbs(props: any) {
 	);
 }
 
-function Filter({setLargeMapEnabled, largeMapEnabled}) {
+function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
 	let {unpaginatedLocations} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
@@ -261,7 +260,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled}) {
 									typeGrades && typeGrades.map(typeGrade => (
 										<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
 											<Dropdown>
-											<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-xs btn-default dropdown-toggle">
+											<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-sm btn-default dropdown-toggle">
 												{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
 											</Dropdown.Toggle>
 
@@ -322,7 +321,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled}) {
 					</div>
 					<div className="col-md-3">
 						<span className="hidden-xs hidden-sm text-button right-margin" onClick={() => setLargeMapEnabled(!largeMapEnabled)} style={{marginBottom: '5px'}}>Toggle Large Map</span>
-						{!largeMapEnabled && <Map {...mapProps}></Map>}
+						{!largeMapEnabled && <Map {...mapProps} hoveredLocation={hoveredLocation}></Map>}
 					</div>
 				</div>
 			</div>

@@ -8,8 +8,9 @@ import { LocationsFetch } from './useLocationsFetcher';
 
 export function LocationTile(props: any) {
     let location: Location = new Location(props.location);
+    let setHoveredLocation = props.setHoveredLocation;
     return (
-        <div className="location-item">
+        <div className="location-item" onMouseOver={() => setHoveredLocation(location)} onMouseOut={() => setHoveredLocation(null)}>
             <div className="location-card">
                 <div className="location-card-info">
                     <div className="row">
@@ -117,7 +118,7 @@ export function LocationTile(props: any) {
 }
 
 
-function LocationTilesContainer() {
+function LocationTilesContainer({setHoveredLocation}) {
 	let {nextLocations, noMoreLocations, locations} = useContext<LocationsFetch>(LocationsContext);
 
    return (
@@ -140,7 +141,7 @@ function LocationTilesContainer() {
         >
             <div className="locations-window">
                 {
-                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} />))
+                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} setHoveredLocation={setHoveredLocation}/>))
                 }
             </div>
         </InfiniteScroll>

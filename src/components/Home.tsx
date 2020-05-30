@@ -14,10 +14,12 @@ export const FilterContext = createContext<filterHook>({});
 export const LocationsContext = createContext<LocationsFetch>({});
 
 function Home() {
-
 	let filterParamHook = useFilterParams();
 	let locationsFetchHook = useLocationsFetcher(filterParamHook);
 	let [largeMapEnabled, setLargeMapEnabled] = useState<boolean>(false);
+
+	let [hoveredLocation, setHoveredLocation] = useState();
+
 	const mapMoved = (map: google.maps.Map): void => {
 		if (map) {
 			let newFilters: FilterParams = new FilterParams(filterParamHook.filterState);
@@ -54,12 +56,10 @@ function Home() {
 	let [mapProps, setMapProps] = useState(getNewMapProps());
 
 	useEffect(() => {
-		console.log('setting map props for large map enabled')
 		setMapProps(getNewMapProps());
 	}, [largeMapEnabled])
 
 	useEffect(() => {
-		console.log('setting map props for unpag')
 		setMapProps(getNewMapProps());
 	}, [locationsFetchHook.unpaginatedLocations])
 
@@ -69,13 +69,13 @@ function Home() {
 			<section>
 				<img src={skyscannerinline} style={{display: 'none'}} alt=""/>
 				<Hero />
-				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled}/>
+				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} />
 				<div className="row">
 					<div className={classNames({'large-map': largeMapEnabled})}>
-						<LocationTilesContainer />
+						<LocationTilesContainer setHoveredLocation={setHoveredLocation} />
 					</div>
 					{largeMapEnabled && (<div>
-						<Map {...mapProps}></Map>
+						<Map {...mapProps} hoveredLocation={hoveredLocation}></Map>
 					</div>)}
 				</div>
 			</section>

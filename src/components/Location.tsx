@@ -60,7 +60,7 @@ function NearbyMap({location}: PropLocation) {
 	}, [location?.latitude, location?.nearby?.length])
 	return (
 		<>
-			{location?.latitude !== null ? <Map {...mapProps} /> : <div>Loading</div>}
+			{location?.latitude !== null ? <Map {...mapProps} hoveredLocation={null} /> : <div>Loading</div>}
 		</>
 	);
 }
