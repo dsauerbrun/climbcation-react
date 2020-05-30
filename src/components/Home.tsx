@@ -70,7 +70,7 @@ function Home() {
 				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} />
 				<div className="row">
 					<div id="locations-window" className={classNames({'large-map': largeMapEnabled})}>
-						<LocationTilesContainer setHoveredLocation={setHoveredLocation} />
+						<LocationTilesContainer airportCode={locationsFetchHook.selectedAirport?.iata_code} setHoveredLocation={setHoveredLocation} />
 					</div>
 					{largeMapEnabled && (<div>
 						<Map {...mapProps} hoveredLocation={hoveredLocation}></Map>

@@ -71,7 +71,7 @@ export default class Location {
     rating: number = 0;
     solo_friendly: boolean | null = null;
     airport_code: string = 'DEN';
-    flightPrice: FlightPrice | null = null;
+    flightPrice: FlightPrice = null;
     referral: string | null = null;
     latitude: number;
     longitude: number;

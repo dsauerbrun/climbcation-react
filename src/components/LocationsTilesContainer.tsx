@@ -1,16 +1,37 @@
-import React, {useContext} from 'react';
+/* eslint-disable react/jsx-no-target-blank */
+import React, {useContext, useEffect} from 'react';
 import {LocationsContext } from './Home';
 import Location from '../classes/Location';
 import classNames from 'classnames';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { IconTooltip } from '../common/HelperComponents';
 import { LocationsFetch } from './useLocationsFetcher';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 
-export function LocationTile(props: any) {
-    let location: Location = new Location(props.location);
+export function LocationTile(props: {location: Location, setHoveredLocation: Function, airportCode: string}) {
+    let location: Location = props.location;
     let setHoveredLocation = props.setHoveredLocation;
+    let airportCode = props.airportCode; 
+    let lowPrice: {date: string, cost: number} = null;
+
+    let transformQuotesToChartData = (flightQuotes) => {
+        let data = [];
+        if (flightQuotes) {
+            let months = Object.keys(flightQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1);
+            months.forEach(month => {
+                let monthQuotes = flightQuotes[month];
+                Object.keys(monthQuotes).sort((a, b) => parseInt(a) < parseInt(b) ? -1 : 1).forEach(day => {
+                    data.push({name: `${month}/${day}`, cost: flightQuotes[month][day]})
+                    if (!lowPrice || lowPrice.cost > parseInt(flightQuotes[month][day])) {
+                        lowPrice = {date: `${month}/${day}`, cost: parseInt(flightQuotes[month][day])};
+                    }
+                })
+            })
+        }
+        return data;
+    }
     return (
-        <div className={`location-item locationscroller${props.id}`} data-name={`locationscroller${props.id}`} onMouseEnter={() => setHoveredLocation(location)} onMouseLeave={() => setHoveredLocation(null)}>
+        <div className={`location-item`} onMouseEnter={() => setHoveredLocation(location)} onMouseLeave={() => setHoveredLocation(null)}>
             <div className="location-card">
                 <div className="location-card-info">
                     <div className="row">
@@ -85,28 +106,40 @@ export function LocationTile(props: any) {
                     </div>
                 </div>
                 <div className="location-airfare">
-                    {
-                        location.lowestPrice.date ? <div>
-                            <div id="highchart{location.airport_code + '-' +location.slug + '-' + location.id}" style={{margin: '0 auto'}}></div>
-                            <div className="row">
-                                <span className="col-md-6">
-                                    <label>Airline Prices(hover to see prices)</label>
-                                </span>
-                                <span className="col-md-6 text-right">
-                                    <a href="{location.referral}"><h4 className="text-gray">Low of ${location.lowestPrice.cost} on {location.lowestPrice.date}</h4></a>
-                                </span>
-                            </div>
+                    {airportCode === location?.airport_code ? 
+                        <div className="sorry-message" ng-if="helperService.originAirport == location.airport_code">
+                            <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
                         :
+                    (location?.flightPrice === undefined ? <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading" /> :
+                    (transformQuotesToChartData(location?.flightPrice?.quotes).length ? 
+                    <>
                         <div>
-                            <div className="sorry-message" ng-if="!loadingQuotes || helperService.originAirport != location.airport_code">
-                                <h4>We're sorry, we couldn't find any flight information from { 'origin airport' }} to { location.airport_code }. You may have better luck searching with a bigger airport or for specific dates on Skyscanner or your preferred airline's website.</h4>
-                            </div>
-                            <div className="sorry-message" ng-if="helperService.originAirport == location.airport_code">
-                                <h4>This Destination's airport is the same as the one you are flying out of.</h4>
-                            </div>
-                            <div ng-if="loadingQuotes">
-                                <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading"/>
+                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
+                        </div>
+                        <ResponsiveContainer width="95%" height={125}>
+                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes)} margin={'0 auto'}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="cost" stroke="#3c7e91" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </>
+                    : 
+                    <div className="sorry-message">
+                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airport_code }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
+                    </div>))}
+                    {
+                        lowPrice && <div>
+                            <div className="row">
+                                <span className="col-md-6">
+                                <label>Airline Prices(hover to see prices) </label>
+                                </span>
+                                <span className="col-md-6 text-right">
+                                    <a href={location?.referral}><h4 className="text-gray">Low of ${lowPrice.cost} on {lowPrice.date}</h4></a>
+                                </span>
                             </div>
                         </div>
                     }
@@ -118,7 +151,7 @@ export function LocationTile(props: any) {
 }
 
 
-function LocationTilesContainer({setHoveredLocation}) {
+function LocationTilesContainer({setHoveredLocation, airportCode}) {
 	let {nextLocations, noMoreLocations, locations} = useContext<LocationsFetch>(LocationsContext);
 
    return (
@@ -141,7 +174,7 @@ function LocationTilesContainer({setHoveredLocation}) {
         >
             <div className="locations-window">
                 {
-                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} id={location.id} location={location} setHoveredLocation={setHoveredLocation}/>))
+                    locations?.map((location: Location) => (<LocationTile key={location.id} location={location} setHoveredLocation={setHoveredLocation} airportCode={airportCode}/>))
                 }
             </div>
         </InfiniteScroll>

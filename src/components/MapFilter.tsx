@@ -153,10 +153,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
         }
     }
     useEffect(() => {
-        if (map) {
-            refreshMarkers();
-
-        }
+        refreshMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map])
 

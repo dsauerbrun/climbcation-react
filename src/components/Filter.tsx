@@ -55,11 +55,9 @@ function FilterCrumbs(props: any) {
 
 function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
-	let {unpaginatedLocations} = useContext<LocationsFetch>(LocationsContext);
+	let {unpaginatedLocations, selectedAirport, setSelectedAirport} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
-	let storedIataCode = localStorage.getItem('airport') ? JSON.parse(localStorage.getItem('airport')).iata_code : 'DEN';
-	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === storedIataCode) || allAirports[0]);
 
 	useEffect(() => {
 		async function setOptions() {
