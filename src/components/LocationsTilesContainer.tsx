@@ -112,7 +112,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                 </div>
                 <div className="location-airfare">
                     {airportCode === location?.airport_code ? 
-                        <div className="sorry-message" ng-if="helperService.originAirport == location.airport_code">
+                        <div className="sorry-message">
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
                         :
@@ -171,7 +171,7 @@ function LocationTilesContainer({setHoveredLocation, airportCode}) {
                 </div>
             }
             endMessage={
-                <div className="col-md-12 bottom-padding text-center" ng-if="LocationsGetter.scrollEnded && !largeMapEnabled">
+                <div className="col-md-12 bottom-padding text-center">
                     <h4><strong>No More Crags Available :(</strong></h4>
                     <h4><strong>Try broadening your filters</strong></h4>
                 </div>

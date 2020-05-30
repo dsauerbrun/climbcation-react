@@ -668,7 +668,7 @@ function FlightCostComponent({location}: PropLocation) {
 				</h3>
                 <div className="location-airfare">
                     {airportCode === location?.airport_code ? 
-                        <div className="sorry-message" ng-if="helperService.originAirport == location.airport_code">
+                        <div className="sorry-message">
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
                         :
