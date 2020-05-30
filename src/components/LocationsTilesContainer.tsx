@@ -123,7 +123,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                             <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
-                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} margin={'0 auto'}>
+                            <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" />
                                 <YAxis />

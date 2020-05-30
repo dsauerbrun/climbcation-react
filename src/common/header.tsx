@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Col from 'react-bootstrap/Col';
 import {Row, Dropdown} from 'react-bootstrap';
@@ -8,21 +8,26 @@ import headerLogo from '../images/climbcation-header-logo.png';
 import {
   Link
 } from "react-router-dom";
+import {LoginModal} from '../components/Login';
 
 
 function Header() {
 	const auth = useContext(authContext);
 	let user: User = auth.user;
-
+	let [openLogin, setOpenLogin] = useState(false);
+	let [openSignUp, setOpenSignUp] = useState(false);
 	let showSignUp = () => {
-
+		setOpenLogin(true);	
+		setOpenSignUp(true);
 	}
 
 	let showLogin = () => {
-
+		setOpenLogin(true);	
+		setOpenSignUp(false);
 	}
 
 	return (
+		<>
 		<Nav className="navbar home navbar-inverse">
 	    <div className="d-sm-none">
 	      <div className="navbar-header">
@@ -85,7 +90,7 @@ function Header() {
 							</Dropdown.Menu>	
 						</Dropdown>
 					:
-						<div><Link to="/login">Login</Link> / <Link to="/signup">Signup</Link></div>
+						<div><div onClick={() => showLogin()} style={{cursor: 'pointer', display: 'inline-block'}} >Login</div> / <div style={{display: 'inline-block', cursor: 'pointer'}} onClick={() => showSignUp()}>Signup</div></div>
 				}
 		      </Col>
 		      <Col md={2} className="nav-link text">
@@ -97,6 +102,8 @@ function Header() {
 	      </Row>
 	    </div>
 	  </Nav>
+				<LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
+	</>
 	);
 }
 

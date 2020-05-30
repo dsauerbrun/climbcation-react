@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import {
     useRouteMatch
 } from "react-router-dom";
+import { Modal } from 'react-bootstrap';
 
 interface LoginForm {
     email: string;
@@ -42,6 +43,7 @@ export function Login(props) {
     let [signUpEnabled, setSignUpEnabled] = useState<boolean>(false)
     let [forgotPasswordEnabled, setForgotPasswordEnabled] = useState<boolean>(false)
     let [formAlerts, setFormAlerts] = useState({authError: null, success: false});
+    let successCallback = props.successCallback;
 
 	let { register, handleSubmit, watch, errors, formState, setValue } = useForm<LoginForm>({});
 	let {dirty, isSubmitting, touched, submitCount} = formState;
@@ -67,7 +69,7 @@ export function Login(props) {
 
 		try {
 			await auth.login(username, password);
-			//$('#loginModal').modal('hide');
+            successCallback && successCallback();
 		} catch (err) {
 			if (err.status === 400) {
 				changeFormAlerts({authError: 'Invalid Username or Password'});
@@ -84,8 +86,8 @@ export function Login(props) {
 			/*ngToast.create({
 				additionalClasses: 'climbcation-toast',
 				content: 'A link to reset your password has been sent to your email!'
-			});
-			$('#loginModal').modal('hide');*/
+			});*/
+            successCallback && successCallback();
 		} catch (err) {
             changeFormAlerts({authError: err});
 		}
@@ -100,8 +102,8 @@ export function Login(props) {
 				/*ngToast.create({
 					additionalClasses: 'climbcation-toast',
 					content: 'A link to verify your account has been sent to your email!'
-				});
-				$('#loginModal').modal('hide');*/
+				});*/
+                successCallback && successCallback();
 			} catch (err) {
                 changeFormAlerts({authError: err});
 			}
@@ -122,14 +124,7 @@ export function Login(props) {
     }, [])
     
     return (
-        <div id="loginModal" >
-            <div className="modal-dialog">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 className="modal-title">{ signUpEnabled ? 'Sign Up': 'Log In' }</h4>
-                    </div>
-                    <div className="modal-body login-modal">
+        <div id="loginModal" className="login-modal" >
                         {formAlerts.authError && <div className="alert alert-warning alert-dismissable">
                             <button type="button" className="close" onClick={() => changeFormAlerts({authError: null})}>&times;</button>
                             <div>{formAlerts.authError}</div>
@@ -154,8 +149,8 @@ export function Login(props) {
                             </div>
                             <hr />
                             <div className="row">
-                                <form onSubmit={handleSubmit(onSubmit)}>
-                                    <div className="col-md-12">
+                                <form className="col-md-12" onSubmit={handleSubmit(onSubmit)}>
+                                    <div >
                                         <label>Email</label>
                                         <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="username" />
                                         <div className="password-label">
@@ -229,7 +224,7 @@ export function Login(props) {
                                         <input className="form-control" type="password" ref={register({required: true, minLength: 3})} name="password" />
                                         <div className="go-row">
                                             <div>
-                                                Already have an account? <a href="" onClick={() => setSignUpEnabled(false)}>Sign In!</a>
+                                                Already have an account? <a onClick={() => setSignUpEnabled(false)}>Sign In!</a>
                                             </div>
                                             <div>
                                                 <button className="btn btn-primary pull-right" disabled={isSubmitting}>
@@ -241,10 +236,25 @@ export function Login(props) {
                                 </div>
                             </div>
                         </div>}
-                    </div>
-                </div>
-            </div>
         </div>
+    );
+}
+
+export function LoginModal({signUpEnabled, setSignUpEnabled, showLoginModal, setShowLoginModal}) {
+    return (
+        <Modal show={showLoginModal} onHide={() => setShowLoginModal(false)} id="loginModal" className="modal">
+            <Modal.Header>
+                <h4 className="modal-title">{ signUpEnabled ? 'Sign Up': 'Log In' }</h4>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => setShowLoginModal(false)}><span aria-hidden="true">&times;</span></button>
+            </Modal.Header>
+            <Modal.Body>
+                <Login signUpEnabled={signUpEnabled} successCallback={() => setShowLoginModal(false)}/>
+            </Modal.Body>
+            <Modal.Footer>
+                <div className="btn btn-default" onClick={() => setShowLoginModal(false)}>Cancel</div>
+            </Modal.Footer>
+        </Modal>
+
     );
 }
 

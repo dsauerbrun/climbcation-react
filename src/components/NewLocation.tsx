@@ -195,13 +195,13 @@ function NewLocation () {
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
-									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" ng-click="prevPage()">
+									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" >
 										{page !== 1 && page !== 6 && <span className="text-button" onClick={() => setPage(page - 1)} >Back</span>}
 									</div>}
 									{page < 5 && <div className="col-md-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
 										<div>Next</div>
 									</div>}
-									<button className="col-md-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" ng-click="submitLocation()">
+									<button className="col-md-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" >
 										{!isSubmitting && (<div>Publish</div>)}
 										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
 									</button>
@@ -320,7 +320,7 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 	}, [locationId])
 
 	return (
-		<div className="row" ng-if="currentPage == 6">
+		<div className="row">
 			<div className="text-center" style={{width: '100%'}}>
 				<h3 className="bottom-padding">Congrats!</h3>
 				<h4>You've added all the necessary content.</h4>
@@ -459,7 +459,7 @@ function CostSection({locationName, register, setValue, getValues, watch, foodOp
 						</div>)}
 					</div>
 					<div className="col-md-6">
-						<div className="row" ng-if="locationObj.foodOptions">
+						<div className="row" >
 							<label>Cost for a single meal?</label>
 							<div className="row">
 								{selectedFoodOptions?.map(foodOption => <div className="col-md-6 col-xs-6" key={foodOption.id}>
@@ -786,7 +786,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 	return (
 		<div className="row" style={style}>
 			<div className="col-md-12">
-				<div className="row"> {/*ng-className="{ 'has-success': locationForm.name.$valid && locationForm.name.$dirty, 'has-error': locationForm.name.$invalid && locationForm.name.$dirty }"*/}
+				<div className="row"> 
 					<span className={classNames("form-group col-md-4", {'has-success': 1, 'has-error': 0})}  >
 						<label>Location Name<span className="text-danger required-field">*</span></label>
 						<div ref={overlayTarget}>
@@ -806,13 +806,11 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 							</Popover>
 						</Overlay>
 					</span>
-					{/*ng-className="{ 'has-success': locationForm.country.$valid && locationForm.country.$dirty, 'has-error': locationForm.country.$invalid && locationForm.country.$dirty }"*/}	
 					<span className="form-group col-md-4" >
 						<label>Country</label>
 						<input name="country" ref={register} placeholder="ex. United States" className="form-control" /> 
 					</span>
 
-					{/*ng-className="{ 'has-success': locationForm.solo_friendly.$valid && locationForm.solo_friendly.$dirty, 'has-error': locationForm.solo_friendly.$invalid && locationForm.solo_friendly.$dirty }"*/}
 					<span className="form-group col-md-4">
 						<label>Easy To Meet Partners?<span className="text-danger required-field">*</span></label>
 						<div className="btn-group btn-group-sm center-block btn-group-toggle" data-toggle="buttons" style={{width: '100%'}}>
@@ -832,7 +830,6 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 					</span>
 				</div>
 				<div className="row">
-					{/*ng-className="{ 'has-success': locationForm.airport.$valid && locationForm.airport.$dirty, 'has-error': locationForm.airport.$invalid && locationForm.airport.$dirty }"  */}
 					<span className="form-group col-md-4" >
 						<label>Nearest Airport</label>
 						<div className="airport-wrapper">
@@ -868,7 +865,6 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 						<label className="col-xs-12">What should I climb?<span className="text-danger required-field">*</span></label>
 						{climbingTypes?.map(climbingType => (
 							<div className="col-xs-4 col-md-12" key={climbingType.name}>
-								{/*ng-className="{'active': locationForm[climbing_type.name].$viewValue == true}" */}
 								<label className="control control--checkbox" htmlFor={ `climbType${climbingType?.name}` } >
 									<input type="checkbox" id={ `climbType${climbingType?.name}` } onChange={() => toggleClimbType(climbingType)} />
 									<div className="control__indicator"></div>

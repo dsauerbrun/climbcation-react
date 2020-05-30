@@ -1,4 +1,5 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
+import {LoginModal} from './Login';
 import { authContext, User } from '../common/useAuth';
 import { Post } from '../classes/Forum';
 import moment from 'moment';
@@ -13,6 +14,17 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     let newPostRef = useRef(undefined);
     let [newPost, setNewPost] = useState<string>(undefined);
     let [postingComment, setPostingComment] = useState<boolean>();
+	let [openLogin, setOpenLogin] = useState(false);
+	let [openSignUp, setOpenSignUp] = useState(false);
+	let showSignUp = () => {
+		setOpenLogin(true);	
+		setOpenSignUp(true);
+	}
+
+	let showLogin = () => {
+		setOpenLogin(true);	
+		setOpenSignUp(false);
+	}
 
     let clearPost = () => {
         setNewPost(undefined);
@@ -50,8 +62,9 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     }, [newPost])
     return (
         <>
+        <LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
         {!user?.user_id && <div ng-show="!authService.user" className="text-gray">
-            Please <div className="anchor" ng-click="showLogin()" style={{display: 'inline', cursor: 'pointer'}}>Login</div> to post a comment. Don't have an account? <div className="anchor" ng-click="showSignUp()" style={{display: 'inline', cursor: 'pointer'}}>Signup</div> here
+            Please <div className="anchor" onClick={() => showLogin()} style={{display: 'inline', cursor: 'pointer'}}>Login</div> to post a comment. Don't have an account? <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline', cursor: 'pointer'}}>Signup</div> here
         </div>}
         <div className="new-post-container" ng-show="authService.user">
             {commentError && <div className="alert alert-danger alert-dismissable">
