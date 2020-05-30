@@ -3,6 +3,7 @@ import { isEqual, omit, functions } from 'lodash';
 import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
 import Location from '../classes/Location';
+import _ from 'lodash';
 
   Map.defaultProps = {
     options: {
@@ -30,61 +31,40 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
         };
         setHoveredLocation(new Location(location));
         let point = map.overlay.getProjection().fromLatLngToContainerPixel(this.getPosition());
-        //let point = map.overlay.getProjection().fromLatLngToContainerPixel(this.position);
         var offsetCalcY = 0;
         var offsetCalcX = 0;
         var bottomOffset = 0;
         let locationCard: HTMLElement = document.querySelector('.map-info-window > .location-card');
-        //debugger;
-        //if (map.getDiv().id === 'mapFilterLarge') {
-            //debugger;
         if (mapName === 'mapFilterLarge') {
-            offsetCalcY = 50;
-            offsetCalcX = 24;
+            offsetCalcY = -640;
+            offsetCalcX = -606;
             bottomOffset = 50;
         } else if (mapName === 'mapFilter') {
             offsetCalcY = 45;
             offsetCalcX = -39;
             bottomOffset = 50;
         } else if (mapName === 'nearby-map') {
-            offsetCalcY = 60;
-            offsetCalcX = 425;
-            bottomOffset = 50;
             offsetCalcY = 45;
             offsetCalcX = -387;
             bottomOffset = 50;
-            //$('.map-info-window > .location-card').addClass('left-arrow');
             locationCard.classList.add('left-arrow');
         }
         
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
         mapInfoWindow.style.display = 'block';
-        //let infoWindowWidth = $('.map-info-window').outerWidth();
-        //let infoWindowHeight = $('.map-info-window').outerHeight();
         let infoWindowWidth = mapInfoWindow.offsetWidth;
         let infoWindowHeight = mapInfoWindow.offsetHeight;
 
-        //$('.map-info-window').show();
         locationCard.classList.add('map-info-window-arrow-bottom');
         locationCard.classList.remove('map-info-window-arrow-top');
         mapInfoWindow.style.top = (point.y - infoWindowHeight - offsetCalcY) + 'px';
         mapInfoWindow.style.left = (point.x - infoWindowWidth - offsetCalcX) + 'px';
-        //$('.map-info-window > .location-card').addClass('map-info-window-arrow-bottom');
-        //$('.map-info-window > .location-card').removeClass('map-info-window-arrow-top');
-        //$('.map-info-window').css('top', (point.y - infoWindowHeight - offsetCalcY) + 'px');
-        //$('.map-info-window').css('left', (point.x - infoWindowWidth + offsetCalcX) + 'px');
 
         if (!isInViewport(mapInfoWindow)) {
             mapInfoWindow.style.top = (point.y - infoWindowHeight - offsetCalcY + (infoWindowHeight + bottomOffset)) + 'px'; 
             locationCard.classList.remove('map-info-window-arrow-bottom');
             locationCard.classList.add('map-info-window-arrow-top');
         }
-        
-        /*if (!$('.map-info-window').visible()) {
-            $('.map-info-window').css('top', (point.y - infoWindowHeight - offsetCalcY + (infoWindowHeight + bottomOffset)) + 'px');
-            $('.map-info-window > .location-card').removeClass('map-info-window-arrow-bottom');
-            $('.map-info-window > .location-card').addClass('map-info-window-arrow-top');
-        }*/
     })
     marker.addListener('mouseout', (event) => {
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
@@ -103,7 +83,6 @@ function removeMarker(marker: google.maps.Marker) {
     google.maps.event.clearListeners(marker, 'mouseout');
     google.maps.event.clearListeners(marker, 'mouseover');
     google.maps.event.clearListeners(marker, 'click');
-
     marker.setMap(null);
 }
 
@@ -117,13 +96,12 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
     const [mapId, setMapId] = useState<string>(options.id || 'mapFilter');
     let [pushedMarkers, setPushedMarkers] = useState<google.maps.Marker[]>([]);
     let [hoveredLocation, setHoveredLocation] = useState<Location>(null);
-    //let pushedMarkers: google.maps.Marker[] = [];
-
   
     useEffect(() => {
         setMapId(options.id);
         const onLoad = () => {
-            setMap(new ClimbcationMap(ref.current, options))
+            setMap(new ClimbcationMap(ref.current, options));
+            refreshMarkers();
         }
         if (!window.google) {
             const script = document.createElement(`script`)
@@ -158,22 +136,32 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map])
 
+    let refreshMarkers = () => {
+        if (map) {
+            // remove markers that are no longer used
+            let removeMarkers = pushedMarkers.filter(marker => !markers.find(newMarker => newMarker.latitude === marker.getPosition().lat()))
+            removeMarkers.forEach((marker) => {
+                removeMarker(marker);
+            });
+            let newMarkerSet = pushedMarkers.filter(marker => markers.find(newMarker => newMarker.latitude === marker.getPosition().lat()))
+
+            let markersToAdd = markers.filter(newMarker => !pushedMarkers.find(pushedMarker => pushedMarker.getPosition().lat() === newMarker.latitude));
+            markersToAdd?.forEach(function(marker) {
+                newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, marker.isPrimary ? true : false, markerClickFunc, setHoveredLocation, options.id));
+            })
+            setPushedMarkers(newMarkerSet);
+        }
+    }
     useEffect(() => {
-        console.log('updating markers', markers)
-        // remove markers that are no longer used
+        if (map) {
+            refreshMarkers();
 
-        let removeMarkers = pushedMarkers.filter(marker => !markers.find(newMarker => newMarker.latitude === marker.getPosition().lat()))
-        removeMarkers.forEach((marker) => {
-            removeMarker(marker);
-        });
-        let newMarkerSet = pushedMarkers.filter(marker => markers.find(newMarker => newMarker.latitude === marker.getPosition().lat()))
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [map])
 
-        let markersToAdd = markers.filter(newMarker => !pushedMarkers.find(pushedMarker => pushedMarker.getPosition().lat() === newMarker.latitude));
-        markersToAdd?.forEach(function(marker) {
-            newMarkerSet.push(addMarker(map, marker.latitude, marker.longitude, marker, marker.isPrimary ? true : false, markerClickFunc, setHoveredLocation, options.id));
-        })
-        setPushedMarkers(newMarkerSet);
-        
+    useEffect(() => {
+        refreshMarkers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [markers])
   

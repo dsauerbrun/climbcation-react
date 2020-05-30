@@ -200,7 +200,9 @@
 	width: 40%;
 	margin: 0px;
 	display: inline-block;
+	margin-left: 10px;
 	.locations-window {
+		min-width: 40vw;
 		clear: both;
 		.location-item {
 			max-width: 100%;

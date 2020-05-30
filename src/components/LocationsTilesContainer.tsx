@@ -121,32 +121,29 @@ function LocationTilesContainer() {
 	let {nextLocations, noMoreLocations, locations} = useContext<LocationsFetch>(LocationsContext);
 
    return (
-        <div className="row">
-            <InfiniteScroll 
-                dataLength={locations.length}
-                next={nextLocations}
-                hasMore={!noMoreLocations}
-                scrollThreshold={.9}
-                loader={
-                    <div className="col-md-12 bottom-padding text-center" style={{minHeight: '300px'}}>
-                        <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
-                    </div>
-                }
-                endMessage={
-                    <div className="col-md-12 bottom-padding text-center" ng-if="LocationsGetter.scrollEnded && !largeMapEnabled">
-                        <h4><strong>No More Crags Available :(</strong></h4>
-                        <h4><strong>Try broadening your filters</strong></h4>
-                    </div>
-                }
-            >
-                <div className="locations-window">
-                    {
-                        locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} />))
-                    }
+        <InfiniteScroll 
+            dataLength={locations.length}
+            next={nextLocations}
+            hasMore={!noMoreLocations}
+            scrollThreshold={.9}
+            loader={
+                <div className="col-md-12 bottom-padding text-center" style={{minHeight: '300px'}}>
+                    <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
                 </div>
-            </InfiniteScroll>
-           
-        </div>
+            }
+            endMessage={
+                <div className="col-md-12 bottom-padding text-center" ng-if="LocationsGetter.scrollEnded && !largeMapEnabled">
+                    <h4><strong>No More Crags Available :(</strong></h4>
+                    <h4><strong>Try broadening your filters</strong></h4>
+                </div>
+            }
+        >
+            <div className="locations-window">
+                {
+                    locations?.map((location: { id: any; }) => (<LocationTile key={location.id} location={location} />))
+                }
+            </div>
+        </InfiniteScroll>
     );
 }
 

@@ -53,7 +53,7 @@ function FilterCrumbs(props: any) {
 	);
 }
 
-function Filter() {
+function Filter({setLargeMapEnabled, largeMapEnabled}) {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
 	let {unpaginatedLocations} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
@@ -321,14 +321,8 @@ function Filter() {
 						</div>
 					</div>
 					<div className="col-md-3">
-						<Map {...mapProps}></Map>
-					{
-						/*
-	<map-filter ng-if="!mobile" filter-type="small">
-						</map-filter>
-						*/
-					}
-						
+						<span className="hidden-xs hidden-sm text-button right-margin" onClick={() => setLargeMapEnabled(!largeMapEnabled)} style={{marginBottom: '5px'}}>Toggle Large Map</span>
+						{!largeMapEnabled && <Map {...mapProps}></Map>}
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import React, {createContext} from 'react';
+import React, {createContext, useState, useContext, useEffect} from 'react';
 import heroImageLeft from '../images/hero-image-left.png';
 import heroImageRight from '../images/hero-image-right.png';
 import skyscannerinline from '../images/skyscannerinline.png';
@@ -6,13 +6,62 @@ import Filter from './Filter';
 import LocationTilesContainer from './LocationsTilesContainer';
 import useFilterParams, {filterHook} from './useFilterParams';
 import useLocationsFetcher, { LocationsFetch } from './useLocationsFetcher';
+import { FilterParams } from '../classes/FilterParams';
+import Map from './MapFilter';
+import classNames from 'classnames';
 
 export const FilterContext = createContext<filterHook>({});
 export const LocationsContext = createContext<LocationsFetch>({});
 
 function Home() {
+
 	let filterParamHook = useFilterParams();
-    let locationsFetchHook = useLocationsFetcher(filterParamHook);
+	let locationsFetchHook = useLocationsFetcher(filterParamHook);
+	let [largeMapEnabled, setLargeMapEnabled] = useState<boolean>(false);
+	const mapMoved = (map: google.maps.Map): void => {
+		if (map) {
+			let newFilters: FilterParams = new FilterParams(filterParamHook.filterState);
+			let southWest = map.getBounds().getSouthWest();
+			let northEast = map.getBounds().getNorthEast();
+			let center = map.getCenter();
+			newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
+			newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
+			newFilters.center = {lat: center.lat(), lng: center.lng()};
+			newFilters.page = 1;
+			filterParamHook.setFilterState(newFilters);
+		}
+	}
+
+	let getNewMapProps = () => {
+		return {
+			options: {
+			center: filterParamHook.filterState.center,
+			zoom: 2,
+			mapTypeId: 'roadmap',
+			id: 'mapFilterLarge',
+			},
+			styles: {
+				width: '58vw',
+				height: '100%'
+			},
+			onDragEnd: mapMoved,
+			onZoomChange: mapMoved,
+			markers: locationsFetchHook.unpaginatedLocations,
+			markerClickFunc: null,
+			onMount: null, className: null, onMountProps: null
+		};
+	}
+	let [mapProps, setMapProps] = useState(getNewMapProps());
+
+	useEffect(() => {
+		console.log('setting map props for large map enabled')
+		setMapProps(getNewMapProps());
+	}, [largeMapEnabled])
+
+	useEffect(() => {
+		console.log('setting map props for unpag')
+		setMapProps(getNewMapProps());
+	}, [locationsFetchHook.unpaginatedLocations])
 
 	return (
 		<FilterContext.Provider value={filterParamHook}>
@@ -20,8 +69,15 @@ function Home() {
 			<section>
 				<img src={skyscannerinline} style={{display: 'none'}} alt=""/>
 				<Hero />
-				<Filter/>
-				<LocationTilesContainer/>
+				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled}/>
+				<div className="row">
+					<div className={classNames({'large-map': largeMapEnabled})}>
+						<LocationTilesContainer />
+					</div>
+					{largeMapEnabled && (<div>
+						<Map {...mapProps}></Map>
+					</div>)}
+				</div>
 			</section>
 		</LocationsContext.Provider>
 		</FilterContext.Provider>
