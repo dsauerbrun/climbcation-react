@@ -58,7 +58,8 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 	let {unpaginatedLocations} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
-	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === 'DEN') || allAirports[0]);
+	let storedIataCode = localStorage.getItem('airport') ? JSON.parse(localStorage.getItem('airport')).iata_code : 'DEN';
+	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === storedIataCode) || allAirports[0]);
 
 	useEffect(() => {
 		async function setOptions() {
@@ -181,6 +182,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 			newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
 			newFilters.center = {lat: center.lat(), lng: center.lng()};
 			newFilters.page = 1;
+			newFilters.zoom = map.getZoom();
 			setFilterState(newFilters);
 		}
 	}
@@ -189,7 +191,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 	let mapProps = {
 		options: {
 		  center: filterState.center,
-		  zoom: 0,
+		  zoom: filterState.zoom,
 		  mapTypeId: 'roadmap',
 		  id: 'mapFilter'
 		},

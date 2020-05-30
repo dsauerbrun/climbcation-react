@@ -48,11 +48,14 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
     }
    
     useEffect(() => {
+        console.log('reloading')
         async function reloadLocations() {
             setLocations([]);
             setNoMoreLocations(false);
             let newFilters: FilterParams = new FilterParams(filterState);
             newFilters.page = 1;
+            localStorage.setItem('filters', JSON.stringify(newFilters));
+            console.log('new filters', newFilters);
             setFilterState(newFilters);
             let objectBody = {...filterState?.filterUrlObject};
             const requestOptions = {
@@ -69,10 +72,6 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
                 let filtered = await filteredFetch.json() as any
                 setLocations(filtered.paginated);
                 setUnpaginatedLocations(filtered.unpaginated);
-                /*let nonExistentUnpaginated = filtered.unpaginated.filter((x: any) => !unpaginatedLocations.find( y => y.id === x.id));
-                if (nonExistentUnpaginated.length > 0) {
-                    setUnpaginatedLocations(unpaginatedLocations.concat(nonExistentUnpaginated));
-                }*/
                 if (filtered.paginated.length === 0) { 
                     setNoMoreLocations(true);
                 }
