@@ -19,6 +19,8 @@ function Home() {
 	let filterParamHook = useFilterParams();
 	let locationsFetchHook = useLocationsFetcher(filterParamHook);
 	let [largeMapEnabled, setLargeMapEnabled] = useState<boolean>(false);
+	let [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+	let [mobileMapOpen, setMobileMapOpen] = useState(false);
 
 	let [hoveredLocation, setHoveredLocation] = useState();
 
@@ -67,8 +69,8 @@ function Home() {
 			<section>
 				<img src={skyscannerinline} style={{display: 'none'}} alt=""/>
 				<Hero />
-				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} />
-				<div className="row">
+				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} mobileMapOpen={mobileMapOpen} setMobileMapOpen={setMobileMapOpen} mobileFilterOpen={mobileFilterOpen} setMobileFilterOpen={setMobileFilterOpen}/>
+				<div className="row" style={{display: mobileMapOpen || mobileFilterOpen ? 'none' : ''}}>
 					<div id="locations-window" className={classNames({'large-map': largeMapEnabled})}>
 						<LocationTilesContainer airportCode={locationsFetchHook.selectedAirport?.iata_code} setHoveredLocation={setHoveredLocation} />
 					</div>
@@ -84,7 +86,7 @@ function Home() {
 
 function Hero() {
 	return (
-		<div className="home-hero hidden-xs">
+		<div className="home-hero d-none d-md-block">
 			<div className="home-hero-overlay">
 				<div className="home-hero-overlay-title">
 					<div>

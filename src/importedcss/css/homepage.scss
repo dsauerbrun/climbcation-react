@@ -1,3 +1,9 @@
+.sticky-filter {
+	position: -webkit-sticky !important;
+	position: sticky !important;
+	top: 0;
+}
+
 .login-modal {
 	a {
 		cursor: pointer;

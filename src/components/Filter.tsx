@@ -11,6 +11,8 @@ import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { LocationsFetch } from './useLocationsFetcher';
 import { useHistory } from 'react-router-dom';
+import { animateScroll } from "react-scroll";
+import { useMediaQuery } from 'react-responsive'
 
 function FilterCrumbs(props: any) {
 	let filters: FilterParams = props.filterParams;
@@ -53,11 +55,13 @@ function FilterCrumbs(props: any) {
 	);
 }
 
-function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
+function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMapOpen, mobileFilterOpen, setMobileFilterOpen, setMobileMapOpen}) {
 	let {filterState, setFilterState} = useContext<filterHook>(FilterContext);
 	let {unpaginatedLocations, selectedAirport, setSelectedAirport} = useContext<LocationsFetch>(LocationsContext);
 	let [climbTypes, setClimbTypes] = useState<climbType[]>([]);
 	let [typeGrades, setTypeGrades] = useState<typeGrades[]>([]);
+	const isMobile = useMediaQuery({ maxWidth: 767 })
+
 
 	useEffect(() => {
 		async function setOptions() {
@@ -191,7 +195,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 		  center: filterState.center,
 		  zoom: filterState.zoom,
 		  mapTypeId: 'roadmap',
-		  id: 'mapFilter',
+		  id: isMobile ? 'mobileMapFilter' : 'mapFilter',
 		  gestureHandling: 'greedy',
 		  scrollWheel: false
 		},
@@ -201,12 +205,161 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 		markerClickFunc: (location) => {
 			history.push(`/location/${location.slug}`)
 		},
-		onMount: null, className: null, onMountProps: null, styles: null
+		onMount: null, className: null, onMountProps: null, styles: (isMobile ? { width: '100% !important', height: '82vh'} : null)
 	};
+
 
 	return (
 		<>
-		<section className="filter hidden-xs">
+		{isMobile && <section className={classNames("filter fixed d-sm-none", {'sticky-filter': !mobileFilterOpen && !mobileMapOpen, 'full-screen': mobileFilterOpen || mobileMapOpen})} >
+			<div className="row filter-banner">
+				{!mobileMapOpen && !mobileFilterOpen && <><div className="col-3" onClick={() => {setMobileFilterOpen(true); animateScroll.scrollToTop()}}>
+					<div className="btn btn-climbcation">
+						Filter
+					</div>
+				</div>
+				<div className="offset-3 col-6" onClick={() => setMobileMapOpen(true)}>
+					<div className="btn btn-climbcation pull-right">
+						Open Map Filter
+					</div>
+				</div></>}
+				{mobileFilterOpen && <div className="col-6" onClick={() => setMobileFilterOpen(false)}>
+					<div className="btn btn-climbcation">
+						Close Filters
+					</div>
+				</div>}
+				{mobileMapOpen && <div className="offset-6 col-6" onClick={() => setMobileMapOpen(false)}>
+					<div className="btn btn-climbcation pull-right">
+						Close Map Filter
+					</div>
+				</div>}
+			</div>
+			<div style={{display: mobileMapOpen ? '' : 'none', height: '100% !important', width: '100% !important'}}>
+				{!largeMapEnabled && <Map {...mapProps} hoveredLocation={hoveredLocation}></Map>}
+			</div>
+			<div style={{display: mobileFilterOpen ? '' : 'none'}}>
+				<div className="container-fluid" style={{width: '80%', paddingLeft: '0'}}>		
+					<div className="row">
+						<div className="col-md-9">
+							<div className="row offset-md-4 col-md-8">
+								<h4 className="text-center" style={{width: '100%'}}>
+									Select the relevant criteria to find your perfect climbing trip
+								</h4>
+							</div>
+							<div className="row bottom-padding">
+								<div className="col-md-5">
+									<label>What do you want to climb?</label>
+									<ButtonGroup className="btn-group-sm btn-group-filter">
+										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
+										{
+											climbTypes?.map(x => 
+												<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
+											)
+										}
+									</ButtonGroup>
+								</div>
+								<div className="col-md-4">
+									<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
+									<div className="airport-wrapper">
+										<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
+									</div>
+								</div>
+								<div className="col-md-3">
+									<label>When do you want to go?</label>
+									<Dropdown className="d-inline-block">
+									<Dropdown.Toggle id="monthStart" className="btn btn-default dropdown-toggle">
+										{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
+									</Dropdown.Toggle>
+
+									<Dropdown.Menu>
+										{	months.map(x => <Dropdown.Item onClick={() => filterMonth('start', x)} key={'startmonth'+x.name}>{x.name}</Dropdown.Item>)}
+									</Dropdown.Menu>
+									</Dropdown>
+									<span className="text-gray">To </span>
+									<Dropdown className="d-inline-block">
+									<Dropdown.Toggle id="monthEnd" className="btn btn-default dropdown-toggle">
+										{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
+									</Dropdown.Toggle>
+
+									<Dropdown.Menu>
+										{	months.map(x => <Dropdown.Item onClick={() => filterMonth('end', x)} key={'endmonth'+x.name}>{x.name}</Dropdown.Item>)}
+									</Dropdown.Menu>
+									</Dropdown>
+								</div>
+							</div>
+							<div className="row">
+								<div className="col-md-5">
+									<label>What is the hardest grade you're looking for?</label>
+									{
+										typeGrades && typeGrades.map(typeGrade => (
+											<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
+												<Dropdown>
+												<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-sm btn-default dropdown-toggle">
+													{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
+												</Dropdown.Toggle>
+
+												<Dropdown.Menu>
+													<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType, order: 0})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
+													{	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
+												</Dropdown.Menu>
+												</Dropdown>
+											</ButtonGroup>
+										))
+									}
+								</div>
+								<div className="col-md-4">
+									<label>Keyword Search</label>
+									<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
+								</div>
+								<div className="col-md-3">
+									<div className="small-toggles-flex">
+										<div>
+											<label>Rating</label>
+											<ButtonGroup className="btn-group-sm btn-group-filter">
+												<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+												{
+													[1,2,3].map(x => (
+														<IconTooltip
+															key={'rating'+x}
+															tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
+															dom={
+																<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
+																	<span className="glyphicon glyphicon-star"></span>
+																</Button>
+															}
+														></IconTooltip>
+													))
+												}
+											</ButtonGroup>
+										</div>
+										<div>
+											<label></label>
+											<div style={{marginBottom: '5px'}}>
+												<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
+													<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
+													<div className="control__indicator"></div>
+													<span>Solo Friendly</span>
+												</label>
+											</div>
+											<div>
+												<label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
+													<input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
+													<div className="control__indicator"></div>
+													<span>No Car?</span>
+												</label>
+											</div>
+										</div>
+									</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<div ng-show="mapFilterShown">
+			</div>
+		</section>}
+		{!isMobile && <section className="filter d-none d-md-block">
 			<div className="container-fluid">		
 				<div className="row">
 					<div className="col-md-9">
@@ -331,7 +484,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation}) {
 					</div>
 				</div>
 			</div>
-		</section>
+		</section>}
 		<FilterCrumbs setFilterState={setFilterState} filterParams={filterState}></FilterCrumbs>
 		</>
 	);
