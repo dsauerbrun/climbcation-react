@@ -14,30 +14,6 @@ interface LoginForm {
     password: string;
 }
 
-let signUpValid = (email:string , password: string, username: string) => {
-    function emailIsValid (email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    }
-
-    let invalidString = '';
-    if (!password || password.length < 6) {
-        invalidString += `Password must be at least 6 characters <br />`;
-    }
-    if (!username || username.length < 3) {
-        invalidString += `Username must be at least 3 characters <br />`;
-    }
-
-    if (!email || !emailIsValid(email)) {
-        invalidString += `Must enter a valid email <br />`;
-    }
-
-    if (invalidString == '') {
-        return true;
-    } else {
-        return invalidString;
-    }
-}
-
 export function Login(props) {
 	const auth = useContext(authContext);
     let user: User = auth.user;
@@ -46,15 +22,16 @@ export function Login(props) {
     let [formAlerts, setFormAlerts] = useState({authError: null, success: false});
     let successCallback = props.successCallback;
 
-	let { register, handleSubmit, watch, errors, formState, setValue } = useForm<LoginForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState;
+	let { register, handleSubmit, watch, errors, clearError, formState, setValue } = useForm<LoginForm>({});
+    let {dirty, isSubmitting, touched, submitCount} = formState;
+    let email = watch('email');
 	const onSubmit = async (data: LoginForm) => {
         if (signUpEnabled) {
             await signUp(data.email, data.password, data.username);
         } else if (forgotPasswordEnabled) {
-            await resetPassword(data.username);
+            await resetPassword(data.email);
         } else {
-            await signin(data.username, data.password);
+            await signin(data.email, data.password);
         }
 	};
     
@@ -92,19 +69,13 @@ export function Login(props) {
     
 	let signUp = async (email: string, password: string, username: string) => {
 		changeFormAlerts({authError: null});
-		let signUpFormValid = signUpValid(email, password, username);
-		if (signUpFormValid === true) {
-			try {
-				await auth.signup(email, username, password);
-                successCallback && successCallback('A link to verify your account has been sent to your email!');
-			} catch (err) {
-                changeFormAlerts({authError: err});
-			}
+        try {
+            await auth.signup(email, username, password);
+            successCallback && successCallback('A link to verify your account has been sent to your email!');
+        } catch (err) {
+            changeFormAlerts({authError: err});
+        }
 			
-		} else {
-			// form not valid
-            changeFormAlerts({authError: signUpFormValid});
-		}
 		
     }
     let match = useRouteMatch();  
@@ -116,120 +87,140 @@ export function Login(props) {
         }
     }, [])
     
+    let errorString = () => {
+        let invalidString: string[] = [];
+        if (errors.password?.type === 'required' || errors.password?.type === 'minLength') {
+            invalidString.push(`Password must be at least 6 characters`);
+        }
+        if (errors.username?.type === 'required' || errors.username?.type === 'minLength') {
+            invalidString.push(`Username must be at least 3 characters`);
+        }
+  
+        if (errors.email?.type === 'required' || errors.email?.type === 'pattern' ) {
+            invalidString.push(`Must enter a valid email`);
+        }
+  
+        return invalidString;
+    }
+
     return (
         <>
         <div id="loginModal" className="login-modal" >
-                        {formAlerts.authError && <div className="alert alert-warning alert-dismissable">
-                            <button type="button" className="close" onClick={() => changeFormAlerts({authError: null})}>&times;</button>
-                            <div>{formAlerts.authError}</div>
-                        </div>}
-                        {!signUpEnabled && !forgotPasswordEnabled && <div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="external-sign-in">
-                                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                                            Sign In with Facebook
-                                        </a>
-                                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
-                                            <div className="google-btn">
-                                                <div className="google-icon-wrapper">
-                                                    <img className="google-icon-svg" alt="google icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
-                                                </div>
-                                                <p className="btn-text"><b>Sign In with Google</b></p>
-                                            </div>
-                                        </a>
-                                    </div>
+        {formAlerts.authError && <div className="alert alert-warning alert-dismissable">
+            <button type="button" className="close" onClick={() => changeFormAlerts({authError: null})}>&times;</button>
+            <div>{formAlerts.authError}</div>
+        </div>}
+        {errorString().length > 0 && <div className="alert alert-warning alert-dismissable">
+            <button type="button" className="close" onClick={() => clearError()}>&times;</button>
+            {errorString().map(x => <div key={x}>{x}</div>)}
+        </div>}
+        {!signUpEnabled && !forgotPasswordEnabled && <div>
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="external-sign-in">
+                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
+                            Sign In with Facebook
+                        </a>
+                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                            <div className="google-btn">
+                                <div className="google-icon-wrapper">
+                                    <img className="google-icon-svg" alt="google icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
                                 </div>
+                                <p className="btn-text"><b>Sign In with Google</b></p>
                             </div>
-                            <hr />
-                            <div className="row">
-                                <form className="col-md-12" onSubmit={handleSubmit(onSubmit)}>
-                                    <div >
-                                        <label>Email</label>
-                                        <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="username" />
-                                        <div className="password-label">
-                                            <label>Password</label>
-                                            <a onClick={() => setForgotPasswordEnabled(true)}>Forgot password?</a>
-                                        </div>
-                                        <input className="form-control" type="password" ref={register({required: true, minLength: 3})} name="password" />
-                                        <div className="go-row">
-                                            <div>
-                                                Don't have an account? <a onClick={() => setSignUpEnabled(true)}>Sign Up!</a>
-                                            </div>
-                                            <div>
-                                                <button className="btn btn-primary pull-right" disabled={isSubmitting}>
-                                                    Go!
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div className="row">
+                <form className="col-md-12" onSubmit={handleSubmit(onSubmit)}>
+                    <div >
+                        <label>Email</label>
+                        <input className="form-control" type="text" ref={register({required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, minLength: 3})} name="email" />
+                            <div className="password-label">
+                                <label>Password</label>
+                                <a onClick={() => setForgotPasswordEnabled(true)}>Forgot password?</a>
+                            </div>
+                            <input className="form-control" type="password" ref={register({required: true, minLength: 6})} name="password" />
+                            <div className="go-row">
+                                <div>
+                                    Don't have an account? <a onClick={() => setSignUpEnabled(true)}>Sign Up!</a>
+                                </div>
+                                <div>
+                                    <button className="btn btn-primary pull-right" disabled={isSubmitting}>
+                                        Go!
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        }
-                        
-                        {forgotPasswordEnabled && <div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <form onSubmit={handleSubmit(onSubmit)}>
-                                        <label>Email</label>
-                                        <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="username"/>
-                                        <div className="go-row">
-                                            <div>
-                                                <button className="btn btn-primary pull-right" disabled={isSubmitting}>
-                                                    Reset Password
-                                                </button>
-                                                <div className="btn btn-default pull-right" onClick={() => !isSubmitting && setForgotPasswordEnabled(false)} style={{marginRight: '10px'}}>
-                                                    Cancel
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>}
-                        {signUpEnabled && !forgotPasswordEnabled && <div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="external-sign-in">
-                                    <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                                        Sign Up with Facebook
-                                    </a>
-                                    <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
-                                        <div className="google-btn">
-                                        <div className="google-icon-wrapper">
-                                            <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
-                                        </div>
-                                        <p className="btn-text"><b>Sign Up with Google</b></p>
-                                        </div>
-                                    </a>
+                    </form>
+                </div>
+            </div>
+            }
+            
+            {forgotPasswordEnabled && <div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <label>Email</label>
+                            <input className="form-control" type="text" ref={register({required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,minLength: 3})} name="email"/>
+                            <div className="go-row">
+                                <div>
+                                    <button className="btn btn-primary pull-right" disabled={isSubmitting}>
+                                        Reset Password
+                                    </button>
+                                    <div className="btn btn-default pull-right" onClick={() => !isSubmitting && setForgotPasswordEnabled(false)} style={{marginRight: '10px'}}>
+                                        Cancel
                                     </div>
                                 </div>
                             </div>
-                            <hr />
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <form onSubmit={handleSubmit(onSubmit)}>
-                                        <label>Email</label>
-                                        <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="email" />
-                                        <label>Username</label>
-                                        <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="username" />
-                                        <label>Password</label>
-                                        <input className="form-control" type="password" ref={register({required: true, minLength: 3})} name="password" />
-                                        <div className="go-row">
-                                            <div>
-                                                Already have an account? <a onClick={() => setSignUpEnabled(false)}>Sign In!</a>
-                                            </div>
-                                            <div>
-                                                <button className="btn btn-primary pull-right" disabled={isSubmitting}>
-                                                Go!
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
+                        </form>
+                    </div>
+                </div>
+            </div>}
+            {signUpEnabled && !forgotPasswordEnabled && <div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <div className="external-sign-in">
+                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
+                            Sign Up with Facebook
+                        </a>
+                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                            <div className="google-btn">
+                            <div className="google-icon-wrapper">
+                                <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                            </div>
+                            <p className="btn-text"><b>Sign Up with Google</b></p>
+                            </div>
+                        </a>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div className="row">
+                    <div className="col-md-12">
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <label>Email</label>
+                            <input className="form-control" type="text" ref={register({required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, minLength: 3})} name="email" />
+                            <label>Username</label>
+                            <input className="form-control" type="text" ref={register({required: true, minLength: 3})} name="username" />
+                            <label>Password</label>
+                            <input className="form-control" type="password" ref={register({required: true, minLength: 6})} name="password" />
+                            <div className="go-row">
+                                <div>
+                                    Already have an account? <a onClick={() => setSignUpEnabled(false)}>Sign In!</a>
+                                </div>
+                                <div>
+                                    <button className="btn btn-primary pull-right" disabled={isSubmitting}>
+                                    Go!
+                                    </button>
                                 </div>
                             </div>
-                        </div>}
+                        </form>
+                    </div>
+                </div>
+            </div>}
         </div>
         </>
     );
