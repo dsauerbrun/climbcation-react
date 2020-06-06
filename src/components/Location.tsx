@@ -17,6 +17,7 @@ import { useHistory } from 'react-router-dom';
 import { airport, allAirports } from '../common/airportsList';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { transformQuotesToChartData } from './LocationsTilesContainer';
+import Toast from 'react-bootstrap/Toast';
 
 
 interface PropLocation {
@@ -27,6 +28,7 @@ interface PropLocation {
 	miscSection?: MiscSection;
 	forceUpdate?: any;
 	className?: string;
+	saveCallback?: Function;
 }
 
 function NearbyMap({location}: PropLocation) {
@@ -165,7 +167,7 @@ function InfoHeader({location}: PropLocation) {
 		);
 }
 
-function GettingIn({location, transportationOptions}: PropLocation) {
+function GettingIn({location, transportationOptions, saveCallback}: PropLocation) {
 	interface GettingInForm {
 		walking_distance: string;
 		transportations: string[];
@@ -202,10 +204,7 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 						location.best_transportation = response.data.location.best_transportation;
 						location.walking_distance = response.data.location.walking_distance;
 						setEditingGettingIn(false);
-						/*ngToast.create({
-							additionalClasses: 'climbcation-toast',
-							content: editMessage
-						});*/
+						saveCallback && saveCallback(true);
 					});
 				}
 			});
@@ -352,7 +351,7 @@ function GettingIn({location, transportationOptions}: PropLocation) {
 		</div>
 	);
 }
-function Accommodations({location, accommodationOptions}: PropLocation) {
+function Accommodations({location, accommodationOptions, saveCallback}: PropLocation) {
 	interface AccommodationForm {
 		closestAccommodation: string;
 		accommodations: string[];
@@ -398,10 +397,7 @@ function Accommodations({location, accommodationOptions}: PropLocation) {
 			).then(function(response) {
 				if (response.status === 200) {
 						setEditingAccommodation(false);
-						/*ngToast.create({
-							additionalClasses: 'climbcation-toast',
-							content: editMessage
-						});*/
+						saveCallback && saveCallback(true);
 				}
 			});
 		}
@@ -487,7 +483,7 @@ function Accommodations({location, accommodationOptions}: PropLocation) {
 	);
 }
 
-function CostComponent({location, foodOptionOptions}: PropLocation) {
+function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation) {
 	interface CostForm {
 		foodOptions: string[];
 		foodOptionCosts: any;
@@ -542,10 +538,7 @@ function CostComponent({location, foodOptionOptions}: PropLocation) {
 			).then(function(response) {
 				if (response.status === 200) {
 						setEditingCost(false);
-						/*ngToast.create({
-							additionalClasses: 'climbcation-toast',
-							content: editMessage
-						});*/
+						saveCallback && saveCallback(true);
 				}
 			});
 		}
@@ -716,6 +709,7 @@ function LocationComponent() {
 	let [posts, setPosts] = useState<Post[]>([]);
 	let forceUpdate = useForceUpdate();
 	let {accommodations, foodOptions, transportations} = useEditables();
+	let [showToast, setShowToast] = useState(false);
 
 	let regetPosts = () => {
 		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
@@ -748,32 +742,19 @@ function LocationComponent() {
 
 	return (
 		<>
-		<div id="saveSuccessModal" className="modal">
-			<div className="modal-dialog">
-				<div className="modal-content">
-					<div className="modal-header">
-						<button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						<h4 className="modal-title">Thank you!</h4>
-					</div>
-					<div className="modal-body">
-						<p>Your change has been submitted!</p>
-					</div>
-					<div className="modal-footer">
-						<button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide style={{position: 'fixed', zIndex: 1000, top: 40, right: 20}} >
+			<Toast.Body>Your edit has been submitted and will be approved by a moderator shortly!</Toast.Body>
+		</Toast>
 
 		<section className="location-info-container">
 			<InfoHeader location={location}></InfoHeader>
 			<div className="container-fluid">
 				<div className="row">
-					<GettingIn location={location} transportationOptions={transportations} />
-					<Accommodations location={location} accommodationOptions={accommodations} />
+					<GettingIn location={location} transportationOptions={transportations} saveCallback={setShowToast} />
+					<Accommodations location={location} accommodationOptions={accommodations} saveCallback={setShowToast} />
 				</div>
 				<div className="row">
-					<CostComponent location={location} foodOptionOptions={foodOptions}></CostComponent>
+					<CostComponent location={location} foodOptionOptions={foodOptions} saveCallback={setShowToast}></CostComponent>
 					<FlightCostComponent location={location} />
 				</div>
 				<div>
@@ -783,7 +764,7 @@ function LocationComponent() {
 						</div>
 						<div className="well-content">
 							<div className="misc-container">
-								{location?.miscSections?.map(misc => <React.Fragment key={misc.id || 'newMisc'}><MiscSectionComponent forceUpdate={forceUpdate} location={location} miscSection={misc} /></React.Fragment>)}
+								{location?.miscSections?.map(misc => <React.Fragment key={misc.id || 'newMisc'}><MiscSectionComponent forceUpdate={forceUpdate} location={location} miscSection={misc} saveCallback={setShowToast} /></React.Fragment>)}
 							</div>
 						</div>
 					</div>
@@ -815,7 +796,7 @@ function LocationComponent() {
 	);
 }
 
-export function MiscSectionComponent({location, miscSection, forceUpdate, className}: PropLocation) {
+export function MiscSectionComponent({location, miscSection, forceUpdate, className, saveCallback}: PropLocation) {
 	let [preview, setPreview] = useState<boolean>(Boolean(miscSection?.id));
 	let [isSaving, setIsSaving] = useState<boolean>(false);
 	let [miscState, setMiscState] = useState<MiscSection>(miscSection);
@@ -853,10 +834,7 @@ export function MiscSectionComponent({location, miscSection, forceUpdate, classN
 					miscSection.id = response.data.new_id;
 					forceUpdate();
 				} else {
-					/*ngToast.create({
-						additionalClasses: 'climbcation-toast',
-						content: 'Your edit has been submitted and will be approved by a moderator shortly!'
-					});*/
+					saveCallback && saveCallback(true);
 				}
 				setOriginalBody(miscSection.body);
 				setOriginalTitle(miscSection.title);

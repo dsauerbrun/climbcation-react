@@ -6,6 +6,7 @@ import {
     useRouteMatch
 } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
+import Toast from 'react-bootstrap/Toast';
 
 interface LoginForm {
     email: string;
@@ -83,11 +84,7 @@ export function Login(props) {
 		changeFormAlerts({authError: null});
 		try {
 			await auth.resetPassword(username);
-			/*ngToast.create({
-				additionalClasses: 'climbcation-toast',
-				content: 'A link to reset your password has been sent to your email!'
-			});*/
-            successCallback && successCallback();
+            successCallback && successCallback('A link to reset your password has been sent to your email!');
 		} catch (err) {
             changeFormAlerts({authError: err});
 		}
@@ -99,11 +96,7 @@ export function Login(props) {
 		if (signUpFormValid === true) {
 			try {
 				await auth.signup(email, username, password);
-				/*ngToast.create({
-					additionalClasses: 'climbcation-toast',
-					content: 'A link to verify your account has been sent to your email!'
-				});*/
-                successCallback && successCallback();
+                successCallback && successCallback('A link to verify your account has been sent to your email!');
 			} catch (err) {
                 changeFormAlerts({authError: err});
 			}
@@ -124,6 +117,7 @@ export function Login(props) {
     }, [])
     
     return (
+        <>
         <div id="loginModal" className="login-modal" >
                         {formAlerts.authError && <div className="alert alert-warning alert-dismissable">
                             <button type="button" className="close" onClick={() => changeFormAlerts({authError: null})}>&times;</button>
@@ -237,24 +231,37 @@ export function Login(props) {
                             </div>
                         </div>}
         </div>
+        </>
     );
 }
 
 export function LoginModal({signUpEnabled, setSignUpEnabled, showLoginModal, setShowLoginModal}) {
+    let [showToast, setShowToast] = useState({showing: false, message: ''});
     return (
+        <>
+		<Toast onClose={() => setShowToast({showing: false, message: ''})} show={showToast?.showing} delay={3000} autohide style={{position: 'fixed', zIndex: 1000, top: 40, right: 20}} >
+            <Toast.Body>{showToast.message}</Toast.Body>
+		</Toast>
         <Modal show={showLoginModal} onHide={() => setShowLoginModal(false)} id="loginModal" className="modal">
             <Modal.Header>
                 <h4 className="modal-title">{ signUpEnabled ? 'Sign Up': 'Log In' }</h4>
                 <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => setShowLoginModal(false)}><span aria-hidden="true">&times;</span></button>
             </Modal.Header>
             <Modal.Body>
-                <Login signUpEnabled={signUpEnabled} successCallback={() => setShowLoginModal(false)}/>
+                <Login signUpEnabled={signUpEnabled} successCallback={
+                    (toastMessage: string = null) => {
+                        setShowLoginModal(false)
+                        if (toastMessage) {
+                            setShowToast({showing: true, message: toastMessage});
+                        }
+                    }
+                }/>
             </Modal.Body>
             <Modal.Footer>
                 <div className="btn btn-default" onClick={() => setShowLoginModal(false)}>Cancel</div>
             </Modal.Footer>
         </Modal>
-
+        </>
     );
 }
 
