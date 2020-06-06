@@ -59,11 +59,9 @@ export class FilterParams {
 	noCarFilter: boolean = false;
 	date?: moment.Moment = moment();
 	northEast = {lat: 90, lng: 180};
-	//northEast: google.maps.LatLng = new google.maps.LatLng(90, 180);
 	southWest = {lat: -90, lng: -180};
 	center = {lat: -3.745, lng: -38.523};
 	zoom: number = 0;
-	//southWest: google.maps.LatLng = new google.maps.LatLng(-90, -180);
 
 	constructor(copy?: FilterParams | null) {
 		if (copy) {

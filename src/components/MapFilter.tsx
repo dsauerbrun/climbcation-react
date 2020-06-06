@@ -88,9 +88,11 @@ function removeMarker(marker: google.maps.Marker) {
 
 class ClimbcationMap extends google.maps.Map {
     overlay: google.maps.OverlayView;
+    getLatitude: number;
+    getLongitude: number;
 }
 
-function Map({ options, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange, markerClickFunc, hoveredLocation}) {
+function Map({ options, latitude, longitude, zoom, markers, onMount, className, onMountProps, styles, onDragEnd, onZoomChange, markerClickFunc, hoveredLocation}) {
     const ref = useRef()
     const [map, setMap] = useState<ClimbcationMap>();
     const [mapId, setMapId] = useState<string>(options.id || 'mapFilter');
@@ -115,6 +117,19 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (map) {
+            map.getLatitude = latitude;
+            map.getLongitude = longitude;
+            let currentLat =map.getCenter().lat();
+            if (currentLat === latitude) {
+            } else {
+                map.setCenter(new google.maps.LatLng(latitude, longitude));
+                map.setZoom(zoom);
+            }
+        }
+    }, [latitude])
 
     useEffect(() => {
         if (map) {
@@ -235,11 +250,14 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
 
 function shouldNotUpdate(props, nextProps) {
     const [funcs, nextFuncs] = [functions(props), functions(nextProps)]
-    const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'hoveredLocation', 'options' )), JSON.stringify(omit(nextProps, nextFuncs, 'hoveredLocation', 'options')));
+    const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'hoveredLocation', 'options', 'latitude', 'longitude', 'zoom' )), JSON.stringify(omit(nextProps, nextFuncs, 'hoveredLocation', 'options', 'latitude', 'longitude', 'zoom')));
     const noFuncChange =
       funcs.length === nextFuncs.length &&
       funcs.every(fn => props[fn].toString() === nextProps[fn].toString());
-    return noPropChange && noFuncChange
+    let presetLatitudes = [-3.745, 55.875310835696816, 46.80005944678737]
+    let presetFilterClicked = presetLatitudes.includes(nextProps.latitude)
+    
+    return noPropChange && noFuncChange && !presetFilterClicked;
 }
 
 export default React.memo(Map, shouldNotUpdate); 

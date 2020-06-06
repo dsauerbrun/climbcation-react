@@ -11,7 +11,7 @@ import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { LocationsFetch } from './useLocationsFetcher';
 import { useHistory } from 'react-router-dom';
-import { animateScroll } from "react-scroll";
+import { animateScroll, Element } from "react-scroll";
 import { useMediaQuery } from 'react-responsive'
 
 function FilterCrumbs(props: any) {
@@ -199,6 +199,9 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 		  gestureHandling: 'greedy',
 		  scrollWheel: false
 		},
+		latitude: filterState.center.lat,
+		longitude: filterState.center.lng,
+		zoom: filterState.zoom,
 		onDragEnd: mapMoved,
 		onZoomChange: mapMoved,
 		markers: unpaginatedLocations,
@@ -359,8 +362,8 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 			<div ng-show="mapFilterShown">
 			</div>
 		</section>}
-		{!isMobile && <section className="filter d-none d-md-block">
-			<div className="container-fluid">		
+		{!isMobile && <div id="filter-container" className="filter d-none d-md-block">
+			<Element name="filterContainer" className="container-fluid">		
 				<div className="row">
 					<div className="col-md-9">
 						<div className="row offset-md-4 col-md-8">
@@ -483,8 +486,8 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 						{!largeMapEnabled && <Map {...mapProps} hoveredLocation={hoveredLocation}></Map>}
 					</div>
 				</div>
-			</div>
-		</section>}
+			</Element>
+		</div>}
 		<FilterCrumbs setFilterState={setFilterState} filterParams={filterState}></FilterCrumbs>
 		</>
 	);

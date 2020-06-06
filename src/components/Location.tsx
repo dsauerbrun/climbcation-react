@@ -38,6 +38,9 @@ function NearbyMap({location}: PropLocation) {
 		history.push(`/location/${location.slug}`)
 	}
 	let [mapProps, setMapProps] = useState({
+		latitude: location?.latitude,
+		longitude: location?.longitude,
+		zoom: 6,
 		options: {
 		  center: {lat: location?.latitude, lng: location?.longitude},
 		  zoom: 6,
@@ -53,6 +56,9 @@ function NearbyMap({location}: PropLocation) {
 
 	useEffect(() => {
 		setMapProps({
+			latitude: location?.latitude,
+			longitude: location?.longitude,
+			zoom: 6,
 			options: {
 				center: {lat: location?.latitude, lng: location?.longitude},
 				zoom: 6,
