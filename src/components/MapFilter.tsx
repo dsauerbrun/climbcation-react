@@ -129,6 +129,7 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
         if (map && typeof onZoomChange === `function`) {
             map.addListener('zoom_changed', () => onZoomChange(map));
         }
+
         return () => {
             map && google.maps.event.clearListeners(map, 'dragend');
             map && google.maps.event.clearListeners(map, 'zoom_changed');
@@ -234,11 +235,10 @@ function Map({ options, markers, onMount, className, onMountProps, styles, onDra
 
 function shouldNotUpdate(props, nextProps) {
     const [funcs, nextFuncs] = [functions(props), functions(nextProps)]
-    const noPropChange = isEqual(JSON.stringify(omit(props, funcs )), JSON.stringify(omit(nextProps, nextFuncs)));
-    //const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'markers')), JSON.stringify(omit(nextProps, nextFuncs, 'markers')));
+    const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'hoveredLocation', 'options' )), JSON.stringify(omit(nextProps, nextFuncs, 'hoveredLocation', 'options')));
     const noFuncChange =
       funcs.length === nextFuncs.length &&
-      funcs.every(fn => props[fn].toString() === nextProps[fn].toString())
+      funcs.every(fn => props[fn].toString() === nextProps[fn].toString());
     return noPropChange && noFuncChange
 }
 
