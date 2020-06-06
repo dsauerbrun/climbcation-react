@@ -32,23 +32,6 @@ function App() {
 					<Route path='/profile' component={Profile} />
 					<Route path='/login' component={Login} />
 					<Route path='/signup' component={Login} />
-
-						{/* TODO: need a solution for GOTO routes: 
-						.when('/', {
-								redirectTo: function(current, path, search) {
-									if (search.goto) {
-										// if we were passed in a search param, and it has a path
-										// to redirect to, then redirect to that path
-										return "/" + search.goto
-									} else {
-										// else just redirect back to this location
-										// angular is smart enough to only do this once.
-										return "/home"
-									}
-								}
-								})
-							*/
-							}
 					<Route component={Error} />
 				</Switch>
 			</ProvideAuth>
