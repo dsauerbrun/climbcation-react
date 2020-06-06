@@ -8,6 +8,7 @@ import AirportAutocomplete from '../common/AirportAutocomplete';
 import Linkify from 'react-linkify';
 import { useForm } from "react-hook-form";
 import { useForceUpdate } from '../common/useForceUpdate';
+import { scroller, Element } from "react-scroll";
 import {Thread, PostInput} from './Forum';
 import { Post } from '../classes/Forum';
 import { IconTooltip } from '../common/HelperComponents';
@@ -740,6 +741,12 @@ function LocationComponent() {
 	let addMiscSection = () => {
 		if (location?.miscSections?.find(x => !x.id)) {
 			// misc section found... maybe we scroll to it in TODO
+			scroller.scrollTo('miscSectionnewMisc', {
+				duration: 800,
+				delay: 0,
+				smooth: "easeInOutQuart",
+				offset: 0 
+			});
 		} else {
 			location?.miscSections.push({title: '', body: ''});
 			forceUpdate();
@@ -854,41 +861,43 @@ export function MiscSectionComponent({location, miscSection, forceUpdate, classN
 	}
 	return (
 		<div className={classNames("misc-section", className)}>
-			{!preview && <div>
-				<div className="row">
-					<div className={classNames("col-md-12")}>
-						<div className="form-group">
-							<label>Section Title</label>
-							<input type="text" placeholder="ex. Social Scene" className="form-control" onChange={(e) => handleChange(e, 'title')} value={miscSection.title}/>
+			<Element name={`miscSection${miscSection.id || 'newMisc'}`}>
+				{!preview && <div>
+					<div className="row">
+						<div className={classNames("col-md-12")}>
+							<div className="form-group">
+								<label>Section Title</label>
+								<input type="text" placeholder="ex. Social Scene" className="form-control" onChange={(e) => handleChange(e, 'title')} value={miscSection.title}/>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div className="row">
-					<div className={classNames("col-md-12")}>
-						<div className="form-group">
-							{!miscSection?.id && <label>Section Description</label>}
-							<textarea  placeholder="The best place to meet climbers is at the Fatolitis snack bar, this is a great bar for a post climbing spray session as well" className="form-control" rows={miscSection?.id?3:6} onChange={(e) => handleChange(e, 'body')}  value={miscSection.body}></textarea>
+					<div className="row">
+						<div className={classNames("col-md-12")}>
+							<div className="form-group">
+								{!miscSection?.id && <label>Section Description</label>}
+								<textarea  placeholder="The best place to meet climbers is at the Fatolitis snack bar, this is a great bar for a post climbing spray session as well" className="form-control" rows={miscSection?.id?3:6} onChange={(e) => handleChange(e, 'body')}  value={miscSection.body}></textarea>
+							</div>
+							{
+								location?.id && (<>
+									<div className={classNames("btn btn-default btn-climbcation pull-right", {disabled: isSaving})} onClick={() => saveChanges()}>
+										Save
+									</div>
+									<div className="text-button pull-right pad-top" onClick={() => cancelEdit()}>
+										Cancel
+									</div>
+									</>
+								)
+							}
 						</div>
-						{
-							location?.id && (<>
-								<div className={classNames("btn btn-default btn-climbcation pull-right", {disabled: isSaving})} onClick={() => saveChanges()}>
-									Save
-								</div>
-								<div className="text-button pull-right pad-top" onClick={() => cancelEdit()}>
-									Cancel
-								</div>
-								</>
-							)
-						}
 					</div>
-				</div>
-			</div>}
+				</div>}
 
 
-			{preview && <div> 
-				<h3 className="inline">{miscSection?.title}</h3> <span className="text-button" onClick={() => setPreview(false)}>Edit</span>
-				<p className="text-gray info-text preserve-line-breaks"><Linkify>{miscSection?.body}</Linkify></p>
-			</div>}
+				{preview && <div> 
+					<h3 className="inline">{miscSection?.title}</h3> <span className="text-button" onClick={() => setPreview(false)}>Edit</span>
+					<p className="text-gray info-text preserve-line-breaks"><Linkify>{miscSection?.body}</Linkify></p>
+				</div>}
+			</Element>
 		</div>
 	);
 

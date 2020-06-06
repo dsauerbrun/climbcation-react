@@ -10,7 +10,7 @@ import { FilterParams, months } from '../classes/FilterParams';
 import Map from './MapFilter';
 import classNames from 'classnames';
 import axios from 'axios';
-import { animateScroll, scroller } from "react-scroll";
+import { scroller } from "react-scroll";
 
 export const FilterContext = createContext<filterHook>({});
 export const LocationsContext = createContext<LocationsFetch>({});
