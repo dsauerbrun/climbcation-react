@@ -142,7 +142,7 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 			<div className="home-hero-overlay">
 				<div className="home-hero-overlay-title">
 					<div>
-						<div className="btn btn-climbcation preset alpine hidden-sm" onClick={() => goToFilter('alpine')}>
+						<div className="btn btn-climbcation preset alpine d-none d-sm-none d-md-none d-lg-inline-flex" onClick={() => goToFilter('alpine')}>
 							Get Psyched on Alpine Rock Season
 						</div>
 						<div className="btn btn-climbcation preset euro-sport" onClick={() => goToFilter('euroSport')}>
@@ -153,8 +153,8 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 						</div>
 					</div>
 				</div>
-				<img className="pull-left hidden-xs" src={heroImageLeft} alt=""/>
-				<img className="pull-right hidden-xs" src={heroImageRight} alt=""/>
+				<img className="pull-left" src={heroImageLeft} alt=""/>
+				<img className="pull-right" src={heroImageRight} alt=""/>
 			</div>
 		</div>
 	);

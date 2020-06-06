@@ -195,13 +195,13 @@ function NewLocation () {
 							</div>
 							<div className="col-md-12 well-footer">
 								<div className="row">
-									{page !== 6 &&<div className="offset-md-8 col-md-1 offset-xs-7 col-xs-2" >
+									{page !== 6 &&<div className="offset-8 col-1 offset-xs-7 col-xs-2" >
 										{page !== 1 && page !== 6 && <span className="text-button" onClick={() => setPage(page - 1)} >Back</span>}
 									</div>}
-									{page < 5 && <div className="col-md-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
+									{page < 5 && <div className="col-2 btn btn-climbcation" onClick={() => setPage(page + 1)}>
 										<div>Next</div>
 									</div>}
-									<button className="col-md-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" >
+									<button className="col-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" >
 										{!isSubmitting && (<div>Publish</div>)}
 										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
 									</button>
@@ -287,7 +287,7 @@ function CompletionProgress({generalComplete, getMissingFields}: HeaderProps) {
 		return messages;
 	}
 	return (
-		<div className="col-md-3 hidden-xs">
+		<div className="col-md-3 d-none d-sm-block">
 			<div className="well climbcation-well forms-container">
 				<div className="well-content">
 					<h4>{ generalComplete() ? 'Form Completed!' : 'Form Incomplete'}</h4>
@@ -969,12 +969,12 @@ function NewLocationHeader({currentPage, generalComplete, gettingInComplete, acc
 				</div>
 			</div>
 			<div className="titles">
-				<a onClick={() => changePage(1)}><strong>1.</strong> <span className="hidden-xs">General*</span></a>
-				<a onClick={() => changePage(2)}><strong>2.</strong> <span className="hidden-xs">Getting In</span></a>
-				<a onClick={() => changePage(3)}><strong>3.</strong> <span className="hidden-xs">Accommodation</span></a>
-				<a onClick={() => changePage(4)}><strong>4.</strong> <span className="hidden-xs">Cost</span></a>
-				<a onClick={() => changePage(5)}><strong>5.</strong> <span className="hidden-xs">Other</span></a>
-				<span><strong>6.</strong> <span className="hidden-xs">Publish</span></span>
+				<a onClick={() => changePage(1)}><strong>1.</strong> <span className="d-none d-sm-block">General*</span></a>
+				<a onClick={() => changePage(2)}><strong>2.</strong> <span className="d-none d-sm-block">Getting In</span></a>
+				<a onClick={() => changePage(3)}><strong>3.</strong> <span className="d-none d-sm-block">Accommodation</span></a>
+				<a onClick={() => changePage(4)}><strong>4.</strong> <span className="d-none d-sm-block">Cost</span></a>
+				<a onClick={() => changePage(5)}><strong>5.</strong> <span className="d-none d-sm-block">Other</span></a>
+				<span><strong>6.</strong> <span className="d-none d-sm-block">Publish</span></span>
 			</div>
 		</div>
 

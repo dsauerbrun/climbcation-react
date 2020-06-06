@@ -482,7 +482,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 						</div>
 					</div>
 					<div className="col-md-3">
-						<span className="hidden-xs hidden-sm text-button right-margin" onClick={() => setLargeMapEnabled(!largeMapEnabled)} style={{marginBottom: '5px'}}>Toggle Large Map</span>
+						<span className="text-button right-margin" onClick={() => setLargeMapEnabled(!largeMapEnabled)} style={{marginBottom: '5px'}}>Toggle Large Map</span>
 						{!largeMapEnabled && <Map {...mapProps} hoveredLocation={hoveredLocation}></Map>}
 					</div>
 				</div>
