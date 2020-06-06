@@ -856,7 +856,7 @@ export function MiscSectionComponent({location, miscSection, forceUpdate, classN
 		<div className={classNames("misc-section", className)}>
 			{!preview && <div>
 				<div className="row">
-					<div className={classNames("col-md-11", {'col-md-offset-1': miscSection?.id})}>
+					<div className={classNames("col-md-12")}>
 						<div className="form-group">
 							<label>Section Title</label>
 							<input type="text" placeholder="ex. Social Scene" className="form-control" onChange={(e) => handleChange(e, 'title')} value={miscSection.title}/>
@@ -864,7 +864,7 @@ export function MiscSectionComponent({location, miscSection, forceUpdate, classN
 					</div>
 				</div>
 				<div className="row">
-					<div className={classNames("col-md-11", {'col-md-offset-1': miscSection?.id})}>
+					<div className={classNames("col-md-12")}>
 						<div className="form-group">
 							{!miscSection?.id && <label>Section Description</label>}
 							<textarea  placeholder="The best place to meet climbers is at the Fatolitis snack bar, this is a great bar for a post climbing spray session as well" className="form-control" rows={miscSection?.id?3:6} onChange={(e) => handleChange(e, 'body')}  value={miscSection.body}></textarea>
