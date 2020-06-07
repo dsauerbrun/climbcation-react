@@ -11,7 +11,7 @@ import {
   Link
 } from "react-router-dom";
 import skyscannerLogo from '../images/skyscannerinline.png';
-import loading from "/images/climbcation-loading.gif";
+import loading from "../images/climbcation-loading.gif";
 
 export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
     let data = [];
