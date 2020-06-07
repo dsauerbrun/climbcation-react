@@ -58,9 +58,6 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
 		}
 
     }
-    useEffect(() => {
-        console.log('new post changin')
-    }, [newPost])
     return (
         <>
         <LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
