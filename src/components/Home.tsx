@@ -41,8 +41,8 @@ function Home() {
 
 	let getNewMapProps = () => {
 		return {
-			longitude: filterParamHook.filterState.center.lng,
-			latitude: filterParamHook.filterState.center.lat,
+			longitude: filterParamHook.filterState.center?.lng,
+			latitude: filterParamHook.filterState.center?.lat,
 			zoom: filterParamHook.filterState.zoom,
 			options: {
 				center: filterParamHook.filterState.center,
@@ -93,7 +93,7 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 
 	let goToFilter = async (preset: string) => {
 		let presets = {
-			alpine: {climbingTypes: ['Alpine'], months: {start: 6, end: 9}, map: {zoom: 0, center: {lat: -3.745, lng: -38.523}, northeast: {longitude: 180, latitude: 90}, southwest: {longitude: -180, latitude: -90}} },
+			alpine: {climbingTypes: ['Alpine'], months: {start: 6, end: 9}, map: {zoom: 0, center: {latitude: -3.745, longitude: -38.523}, northeast: {longitude: 180, latitude: 90}, southwest: {longitude: -180, latitude: -90}} },
 			euroSport: {climbingTypes: ['Sport'], map: {zoom: 2, center: {latitude: 55.875310835696816, longitude: 11.162109375}, northeast: {longitude: 82.529296875, latitude: 71.69129271864}, southwest: {longitude: -60.205078125, latitude: 29.38217507514534}} },
 			summerNA: {months: {start: 6, end: 9}, map: {zoom: 2, center: {latitude: 46.80005944678737, longitude: -100.986328125}, northeast: {longitude: -29.619140625, latitude: 67.067433351083}, southwest: {longitude: -172.353515625, latitude: 17.30868788677006}}}
 		}
@@ -106,39 +106,35 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 		});
 
 		if (presets[preset]) {
-			
+			var presetObj = presets[preset];
+			let newFilters: FilterParams = new FilterParams(filterHook.filterState);
+			newFilters.removeAllFilters();
 
-			filterHook.setFilterState(async (current) => {
-				var presetObj = presets[preset];
-				let newFilters: FilterParams = new FilterParams(current);
-				newFilters.removeAllFilters();
+			if (presetObj.map) {
+				newFilters.center.lat = presetObj.map.center.latitude;
+				newFilters.center.lng = presetObj.map.center.longitude;
+				newFilters.zoom = presetObj.map.zoom;
+				newFilters.southWest.lat = presetObj.map.southwest.latitude;
+				newFilters.southWest.lng = presetObj.map.southwest.longitude;
+				newFilters.northEast.lat = presetObj.map.northeast.latitude;
+				newFilters.northEast.lng = presetObj.map.northeast.longitude;
+			}
 
-				if (presetObj.map) {
-					newFilters.center.lat = presetObj.map.center.latitude;
-					newFilters.center.lng = presetObj.map.center.longitude;
-					newFilters.zoom = presetObj.map.zoom;
-					newFilters.southWest.lat = presetObj.map.southwest.latitude;
-					newFilters.southWest.lng = presetObj.map.southwest.longitude;
-					newFilters.northEast.lat = presetObj.map.northeast.latitude;
-					newFilters.northEast.lng = presetObj.map.northeast.longitude;
+			if (presetObj.months) {
+				newFilters.startMonth = months.find(x => x.month === presetObj.months.start);
+				newFilters.endMonth = months.find(x => x.month === presetObj.months.end);
+			}
+
+			if (presetObj.climbingTypes) {
+				if (climbTypes.length === 0) {
+					let filterOptionsFetch = await fetch('/api/filters');
+					let filterOptions = await filterOptionsFetch.json() as any;
+					climbTypes = filterOptions.climbTypes;
 				}
 
-				if (presetObj.months) {
-					newFilters.startMonth = months.find(x => x.month === presetObj.months.start);
-					newFilters.endMonth = months.find(x => x.month === presetObj.months.end);
-				}
-
-				if (presetObj.climbingTypes) {
-					if (climbTypes.length === 0) {
-						let filterOptionsFetch = await fetch('/api/filters');
-						let filterOptions = await filterOptionsFetch.json() as any;
-						climbTypes = filterOptions.climbTypes;
-					}
-
-					newFilters.climbingTypesFilter = climbTypes.filter(x => presetObj.climbingTypes.includes(x.type));
-				}
-				return newFilters;
-			});
+				newFilters.climbingTypesFilter = climbTypes.filter(x => presetObj.climbingTypes.includes(x.type));
+			}
+			filterHook.setFilterState(newFilters);
 		}
 	}
 	return (

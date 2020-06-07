@@ -84,9 +84,9 @@ function FilterCrumbs(props: any) {
 		<div className="row bottom-padding" style={{width: '90%', margin: '0 auto', height: '45px'}}>
 			<div className="col-md-8">
 				&nbsp;
-				{filters?.appliedFilters.length > 0 && <button className="applied-filter" onClick={() => removeAllFilters()}>Clear All</button>}
+				{filters?.appliedFilters?.length > 0 && <button className="applied-filter" onClick={() => removeAllFilters()}>Clear All</button>}
 				{
-					filters?.appliedFilters.map(appliedFilter => (
+					filters?.appliedFilters?.map(appliedFilter => (
 						<div className="applied-filter" key={appliedFilter.title}>
 							<span className="bold">{appliedFilter.title}<span className="close-button" onClick={() => removeAppliedFilter(appliedFilter)}>&times;</span></span>
 						</div>
@@ -229,19 +229,19 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 	}
 
 	const getFilterGradeType = (climbTypeName: string): grade | undefined | null => {
-		let foundGradeFilter = filterState && filterState.gradesFilter.sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.climbingType === climbTypeName);
+		let foundGradeFilter = filterState && filterState.gradesFilter?.sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.climbingType === climbTypeName);
 		return foundGradeFilter;
 	}
 
 	const isActiveClimbingType = (climbTypeFilter: climbType): boolean => {
 		if (climbTypeFilter === null ) {
-			if (filterState.climbingTypesFilter.length === 0) {
+			if (filterState.climbingTypesFilter?.length === 0) {
 				return true;
 			} else {
 				return false;
 			}
 		} else {
-			return Boolean(filterState && filterState.climbingTypesFilter.find(x => x.type === climbTypeFilter.type));
+			return Boolean(filterState && filterState.climbingTypesFilter?.find(x => x.type === climbTypeFilter.type));
 		}
 	};
 	const mapMoved = (map: google.maps.Map): void => {
@@ -271,8 +271,8 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 		  gestureHandling: 'greedy',
 		  scrollWheel: false
 		},
-		latitude: filterState.center.lat,
-		longitude: filterState.center.lng,
+		latitude: filterState.center?.lat,
+		longitude: filterState.center?.lng,
 		zoom: filterState.zoom,
 		onDragEnd: mapMoved,
 		onZoomChange: mapMoved,
@@ -468,7 +468,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								<label>When do you want to go?</label>
 								<Dropdown className="d-inline-block">
 									<Dropdown.Toggle id="monthStart" childBsPrefix="btn btn-default">
-										{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
+										{filterState && filterState.startMonth?.name && filterState.startMonth?.name.substring(0,3)}
 									</Dropdown.Toggle>
 
 									<Dropdown.Menu>
@@ -478,7 +478,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								<span className="text-gray">To </span>
 								<Dropdown className="d-inline-block">
 									<Dropdown.Toggle id="monthEnd" childBsPrefix="btn btn-default">
-										{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
+										{filterState && filterState.endMonth?.name && filterState.endMonth?.name.substring(0,3)}
 									</Dropdown.Toggle>
 
 									<Dropdown.Menu>
@@ -516,7 +516,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									<div>
 										<label>Rating</label>
 										<ButtonGroup className="btn-group-sm btn-group-filter">
-											<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+											<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter?.length === 0}])} onClick={() => filterRating('All')}>All</Button>
 											{
 												[1,2,3].map(x => (
 													<IconTooltip

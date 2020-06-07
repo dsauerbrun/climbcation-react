@@ -131,7 +131,7 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
             } else {
                 google.maps.event.clearListeners(map, 'zoom_changed');
                 map.setZoom(zoom);
-                map.setCenter(new google.maps.LatLng(latitude, longitude));
+                map.setCenter(new google.maps.LatLng(latitude || 0, longitude || 0));
                 map.addListener('zoom_changed', () => onZoomChange(map));
             }
         }
