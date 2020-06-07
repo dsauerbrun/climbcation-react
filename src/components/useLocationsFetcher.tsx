@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import { FilterParams } from '../classes/FilterParams';
 import axios from 'axios';
 import { animateScroll } from "react-scroll";
@@ -21,6 +21,13 @@ interface fetcherParam {
     filterState: FilterParams,
     setFilterState: Function
 }
+function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+ }
 
 function useLocationsFetcher({filterState, setFilterState}: fetcherParam): LocationsFetch {
     let [locations, setLocations] = useState<Location[]>([]);
@@ -75,6 +82,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         getFlightQuotes(locations.map(x => x.slug), selectedAirport?.iata_code);
     }, [selectedAirport])
    
+    let prevFilters: FilterParams = usePrevious(filterState);
     useEffect(() => {
         async function reloadLocations() {
             setLocations([]);
@@ -97,6 +105,8 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
             if (reloadTimeout) {
                 window.clearTimeout(reloadTimeout);
             }
+
+            let filterTimeout = filterState.searchFilter !== prevFilters?.searchFilter ? 500 : 200;
             reloadTimeout = window.setTimeout(async () => {
                 let filteredFetch = await fetch('/api/filter_locations', requestOptions);
                 let filtered = await filteredFetch.json() as any
@@ -107,7 +117,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
                 if (filtered.paginated.length === 0) { 
                     setNoMoreLocations(true);
                 }
-            }, 200);            
+            }, filterTimeout);            
         }
 
         reloadLocations();
