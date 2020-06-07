@@ -39,10 +39,11 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
         if (mapName === 'mapFilterLarge') {
             offsetCalcY = -640;
             offsetCalcX = -606;
+            offsetCalcX = -35;
             bottomOffset = 50;
         } else if (mapName === 'mapFilter') {
-            offsetCalcY = 45;
-            offsetCalcX = -39;
+            offsetCalcY = 15;
+            offsetCalcX = -9;
             bottomOffset = 50;
         } else if (mapName === 'nearby-map') {
             offsetCalcY = 45;
@@ -51,6 +52,8 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
             locationCard.classList.add('left-arrow');
         }
         
+        let mapDiv: HTMLElement = document.querySelector(`#${mapName}`);
+        let mapWidth = mapDiv.offsetWidth;
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
         mapInfoWindow.style.display = 'block';
         let infoWindowWidth = mapInfoWindow.offsetWidth;
@@ -59,7 +62,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
         locationCard.classList.add('map-info-window-arrow-bottom');
         locationCard.classList.remove('map-info-window-arrow-top');
         mapInfoWindow.style.top = (point.y - infoWindowHeight - offsetCalcY) + 'px';
-        mapInfoWindow.style.left = (point.x - infoWindowWidth - offsetCalcX) + 'px';
+        mapInfoWindow.style.right = (mapWidth - point.x + offsetCalcX) + 'px';
 
         if (!isInViewport(mapInfoWindow)) {
             mapInfoWindow.style.top = (point.y - infoWindowHeight - offsetCalcY + (infoWindowHeight + bottomOffset)) + 'px'; 
@@ -69,7 +72,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
     })
     marker.addListener('mouseout', (event) => {
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
-        mapInfoWindow.style.display = 'none';
+        //mapInfoWindow.style.display = 'none';
     })
     if (clickFunc) {
         marker.addListener(`click`, (e) => {
