@@ -37,6 +37,48 @@ function FilterCrumbs(props: any) {
 
 	}
 
+	let sortByRating = () => {
+		setFilterState((current) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			if (newFilters.sort?.rating?.asc) {
+				newFilters.sort.rating = {asc: false};
+			} else if (newFilters.sort?.rating?.asc === false) {
+				newFilters.sort = {};
+			} else {
+				newFilters.sort = {rating: {asc: true}}
+			}
+			return newFilters;
+		})
+	}
+
+	let sortByDistance = () => {
+		if (filters.sort?.distance) {
+			setFilterState((current) => {
+				let newFilters: FilterParams = new FilterParams(current);
+				newFilters.sort = {};
+				return newFilters;
+
+			})
+		} else {
+			navigator.geolocation.getCurrentPosition(
+				function(position) {
+					setFilterState((current) => {
+						let newFilters: FilterParams = new FilterParams(current);
+						newFilters.sort = {distance: {latitude: position.coords.latitude, longitude: position.coords.longitude}};
+						return newFilters;
+					});
+				},
+				function() {
+					console.error('error getting location(probably blocked)');
+					alert('Need location permission to sort by distance, ' +
+						'if you arent given the option to grant permission, ' +
+						'it is probably because your browser doesnt support non-ssl geolocation requests... the webmaster is a cheap bastard ' +
+						'and doesnt want to spend $20/mo, go to https://climbcation.herokuapp.com and it should work just fine');
+				}
+			);
+		}
+	}
+
 	return (
 		<div className="row bottom-padding" style={{width: '90%', margin: '0 auto', height: '45px'}}>
 			<div className="col-md-8">
@@ -52,8 +94,8 @@ function FilterCrumbs(props: any) {
 			</div>
 			<div className="col-md-4">
 				<label className="inline right-margin">Sort By:</label>
-				<div className="text-button right-margin" ng-click="LocationsGetter.setSorting('rating', !LocationsGetter.filter.sort.rating.asc)"><i ng-if="LocationsGetter.filter.sort.rating" className="glyphicon" ng-class="{'glyphicon-sort-by-attributes': LocationsGetter.filter.sort.rating.asc, 'glyphicon-sort-by-attributes-alt': !LocationsGetter.filter.sort.rating.asc}"></i>Rating</div>
-				<div className="text-button" ng-click="LocationsGetter.setSorting('distance', true)"><i ng-if="LocationsGetter.filter.sort.distance" className="glyphicon glyphicon-sort-by-attributes"></i>Distance From Me</div>
+				<div className="text-button right-margin" onClick={() => sortByRating()}>{filters?.sort?.rating && <i className={classNames("glyphicon", {'glyphicon-sort-by-attributes': filters?.sort?.rating?.asc, 'glyphicon-sort-by-attributes-alt': !filters?.sort?.rating?.asc})}></i>}Rating</div>
+				<div className="text-button" onClick={() => sortByDistance()}>{filters?.sort?.distance && <i className={classNames("glyphicon glyphicon-sort-by-attributes")}></i>}Distance From Me</div>
 			</div>
 		</div>
 	);

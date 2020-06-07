@@ -61,6 +61,7 @@ export class FilterParams {
 	northEast = {lat: 90, lng: 180};
 	southWest = {lat: -90, lng: -180};
 	center = {lat: -3.745, lng: -38.523};
+	sort: any;
 	zoom: number = 0;
 
 	constructor(copy?: FilterParams | null) {
@@ -161,7 +162,6 @@ export class FilterParams {
 			filter: {
 				climbing_types: this.climbingTypesFilter.find(x => x.type === 'All') ? [] : this.climbingTypesFilter.map(x => x.type),
 				grades: gradesObj, 
-				sort: [],
 				search: this.searchFilter,
 				start_month: this.startMonth.month,
 				end_month: this.endMonth.month,
@@ -171,6 +171,7 @@ export class FilterParams {
 				solo_friendly: this.soloFriendlyFilter,
 				no_car: this.noCarFilter,
 				date: moment().format('YYYY-MM-DD'),
+				sort: this.sort,
 			},
 			mapFilter: {"northeast":{"longitude": this.northEast.lng,"latitude": this.northEast.lat},"southwest":{"longitude": this.southWest.lng,"latitude": this.southWest.lat}},
 			page: this.page 
