@@ -19,17 +19,21 @@ function FilterCrumbs(props: any) {
 	let setFilterState: Function = props.setFilterState;
 
 	const removeAppliedFilter = (appliedFilter: AppliedFilter): void => {
-		let newFilters: FilterParams = new FilterParams(filters);
-		newFilters.removeAppliedFilter(appliedFilter);
+		setFilterState((current) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			newFilters.removeAppliedFilter(appliedFilter);
 
-		setFilterState(newFilters);
+			return newFilters
+		});
 	}
 
 	const removeAllFilters = (): void => {
-		let newFilters: FilterParams = new FilterParams(filters);
-		newFilters.removeAllFilters();
+		setFilterState((current) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			newFilters.removeAllFilters();
 
-		setFilterState(newFilters);
+			return newFilters;
+		});
 
 	}
 
@@ -80,81 +84,105 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 	
 
 	const filterClimbingType = (climbTypeFilter: climbType): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		if (climbTypeFilter.type === 'All') {
-			newFilters.climbingTypesFilter = [];
-		} else {
-			newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== 'All');
-			if (newFilters.climbingTypesFilter.find(x => x.type === climbTypeFilter.type)) {
-				newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== climbTypeFilter.type);
+		setFilterState((current: FilterParams) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			if (climbTypeFilter.type === 'All') {
+				newFilters.climbingTypesFilter = [];
 			} else {
-				newFilters.climbingTypesFilter.push(climbTypeFilter);
+				newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== 'All');
+				if (newFilters.climbingTypesFilter.find(x => x.type === climbTypeFilter.type)) {
+					newFilters.climbingTypesFilter = newFilters.climbingTypesFilter.filter(x => x.type !== climbTypeFilter.type);
+				} else {
+					newFilters.climbingTypesFilter.push(climbTypeFilter);
+				}
 			}
-		}
-		
-		setFilterState && setFilterState(newFilters);
+
+			return newFilters;
+		});
 	};
 
 	const filterMonth = (startOrEnd: 'start' | 'end', month: month): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		if (startOrEnd === 'start') {
-			newFilters.startMonth = month;
-		} else {
-			newFilters.endMonth = month;
-		}
 
-		setFilterState && setFilterState(newFilters);
+		setFilterState && setFilterState((current: FilterParams) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			if (startOrEnd === 'start') {
+				newFilters.startMonth = month;
+			} else {
+				newFilters.endMonth = month;
+			}
+			
+			return newFilters
+		});
 	}
 
 	const filterRating = (starRating: number | 'All'): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		if (starRating === 'All') {
-			newFilters.ratingsFilter = [];
-		} else {
-			let ratingIndex = newFilters.ratingsFilter.indexOf(starRating);
 
-			if (ratingIndex > -1) {
-				newFilters.ratingsFilter.splice(ratingIndex, 1);
+		setFilterState && setFilterState((current: FilterParams) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			if (starRating === 'All') {
+				newFilters.ratingsFilter = [];
 			} else {
-				newFilters.ratingsFilter.push(starRating);
-			}
-		}
+				let ratingIndex = newFilters.ratingsFilter.indexOf(starRating);
 
-		setFilterState && setFilterState(newFilters);
+				if (ratingIndex > -1) {
+					newFilters.ratingsFilter.splice(ratingIndex, 1);
+				} else {
+					newFilters.ratingsFilter.push(starRating);
+				}
+			}
+		
+			return newFilters
+		});
 	}
 
 	const filterNoCar = (): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		newFilters.noCarFilter = !newFilters.noCarFilter;
 
-		setFilterState && setFilterState(newFilters);
+		setFilterState((current: FilterParams) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			newFilters.noCarFilter = !newFilters.noCarFilter;
+
+			return newFilters;
+		});
 	}
 
 	const filterSoloFriendly = (): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		newFilters.soloFriendlyFilter = !newFilters.soloFriendlyFilter;
 
-		setFilterState && setFilterState(newFilters);
+		setFilterState && setFilterState((current) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			newFilters.soloFriendlyFilter = !newFilters.soloFriendlyFilter;
+
+			return newFilters;
+		});
 	}
 
 	const filterGrade = (grade: grade): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		newFilters.gradesFilter = newFilters.gradesFilter.filter(x => x.climbingType !== grade.climbingType);
 		if (grade.grade === 'All') {
-			setFilterState && setFilterState(newFilters);
+			setFilterState && setFilterState((current) => {
+				let newFilters: FilterParams = new FilterParams(current);
+				newFilters.gradesFilter = newFilters.gradesFilter.filter(x => x.climbingType !== grade.climbingType);
+				return newFilters;
+			});
 			return;
 		} else {
-			let newGrades = typeGrades.find(typeGrade => typeGrade.climbingType === grade.climbingType).grades.filter(typeGrade => typeGrade.order <= grade.order);
-			newFilters.gradesFilter = [...newGrades, ...newFilters.gradesFilter];
-			setFilterState && setFilterState(newFilters);
+			setFilterState && setFilterState((current) => {
+				let newFilters: FilterParams = new FilterParams(current);
+				newFilters.gradesFilter = newFilters.gradesFilter.filter(x => x.climbingType !== grade.climbingType);
+
+				let newGrades = typeGrades.find(typeGrade => typeGrade.climbingType === grade.climbingType).grades.filter(typeGrade => typeGrade.order <= grade.order);
+				newFilters.gradesFilter = [...newGrades, ...newFilters.gradesFilter];
+				return newFilters;
+			});
 		}
 	}
 
 	const searchFilterChange = (e: any): void => {
-		let newFilters: FilterParams = new FilterParams(filterState);
-		newFilters.searchFilter = e.target.value;
+		let newSearchText = e.target.value;
+		setFilterState && setFilterState((current) => {
+			let newFilters: FilterParams = new FilterParams(current);
+			newFilters.searchFilter = newSearchText;
 
-		setFilterState && setFilterState(newFilters);
+			return newFilters;
+		});
 	}
 
 	const getFilterGradeType = (climbTypeName: string): grade | undefined | null => {
@@ -176,16 +204,19 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 
 	const mapMoved = (map: google.maps.Map): void => {
 		if (map) {
-			let newFilters: FilterParams = new FilterParams(filterState);
-			let southWest = map.getBounds().getSouthWest();
-			let northEast = map.getBounds().getNorthEast();
-			let center = map.getCenter();
-			newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
-			newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
-			newFilters.center = {lat: center.lat(), lng: center.lng()};
-			newFilters.page = 1;
-			newFilters.zoom = map.getZoom();
-			setFilterState(newFilters);
+			setFilterState((current) => {
+				let newFilters: FilterParams = new FilterParams(current);
+				let southWest = map.getBounds().getSouthWest();
+				let northEast = map.getBounds().getNorthEast();
+				let center = map.getCenter();
+				newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
+				newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
+				newFilters.center = {lat: center.lat(), lng: center.lng()};
+				newFilters.page = 1;
+				newFilters.zoom = map.getZoom();
+
+				return newFilters;
+			});
 		}
 	}
 	const history = useHistory();
@@ -208,7 +239,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 		markerClickFunc: (location) => {
 			history.push(`/location/${location.slug}`)
 		},
-		onMount: null, className: null, onMountProps: null, styles: (isMobile ? { width: '100% !important', height: '82vh'} : null)
+		onMount: null, className: null, onMountProps: null, styles: (isMobile ? { width: '100% !important', height: '82vh'} : {width: '100%', height: null})
 	};
 
 

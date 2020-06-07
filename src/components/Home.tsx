@@ -1,4 +1,4 @@
-import React, {createContext, useState, useContext, useEffect} from 'react';
+import React, {createContext, useState} from 'react';
 import heroImageLeft from '../images/hero-image-left.png';
 import heroImageRight from '../images/hero-image-right.png';
 import skyscannerinline from '../images/skyscannerinline.png';
@@ -9,7 +9,6 @@ import useLocationsFetcher, { LocationsFetch } from './useLocationsFetcher';
 import { FilterParams, months } from '../classes/FilterParams';
 import Map from './MapFilter';
 import classNames from 'classnames';
-import axios from 'axios';
 import { scroller } from "react-scroll";
 
 export const FilterContext = createContext<filterHook>({});
@@ -21,20 +20,22 @@ function Home() {
 	let [largeMapEnabled, setLargeMapEnabled] = useState<boolean>(false);
 	let [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 	let [mobileMapOpen, setMobileMapOpen] = useState(false);
-
 	let [hoveredLocation, setHoveredLocation] = useState();
 
 	const mapMoved = (map: google.maps.Map): void => {
 		if (map) {
-			let newFilters: FilterParams = new FilterParams(filterParamHook.filterState);
-			let southWest = map.getBounds().getSouthWest();
-			let northEast = map.getBounds().getNorthEast();
-			let center = map.getCenter();
-			newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
-			newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
-			newFilters.center = {lat: center.lat(), lng: center.lng()};
-			newFilters.page = 1;
-			filterParamHook.setFilterState(newFilters);
+			filterParamHook.setFilterState((current) => {
+				let newFilters: FilterParams = new FilterParams(current);
+				let southWest = map.getBounds().getSouthWest();
+				let northEast = map.getBounds().getNorthEast();
+				let center = map.getCenter();
+				newFilters.southWest = {lat: southWest.lat(), lng: southWest.lng() };
+				newFilters.northEast = {lat: northEast.lat(), lng: northEast.lng()}; 
+				newFilters.center = {lat: center.lat(), lng: center.lng()};
+				newFilters.page = 1;
+
+				return newFilters;
+			});
 		}
 	}
 
@@ -105,36 +106,39 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 		});
 
 		if (presets[preset]) {
-			var presetObj = presets[preset];
-			let newFilters: FilterParams = new FilterParams(filterHook.filterState);
-			newFilters.removeAllFilters();
+			
 
-			if (presetObj.map) {
-				newFilters.center.lat = presetObj.map.center.latitude;
-				newFilters.center.lng = presetObj.map.center.longitude;
-				newFilters.zoom = presetObj.map.zoom;
-				newFilters.southWest.lat = presetObj.map.southwest.latitude;
-				newFilters.southWest.lng = presetObj.map.southwest.longitude;
-				newFilters.northEast.lat = presetObj.map.northeast.latitude;
-				newFilters.northEast.lng = presetObj.map.northeast.longitude;
-			}
+			filterHook.setFilterState(async (current) => {
+				var presetObj = presets[preset];
+				let newFilters: FilterParams = new FilterParams(current);
+				newFilters.removeAllFilters();
 
-			if (presetObj.months) {
-				newFilters.startMonth = months.find(x => x.month === presetObj.months.start);
-				newFilters.endMonth = months.find(x => x.month === presetObj.months.end);
-			}
-
-			if (presetObj.climbingTypes) {
-				if (climbTypes.length === 0) {
-					let filterOptionsFetch = await fetch('/api/filters');
-					let filterOptions = await filterOptionsFetch.json() as any;
-					climbTypes = filterOptions.climbTypes;
+				if (presetObj.map) {
+					newFilters.center.lat = presetObj.map.center.latitude;
+					newFilters.center.lng = presetObj.map.center.longitude;
+					newFilters.zoom = presetObj.map.zoom;
+					newFilters.southWest.lat = presetObj.map.southwest.latitude;
+					newFilters.southWest.lng = presetObj.map.southwest.longitude;
+					newFilters.northEast.lat = presetObj.map.northeast.latitude;
+					newFilters.northEast.lng = presetObj.map.northeast.longitude;
 				}
 
-				newFilters.climbingTypesFilter = climbTypes.filter(x => presetObj.climbingTypes.includes(x.type));
-			}
+				if (presetObj.months) {
+					newFilters.startMonth = months.find(x => x.month === presetObj.months.start);
+					newFilters.endMonth = months.find(x => x.month === presetObj.months.end);
+				}
 
-			filterHook.setFilterState(newFilters);
+				if (presetObj.climbingTypes) {
+					if (climbTypes.length === 0) {
+						let filterOptionsFetch = await fetch('/api/filters');
+						let filterOptions = await filterOptionsFetch.json() as any;
+						climbTypes = filterOptions.climbTypes;
+					}
+
+					newFilters.climbingTypesFilter = climbTypes.filter(x => presetObj.climbingTypes.includes(x.type));
+				}
+				return newFilters;
+			});
 		}
 	}
 	return (

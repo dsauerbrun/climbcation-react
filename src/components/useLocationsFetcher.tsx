@@ -46,10 +46,13 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         if (noMoreLocations || locations.length === 0) {
             return;
         }
-        let newFilters: FilterParams = new FilterParams(filterState);
-        newFilters.page = newFilters.page + 1;
-        setFilterState(newFilters);
-        let objectBody = {...newFilters?.filterUrlObject};
+        setFilterState((current) => {
+            let newFilters: FilterParams = new FilterParams(current);
+            newFilters.page = newFilters.page + 1;
+
+            return newFilters;
+        });
+        let objectBody = {...filterState?.filterUrlObject};
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -75,11 +78,13 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         async function reloadLocations() {
             setLocations([]);
             setNoMoreLocations(false);
-            let newFilters: FilterParams = new FilterParams(filterState);
-            newFilters.page = 1;
-            localStorage.setItem('filters', JSON.stringify(newFilters));
-            console.log('new filters', newFilters);
-            setFilterState(newFilters);
+            setFilterState((current) => {
+                let newFilters: FilterParams = new FilterParams(current);
+                newFilters.page = 1;
+                localStorage.setItem('filters', JSON.stringify(newFilters));
+
+                return newFilters;
+            });
             let objectBody = {...filterState?.filterUrlObject};
             const requestOptions = {
                 method: 'POST',
