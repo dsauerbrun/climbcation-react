@@ -7,6 +7,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { IconTooltip } from '../common/HelperComponents';
 import { LocationsFetch } from './useLocationsFetcher';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Link
+} from "react-router-dom";
 
 export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
     let data = [];
@@ -41,13 +44,13 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                 <div className="location-card-info">
                     <div className="row">
                         <div className="col-md-8 location-list-thumb-container">
-                            <a href={"/location/" + location.slug }>
+                            <Link to={"/location/" + location.slug }>
                                 <img className="location-list-thumb" src={ location.home_thumb || '' } alt="location thumbnail" />	
                                 <div className="location-list-thumb-title">
                                     <h3 className="text-gray">{ location.name }</h3>
                                     <h5><strong>{ location.country }</strong></h5>
                                 </div>
-                            </a>
+                            </Link>
                         </div>
                         <div className="col-md-4 location-card-attributes">
                             <div className="col-xs-6 col-md-12">
@@ -166,7 +169,7 @@ function LocationTilesContainer({setHoveredLocation, airportCode}) {
             hasMore={!noMoreLocations}
             scrollThreshold={.9}
             loader={
-                <div className="col-md-12 bottom-padding text-center" style={{minHeight: '300px'}}>
+                <div className="col-md-12 bottom-padding text-center" style={{minHeight: '500px'}}>
                     <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
                 </div>
             }

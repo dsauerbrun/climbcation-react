@@ -4,6 +4,7 @@ import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
 import Location from '../classes/Location';
 import _ from 'lodash';
+import {Link} from 'react-router-dom';
 
   Map.defaultProps = {
     options: {
@@ -207,12 +208,12 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
                     <div className="location-card-info">
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
-                                <a href={`/location/${ tooltipLocation?.slug }}`}>
+                                <Link to={`/location/${ tooltipLocation?.slug }}`}>
                                     <img className="location-list-thumb" src={tooltipLocation?.home_thumb} alt="location thumbnail" />	
                                     <div className="location-list-thumb-title">
                                         <h3 className="text-gray">{ tooltipLocation?.name }</h3>
                                     </div>
-                                </a>
+                                </Link>
 
                             </div>
                             <div className="col-md-4 location-card-attributes">

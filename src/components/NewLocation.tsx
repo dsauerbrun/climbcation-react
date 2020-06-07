@@ -14,6 +14,7 @@ import cljFuzzy from 'clj-fuzzy';
 import { MiscSectionComponent } from './Location';
 import { authContext, User } from '../common/useAuth';
 import { IconTooltip } from '../common/HelperComponents';
+import {Link} from 'react-router-dom';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -207,7 +208,7 @@ function NewLocation () {
 										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
 									</button>
 									{page === 6 && <><div className="offset-md-7 col-md-1 right-margin">
-										<div className="text-button"><a href={`/location/${slug}`} target="_blank">Preview</a></div>
+										<div className="text-button"><Link to={`/location/${slug}`} target="_blank">Preview</Link></div>
 									</div>
 									<div className="col-md-3 btn btn-climbcation" onClick={() => startNewLocation()}>
 										Submit Another Location
@@ -223,7 +224,7 @@ function NewLocation () {
 								<ul>
 									<li>Focus on world class crags, Climbcation is primarily for finding climbing vacation destinations. Do you really want all of us crowding your local crag?</li>
 									<li>Sections with an asterisk (*) are required, but the more info you provide the better!</li>
-									<li>Excellent location examples with multiple categories: <a href="/location/bishop" target="_blank">Bishop</a>, <a href="/location/baile-herculane" target="_blank">Baile Herculane</a></li>
+									<li>Excellent location examples with multiple categories: <Link to="/location/bishop" target="_blank">Bishop</Link>, <Link to="/location/baile-herculane" target="_blank">Baile Herculane</Link></li>
 								</ul>
 							</div>
 					</div>
