@@ -13,6 +13,7 @@ import { LocationsFetch } from './useLocationsFetcher';
 import { useHistory } from 'react-router-dom';
 import { animateScroll, Element } from "react-scroll";
 import { useMediaQuery } from 'react-responsive'
+import {usePrevious} from '../common/HelperComponents';
 
 function FilterCrumbs(props: any) {
 	let filters: FilterParams = props.filterParams;
@@ -23,7 +24,7 @@ function FilterCrumbs(props: any) {
 			let newFilters: FilterParams = new FilterParams(current);
 			newFilters.removeAppliedFilter(appliedFilter);
 
-			return newFilters
+			return newFilters;
 		});
 	}
 
@@ -243,7 +244,6 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 			return Boolean(filterState && filterState.climbingTypesFilter.find(x => x.type === climbTypeFilter.type));
 		}
 	};
-
 	const mapMoved = (map: google.maps.Map): void => {
 		if (map) {
 			setFilterState((current) => {
@@ -256,7 +256,6 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 				newFilters.center = {lat: center.lat(), lng: center.lng()};
 				newFilters.page = 1;
 				newFilters.zoom = map.getZoom();
-
 				return newFilters;
 			});
 		}

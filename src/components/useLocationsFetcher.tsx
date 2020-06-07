@@ -5,6 +5,7 @@ import { animateScroll } from "react-scroll";
 import { useForceUpdate } from '../common/useForceUpdate';
 import Location from '../classes/Location';
 import { airport, allAirports } from '../common/airportsList';
+import {usePrevious} from '../common/HelperComponents';
 
 export interface LocationsFetch {
     nextLocations?: any,
@@ -21,13 +22,6 @@ interface fetcherParam {
     filterState: FilterParams,
     setFilterState: Function
 }
-function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
- }
 
 function useLocationsFetcher({filterState, setFilterState}: fetcherParam): LocationsFetch {
     let [locations, setLocations] = useState<Location[]>([]);

@@ -79,6 +79,10 @@ export class FilterParams {
 		this.ratingsFilter = []; 
 		this.searchFilter = null;
 		this.soloFriendlyFilter = false;
+		this.northEast = {lat: 90, lng: 180};
+		this.southWest = {lat: -90, lng: -180};
+		this.center = {lat: -3.745, lng: -38.523};
+		this.zoom = 0;
 	}
 
 	removeAppliedFilter(filter: AppliedFilter): void {

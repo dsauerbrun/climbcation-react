@@ -126,11 +126,13 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
         if (map) {
             map.getLatitude = latitude;
             map.getLongitude = longitude;
-            let currentLat =map.getCenter().lat();
+            let currentLat = map.getCenter().lat();
             if (currentLat === latitude) {
             } else {
-                map.setCenter(new google.maps.LatLng(latitude, longitude));
+                google.maps.event.clearListeners(map, 'zoom_changed');
                 map.setZoom(zoom);
+                map.setCenter(new google.maps.LatLng(latitude, longitude));
+                map.addListener('zoom_changed', () => onZoomChange(map));
             }
         }
     }, [latitude])

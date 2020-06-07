@@ -1,5 +1,5 @@
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export function IconTooltip(props: any) {
     return (
@@ -20,3 +20,11 @@ function renderTooltip(props: any) {
         </Tooltip>
     );
 }
+
+export function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+ }
