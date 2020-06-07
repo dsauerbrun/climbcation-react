@@ -32,6 +32,10 @@
 	}
 	.nav-link.text {
 		padding-top: 1em;
+		color: #fff;
+		a:not(.dropdown-item) {
+			color: #fff;
+		}
 	}
 	.nav-link {
 		padding: 0;

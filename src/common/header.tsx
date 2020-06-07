@@ -70,9 +70,9 @@ function Header() {
 					<Link to="/about">What is Climbcation?</Link>
 				</Col>
 				<Col md={4} className="nav-link">
-					<a className="navbar-logo" href="/home">
-					<img src={headerLogo} alt="logo" />
-					</a>
+					<Link className="navbar-logo" to="/home">
+						<img src={headerLogo} alt="logo" />
+					</Link>
 				</Col>
 				<Col md={2} className="nav-link text">
 					{
@@ -83,7 +83,7 @@ function Header() {
 								</Dropdown.Toggle>
 								<Dropdown.Menu>
 									<Dropdown.Item onClick={() => auth.resetPassword(user.email)}>Change Password</Dropdown.Item>
-									<Dropdown.Item><Link to="/profile">Change Username</Link></Dropdown.Item>
+									<Dropdown.Item as={Link} to="/profile">Change Username</Dropdown.Item>
 									<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
 								</Dropdown.Menu>	
 							</Dropdown>
@@ -92,7 +92,7 @@ function Header() {
 					}
 				</Col>
 				<Col md={2} className="nav-link text">
-					<a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'middle'}}><span className="glyphicon glyphicon-envelope"></span></a>
+					<a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'sub'}}><span className="glyphicon glyphicon-envelope"></span></a>
 					<a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a>
 					<div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
 				</Col>
