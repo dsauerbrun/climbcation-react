@@ -72,7 +72,7 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
     })
     marker.addListener('mouseout', (event) => {
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
-        //mapInfoWindow.style.display = 'none';
+        mapInfoWindow.style.display = 'none';
     })
     if (clickFunc) {
         marker.addListener(`click`, (e) => {
