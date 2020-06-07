@@ -52,6 +52,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
 
             return newFilters;
         });
+        filterState.page = filterState.page + 1;
         let objectBody = {...filterState?.filterUrlObject};
         const requestOptions = {
             method: 'POST',
@@ -85,6 +86,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
 
                 return newFilters;
             });
+            filterState.page = 1;
             let objectBody = {...filterState?.filterUrlObject};
             const requestOptions = {
                 method: 'POST',
