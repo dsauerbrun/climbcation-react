@@ -74,7 +74,7 @@ function Home() {
 				<Hero filterHook={filterParamHook}/>
 				<Filter largeMapEnabled={largeMapEnabled} setLargeMapEnabled={setLargeMapEnabled} hoveredLocation={hoveredLocation} mobileMapOpen={mobileMapOpen} setMobileMapOpen={setMobileMapOpen} mobileFilterOpen={mobileFilterOpen} setMobileFilterOpen={setMobileFilterOpen}/>
 				<div className="row" style={{display: mobileMapOpen || mobileFilterOpen ? 'none' : ''}}>
-					<div id="locations-window" className={classNames({'large-map': largeMapEnabled})}>
+					<div id="locations-window" style={{margin: '0 auto'}} className={classNames({'large-map': largeMapEnabled})}>
 						<LocationTilesContainer airportCode={locationsFetchHook.selectedAirport?.iata_code} setHoveredLocation={setHoveredLocation} />
 					</div>
 					{largeMapEnabled && (<div>
