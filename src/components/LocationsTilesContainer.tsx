@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-target-blank */
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 import {LocationsContext } from './Home';
 import Location from '../classes/Location';
 import classNames from 'classnames';
@@ -23,7 +23,7 @@ export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
                 data.push({name: `${month}/${day}`, cost: flightQuotes[month][day]})
                 if (!lowPrice || lowPrice.cost > parseInt(flightQuotes[month][day])) {
                     if (!lowPrice) {
-                        throw 'Error setting low price';
+                        throw new Error('Error setting low price');
                     }
                     lowPrice.date = `${month}/${day}`;
                     lowPrice.cost = parseInt(flightQuotes[month][day]);

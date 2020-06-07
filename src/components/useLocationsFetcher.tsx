@@ -1,4 +1,5 @@
-import {useState, useEffect, useRef} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import {useState, useEffect} from 'react';
 import { FilterParams } from '../classes/FilterParams';
 import axios from 'axios';
 import { animateScroll } from "react-scroll";

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {FilterParams} from '../classes/FilterParams';
 
 export interface filterHook {

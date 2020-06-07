@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState, useEffect } from 'react';
 import { authContext, User } from '../common/useAuth';
 import { useForm } from "react-hook-form";
@@ -10,8 +11,8 @@ function Profile () {
 	const auth = useContext(authContext);
 	let user: User = auth.user;
 	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue } = useForm<ProfileForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState;
+	let { register, handleSubmit, formState, setValue } = useForm<ProfileForm>({});
+	let {isSubmitting} = formState;
 	const onSubmit = async (data) => {
 		try {
 			await auth.changeUsername(data.username);

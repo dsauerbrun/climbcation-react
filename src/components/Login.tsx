@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useContext, useState, useEffect } from 'react';
-import { authContext, User } from '../common/useAuth';
+import { authContext } from '../common/useAuth';
 import { useForm } from "react-hook-form";
 import {
     useRouteMatch
@@ -16,14 +17,14 @@ interface LoginForm {
 
 export function Login(props) {
 	const auth = useContext(authContext);
-    let user: User = auth.user;
     let [signUpEnabled, setSignUpEnabled] = useState<boolean>(false)
     let [forgotPasswordEnabled, setForgotPasswordEnabled] = useState<boolean>(false)
     let [formAlerts, setFormAlerts] = useState({authError: null, success: false});
     let successCallback = props.successCallback;
 
-	let { register, handleSubmit, watch, errors, clearError, formState, setValue } = useForm<LoginForm>({});
-    let {dirty, isSubmitting, touched, submitCount} = formState;
+	let { register, handleSubmit, watch, errors, clearError, formState} = useForm<LoginForm>({});
+    let {isSubmitting} = formState;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let email = watch('email');
 	const onSubmit = async (data: LoginForm) => {
         if (signUpEnabled) {
@@ -189,7 +190,7 @@ export function Login(props) {
                         <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
                             <div className="google-btn">
                             <div className="google-icon-wrapper">
-                                <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                                <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="google sign in logo" />
                             </div>
                             <p className="btn-text"><b>Sign Up with Google</b></p>
                             </div>

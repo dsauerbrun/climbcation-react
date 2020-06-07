@@ -1,15 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import axios from 'axios';
-import Location, {Accommodation, FoodOption, Transportation, MiscSection, ClimbingType, Grade} from '../classes/Location';
+import Location, {MiscSection, ClimbingType, Grade} from '../classes/Location';
 import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
-import { useForceUpdate } from '../common/useForceUpdate';
 import AirportAutocomplete from '../common/AirportAutocomplete';
-import { airport, allAirports } from '../common/airportsList';
+import { airport } from '../common/airportsList';
 import { useEditables, Month, TransportationOption, AccommodationOption, FoodOptionOption } from '../common/useEditables';
 import _ from 'lodash';
-import { Tooltip, OverlayTrigger, Overlay, Popover, Modal } from 'react-bootstrap';
+import { Overlay, Popover, Modal } from 'react-bootstrap';
 import cljFuzzy from 'clj-fuzzy';
 import { MiscSectionComponent } from './Location';
 import { authContext, User } from '../common/useAuth';
@@ -44,9 +44,8 @@ interface LocationForm {
 }
 
 function NewLocation () {
-	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues, reset } = useForm<LocationForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState
+	let { register, handleSubmit, watch, formState, setValue, getValues, reset } = useForm<LocationForm>({});
+	let {isSubmitting} = formState
 	let [page, setPage] = useState<number>(1);
 	let {accommodations, climbingTypes, months, grades, foodOptions, transportations} = useEditables();
 	let locationName = watch('name');
@@ -922,7 +921,7 @@ interface HeaderProps {
 
 function NewLocationHeader({currentPage, generalComplete, gettingInComplete, accommodationComplete, costComplete, changePage}: HeaderProps) {
 	let maxPages: number = 6;
-	let progressBar: number = currentPage * 100 / 6; 
+	let progressBar: number = currentPage * 100 / maxPages; 
 
 	let getIconUrl = (page: number) => {
 		var url;
@@ -957,7 +956,7 @@ function NewLocationHeader({currentPage, generalComplete, gettingInComplete, acc
 	}
 
 	useEffect(() => {
-		progressBar = currentPage * 100 / 6;
+		progressBar = currentPage * 100 / maxPages;
 	}, [currentPage]);
 
 	return (

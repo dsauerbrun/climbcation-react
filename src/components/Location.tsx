@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from 'react';
 import {useParams, Link} from "react-router-dom";
 import axios from 'axios';
 import classNames from 'classnames';
-import Location, {Accommodation, FoodOption, Transportation, MiscSection} from '../classes/Location';
+import Location, {MiscSection} from '../classes/Location';
 import AirportAutocomplete from '../common/AirportAutocomplete';
 import Linkify from 'react-linkify';
 import { useForm } from "react-hook-form";
@@ -126,7 +127,7 @@ function InfoHeader({location}: PropLocation) {
 									<div className="col-md-4 col-xs-4">
 										<label>Solo Traveler Friendly?</label>
 										{
-											location?.solo_friendly === null ? (<p className="text-gray info-text">Maybe <IconTooltip tooltip={"'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one'"} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>) : (
+											location?.solo_friendly === null ? (<p className="text-gray info-text">Maybe <IconTooltip tooltip={"We're not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one"} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>) : (
 											<p className="text-gray info-text" >{location?.solo_friendly ? 'Yes' : 'No'} <IconTooltip tooltip={location?.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>)
 										}
 									</div>
@@ -185,10 +186,10 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 		bestTransportationCost: string;
 	}
 
-	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<GettingInForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState
+	let { register, handleSubmit, watch, formState, setValue } = useForm<GettingInForm>({});
+	let { isSubmitting } = formState
 	let [editingGettingIn, setEditingGettingIn] = useState<boolean>(false);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let walkingDistance = watch('walking_distance');
 	let transportations: string[] = watch('transportations');
 	let bestTransportation: string = watch('bestTransportation');
@@ -223,7 +224,6 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 	const toggleEdit = (shouldEdit: boolean) => {
 		if (shouldEdit) {
 			let filteredTransportationOptions = transportationOptions?.filter(x => location?.transportations.find(y => y.id === x.id));
-			let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.best_transportation.id);
 			let walkingDistanceSet = location?.walking_distance === null ? 'null' : (location?.walking_distance ? 'true' : 'false');
 			setValue([
 				{walking_distance: walkingDistanceSet},
@@ -368,11 +368,12 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 		accommodationNotes: string;
 	}
 
-	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<AccommodationForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState
+	let { register, handleSubmit, watch, formState, setValue } = useForm<AccommodationForm>({});
+	let {isSubmitting} = formState
 	let [editingAccommodation, setEditingAccommodation] = useState<boolean>(false);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let accommodations: string[] = watch('accommodations');
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let accommodationCosts: any = watch('accommodationCosts');
 
 	const toggleEdit = (shouldEdit: boolean) => {
@@ -500,9 +501,8 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 		savingMoneyTips: string;
 	}
 
-	let [formAlerts, setFormAlerts] = useState({error: null, success: false});
-	let { register, handleSubmit, watch, errors, formState, setValue, getValues } = useForm<CostForm>({});
-	let {dirty, isSubmitting, touched, submitCount} = formState
+	let { register, handleSubmit, watch, formState, setValue } = useForm<CostForm>({});
+	let {isSubmitting} = formState
 	let [editingCost, setEditingCost] = useState<boolean>(false);
 	let selectedFoodOptions: string[] = watch('foodOptions');
 	let currentFoodCostValues = watch('foodOptionCosts');
@@ -678,7 +678,7 @@ function FlightCostComponent({location}: PropLocation) {
                     (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
-                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
+                            <a href={location?.referral} target="_blank" rel="noopener noreferrer">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
                             <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} >
@@ -814,6 +814,7 @@ function LocationComponent() {
 export function MiscSectionComponent({location, miscSection, forceUpdate, className, saveCallback}: PropLocation) {
 	let [preview, setPreview] = useState<boolean>(Boolean(miscSection?.id));
 	let [isSaving, setIsSaving] = useState<boolean>(false);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let [miscState, setMiscState] = useState<MiscSection>(miscSection);
 	let [originalBody, setOriginalBody] = useState<string>(miscSection?.body);
 	let [originalTitle, setOriginalTitle] = useState<string>(miscSection?.title);

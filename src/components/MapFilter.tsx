@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState} from 'react';
 import { isEqual, omit, functions } from 'lodash';
 import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
 import Location from '../classes/Location';
-import _ from 'lodash';
 import {Link} from 'react-router-dom';
 
   Map.defaultProps = {
@@ -56,7 +56,6 @@ export function addMarker(map: ClimbcationMap,lat = -3.745,lng = -38.523,locatio
         let mapWidth = mapDiv.offsetWidth;
         let mapInfoWindow: HTMLElement = document.querySelector('.map-info-window');
         mapInfoWindow.style.display = 'block';
-        let infoWindowWidth = mapInfoWindow.offsetWidth;
         let infoWindowHeight = mapInfoWindow.offsetHeight;
 
         locationCard.classList.add('map-info-window-arrow-bottom');

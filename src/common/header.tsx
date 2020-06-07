@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
-import Nav from 'react-bootstrap/Nav';
 import Col from 'react-bootstrap/Col';
-import {Row, Dropdown, Navbar, NavDropdown, Form, FormControl, Button} from 'react-bootstrap';
+import {Row, Dropdown, Navbar} from 'react-bootstrap';
 import {authContext, User} from './useAuth';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
@@ -43,7 +42,7 @@ function Header() {
 							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => auth.resetPassword(user.email)}>Change Password</a></li>
 							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
 							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
-							<li><a onClick={() => showLogin()} style={{display: 'inline'}}>Login</a> / <a onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</a></li>
+							<li><div className="anchor" onClick={() => showLogin()} style={{display: 'inline'}}>Login</div> / <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</div></li>
 							}
 							<li role="separator" className="divider"></li>
 							<li><Link to="/new-location">Submit a New Location</Link></li>

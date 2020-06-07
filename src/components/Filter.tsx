@@ -6,14 +6,12 @@ import {FilterContext, LocationsContext} from './Home';
 import {ButtonGroup, Button, Dropdown} from 'react-bootstrap';
 import {filterHook} from './useFilterParams';
 import AirportAutocomplete from '../common/AirportAutocomplete';
-import { allAirports, airport } from '../common/airportsList';
 import { IconTooltip } from '../common/HelperComponents';
 import Map from './MapFilter';
 import { LocationsFetch } from './useLocationsFetcher';
 import { useHistory } from 'react-router-dom';
 import { animateScroll, Element } from "react-scroll";
 import { useMediaQuery } from 'react-responsive'
-import {usePrevious} from '../common/HelperComponents';
 
 function FilterCrumbs(props: any) {
 	let filters: FilterParams = props.filterParams;

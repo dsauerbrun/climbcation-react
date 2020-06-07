@@ -1,11 +1,10 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
+import React, {useContext, useState, useRef} from 'react';
 import {LoginModal} from './Login';
 import { authContext, User } from '../common/useAuth';
 import { Post } from '../classes/Forum';
 import moment from 'moment';
 import Linkify from 'react-linkify';
 import axios from 'axios';
-import { useForceUpdate } from '../common/useForceUpdate';
 import loading from '../images/climbcation-loading.gif';
 
 export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: string; callBack?: Function}) {
@@ -82,7 +81,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
             {newPost != null && <div className="submit-buttons">
                 {!postingComment && <><div className="btn btn-default" onClick={() => clearPost()}>Cancel</div>
                 <div className="btn btn-climbcation" onClick={() => submitComment()}>Submit</div></>}
-                {postingComment && <div><img src={loading} /></div>}
+                {postingComment && <div><img src={loading} alt="loading" /></div>}
             </div>}
         </div>
         </>
@@ -154,10 +153,10 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
                 value={editedContent}
             ></textarea>}
             {user?.user_id === post.user_id && <div className="post-actions">
-                {!isEditing && <a onClick={() => startEditing()}>Edit</a>}
+                {!isEditing && <div className="anchor" onClick={() => startEditing()}>Edit</div>}
                 {isEditing && 
                 <>
-                    <a onClick={() => cancelEdit()}>Cancel</a>
+                    <div className="anchor d-inline" onClick={() => cancelEdit()}>Cancel</div>
                     <span className="btn btn-climbcation" onClick={() => editComment(post)} >Submit</span>
                 </>
                 }
