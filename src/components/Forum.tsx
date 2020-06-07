@@ -6,6 +6,7 @@ import moment from 'moment';
 import Linkify from 'react-linkify';
 import axios from 'axios';
 import { useForceUpdate } from '../common/useForceUpdate';
+import loading from '../images/climbcation-loading.gif';
 
 export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: string; callBack?: Function}) {
 	const auth = useContext(authContext);
@@ -84,7 +85,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
             {newPost != null && <div className="submit-buttons">
                 {!postingComment && <><div className="btn btn-default" onClick={() => clearPost()}>Cancel</div>
                 <div className="btn btn-climbcation" onClick={() => submitComment()}>Submit</div></>}
-                {postingComment && <div><img src="/images/climbcation-loading.gif" /></div>}
+                {postingComment && <div><img src={loading} /></div>}
             </div>}
         </div>
         </>

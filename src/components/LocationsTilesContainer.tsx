@@ -10,6 +10,8 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContai
 import {
   Link
 } from "react-router-dom";
+import skyscannerLogo from '../images/skyscannerinline.png';
+import loading from "/images/climbcation-loading.gif";
 
 export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
     let data = [];
@@ -119,11 +121,11 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
                         :
-                    (location?.flightPrice === undefined ? <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading" /> :
+                    (location?.flightPrice === undefined ? <img className="loading-quote" src={loading} alt="loading" /> :
                     (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
-                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
+                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
                             <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)}>
@@ -170,7 +172,7 @@ function LocationTilesContainer({setHoveredLocation, airportCode}) {
             scrollThreshold={.9}
             loader={
                 <div className="col-md-12 bottom-padding text-center" style={{minHeight: '500px'}}>
-                    <h4><img src="/images/climbcation-loading.gif" alt="loading" /><strong>Loading more crags!</strong></h4>
+                    <h4><img src={loading} alt="loading" /><strong>Loading more crags!</strong></h4>
                 </div>
             }
             endMessage={

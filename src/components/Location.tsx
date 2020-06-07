@@ -19,6 +19,8 @@ import { airport, allAirports } from '../common/airportsList';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { transformQuotesToChartData } from './LocationsTilesContainer';
 import Toast from 'react-bootstrap/Toast';
+import skyscannerLogo from '../images/skyscannerinline.png';
+import loading from '../images/climbcation-loading.gif';
 
 
 interface PropLocation {
@@ -672,11 +674,11 @@ function FlightCostComponent({location}: PropLocation) {
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
                         :
-                    (location?.flightPrice === undefined ? <img className="loading-quote" src="/images/climbcation-loading.gif" alt="loading" /> :
+                    (location?.flightPrice === undefined ? <img className="loading-quote" src={loading} alt="loading" /> :
                     (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
-                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src="/images/skyscannerinline.png" alt="skyscanner" /></a>
+                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
                             <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} >

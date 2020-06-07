@@ -15,6 +15,8 @@ import { MiscSectionComponent } from './Location';
 import { authContext, User } from '../common/useAuth';
 import { IconTooltip } from '../common/HelperComponents';
 import {Link} from 'react-router-dom';
+import loading from '../images/climbcation-loading.gif';
+import successImage from '../images/success-icon.png';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -205,7 +207,7 @@ function NewLocation () {
 									</div>}
 									<button className="col-2 btn btn-climbcation" style={{display: page === 5 ? '' : 'none'}} id="publish-button" >
 										{!isSubmitting && (<div>Publish</div>)}
-										{isSubmitting && <img src="/images/climbcation-loading.gif" alt="loading"/>}
+										{isSubmitting && <img src={loading} alt="loading"/>}
 									</button>
 									{page === 6 && <><div className="offset-md-7 col-md-1 right-margin">
 										<div className="text-button"><Link to={`/location/${slug}`} target="_blank">Preview</Link></div>
@@ -327,7 +329,7 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 				<h3 className="bottom-padding">Congrats!</h3>
 				<h4>You've added all the necessary content.</h4>
 				<h4 className="bottom-padding">You should see your location available in a day after an admin reviews the content</h4>
-				<img src="/images/success-icon.png" alt="success" />
+				<img src={successImage} alt="success" />
 			</div>
 			{!user && <div className="col-md-12 row bottom-padding" style={{paddingBottom: '25px'}}>
 				<label className="col-md-8 email-prompt">
