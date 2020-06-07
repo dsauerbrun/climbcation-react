@@ -214,7 +214,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 
 	return (
 		<>
-		{isMobile && <section className={classNames("filter fixed d-sm-none", {'sticky-filter': !mobileFilterOpen && !mobileMapOpen, 'full-screen': mobileFilterOpen || mobileMapOpen})} >
+		{isMobile && <section className={classNames("filter fixed", {'sticky-filter': !mobileFilterOpen && !mobileMapOpen, 'full-screen': mobileFilterOpen || mobileMapOpen})} >
 			<div className="row filter-banner">
 				{!mobileMapOpen && !mobileFilterOpen && <><div className="col-3" onClick={() => {setMobileFilterOpen(true); animateScroll.scrollToTop()}}>
 					<div className="btn btn-climbcation">
