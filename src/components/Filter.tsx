@@ -253,10 +253,10 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								<div className="col-md-5">
 									<label>What do you want to climb?</label>
 									<ButtonGroup className="btn-group-sm btn-group-filter">
-										<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
+										<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
 										{
 											climbTypes?.map(x => 
-												<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
+												<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
 											)
 										}
 									</ButtonGroup>
@@ -270,7 +270,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								<div className="col-md-3">
 									<label>When do you want to go?</label>
 									<Dropdown className="d-inline-block">
-									<Dropdown.Toggle id="monthStart" className="btn btn-default dropdown-toggle">
+									<Dropdown.Toggle id="monthStart" childBsPrefix="btn btn-default dropdown-toggle">
 										{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
 									</Dropdown.Toggle>
 
@@ -280,7 +280,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									</Dropdown>
 									<span className="text-gray">To </span>
 									<Dropdown className="d-inline-block">
-									<Dropdown.Toggle id="monthEnd" className="btn btn-default dropdown-toggle">
+									<Dropdown.Toggle id="monthEnd" childBsPrefix="btn btn-default dropdown-toggle">
 										{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
 									</Dropdown.Toggle>
 
@@ -297,7 +297,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 										typeGrades && typeGrades.map(typeGrade => (
 											<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
 												<Dropdown>
-												<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-sm btn-default dropdown-toggle">
+												<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} childBsPrefix="filter-button btn btn-sm btn-default">
 													{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
 												</Dropdown.Toggle>
 
@@ -319,14 +319,14 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 										<div>
 											<label>Rating</label>
 											<ButtonGroup className="btn-group-sm btn-group-filter">
-												<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+												<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
 												{
 													[1,2,3].map(x => (
 														<IconTooltip
 															key={'rating'+x}
 															tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
 															dom={
-																<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
+																<Button onClick={() => filterRating(x)} bsPrefix={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
 																	<span className="glyphicon glyphicon-star"></span>
 																</Button>
 															}
@@ -378,10 +378,10 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 							<div className="col-md-5">
 								<label>What do you want to climb?</label>
 								<ButtonGroup className="btn-group-sm btn-group-filter">
-									<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
+									<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(null)}])} onClick={() => filterClimbingType({type: 'All', url: 'none'})}>All</Button>
 									{
 										climbTypes?.map(x => 
-											<Button className={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
+											<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: isActiveClimbingType(x)}])} key={x.type} onClick={() => filterClimbingType(x)}>{x.type}</Button>
 										)
 									}
 								</ButtonGroup>
@@ -395,23 +395,23 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 							<div className="col-md-3">
 								<label>When do you want to go?</label>
 								<Dropdown className="d-inline-block">
-								<Dropdown.Toggle id="monthStart" className="btn btn-default dropdown-toggle">
-									{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
-								</Dropdown.Toggle>
+									<Dropdown.Toggle id="monthStart" childBsPrefix="btn btn-default">
+										{filterState && filterState.startMonth.name && filterState.startMonth.name.substring(0,3)}
+									</Dropdown.Toggle>
 
-								<Dropdown.Menu>
-									{	months.map(x => <Dropdown.Item onClick={() => filterMonth('start', x)} key={'startmonth'+x.name}>{x.name}</Dropdown.Item>)}
-								</Dropdown.Menu>
+									<Dropdown.Menu>
+										{	months.map(x => <Dropdown.Item onClick={() => filterMonth('start', x)} key={'startmonth'+x.name}>{x.name}</Dropdown.Item>)}
+									</Dropdown.Menu>
 								</Dropdown>
 								<span className="text-gray">To </span>
 								<Dropdown className="d-inline-block">
-								<Dropdown.Toggle id="monthEnd" className="btn btn-default dropdown-toggle">
-									{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
-								</Dropdown.Toggle>
+									<Dropdown.Toggle id="monthEnd" childBsPrefix="btn btn-default">
+										{filterState && filterState.endMonth.name && filterState.endMonth.name.substring(0,3)}
+									</Dropdown.Toggle>
 
-								<Dropdown.Menu>
-									{	months.map(x => <Dropdown.Item onClick={() => filterMonth('end', x)} key={'endmonth'+x.name}>{x.name}</Dropdown.Item>)}
-								</Dropdown.Menu>
+									<Dropdown.Menu>
+										{	months.map(x => <Dropdown.Item onClick={() => filterMonth('end', x)} key={'endmonth'+x.name}>{x.name}</Dropdown.Item>)}
+									</Dropdown.Menu>
 								</Dropdown>
 							</div>
 						</div>
@@ -422,14 +422,14 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									typeGrades && typeGrades.map(typeGrade => (
 										<ButtonGroup className="grade-filter-button" key={'typegrade'+typeGrade.climbingType}>
 											<Dropdown>
-											<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} className="filter-button btn btn-sm btn-default dropdown-toggle">
-												{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
-											</Dropdown.Toggle>
+												<Dropdown.Toggle id={'typegrade'+typeGrade.climbingType} childBsPrefix="filter-button btn btn-sm btn-default">
+													{Boolean(getFilterGradeType(typeGrade.climbingType)) ? getFilterGradeType(typeGrade.climbingType)?.grade : typeGrade.climbingType}
+												</Dropdown.Toggle>
 
-											<Dropdown.Menu>
-												<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType, order: 0})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
-												{	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
-											</Dropdown.Menu>
+												<Dropdown.Menu>
+													<Dropdown.Item key={typeGrade.climbingType+'all'} onClick={() => filterGrade({grade: 'All', climbingType: typeGrade.climbingType, order: 0})}>All {typeGrade.climbingType} Grades</Dropdown.Item>
+													{	typeGrade.grades.map(x => <Dropdown.Item key={typeGrade.climbingType+x.grade} onClick={() => filterGrade(x)}>{x.grade}</Dropdown.Item>)}
+												</Dropdown.Menu>
 											</Dropdown>
 										</ButtonGroup>
 									))
@@ -444,14 +444,14 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									<div>
 										<label>Rating</label>
 										<ButtonGroup className="btn-group-sm btn-group-filter">
-											<Button className={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+											<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
 											{
 												[1,2,3].map(x => (
 													<IconTooltip
 														key={'rating'+x}
 														tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
 														dom={
-															<Button onClick={() => filterRating(x)} className={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
+															<Button onClick={() => filterRating(x)} bsPrefix={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
 																<span className="glyphicon glyphicon-star"></span>
 															</Button>
 														}

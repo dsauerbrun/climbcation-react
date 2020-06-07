@@ -13,6 +13,7 @@ import { Tooltip, OverlayTrigger, Overlay, Popover, Modal } from 'react-bootstra
 import cljFuzzy from 'clj-fuzzy';
 import { MiscSectionComponent } from './Location';
 import { authContext, User } from '../common/useAuth';
+import { IconTooltip } from '../common/HelperComponents';
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -664,8 +665,10 @@ function GettingInSection({locationName, register, setValue, getValues, watch, t
 				</div>
 				<div className="col-md-6">
 					<label>Upon arrival, can you reliably get to where you need without a car/motorbike?(eg. crag, camping, food, etc...)</label>
-					<i className="glyphicon glyphicon-info-sign text-gray" data-template-url="views/tooltips/startooltip.tpl.html" data-animation="am-flip-x" bs-tooltip="'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'"></i>
-					<div className="btn-group btn-group-sm center-block btn-group-toggle" data-toggle="buttons" style={{width: '100%'}}>
+					<IconTooltip tooltip={'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'} 
+						dom={<i style={{display: 'block', width: 'fit-content', marginBottom: '10px'}} className="glyphicon glyphicon-info-sign text-gray" ></i>}
+					/>
+					<div className="btn-group btn-group-sm center-block btn-group-toggle" data-toggle="buttons">
 						<input type="radio" name="walkingDistance" onChange={() => setValue([{walkingDistance: true}])} checked={walkingDistance === true}  id="walkingDistanceYes" style={{display: 'none'}}/> 
 						<label className={classNames("btn btn-sm btn-default")} htmlFor={`walkingDistanceYes`} style={{borderTopLeftRadius: '3px', borderBottomLeftRadius: '3px' }}>
 							Yes	
@@ -969,12 +972,12 @@ function NewLocationHeader({currentPage, generalComplete, gettingInComplete, acc
 				</div>
 			</div>
 			<div className="titles">
-				<a onClick={() => changePage(1)}><strong>1.</strong> <span className="d-none d-sm-block">General*</span></a>
-				<a onClick={() => changePage(2)}><strong>2.</strong> <span className="d-none d-sm-block">Getting In</span></a>
-				<a onClick={() => changePage(3)}><strong>3.</strong> <span className="d-none d-sm-block">Accommodation</span></a>
-				<a onClick={() => changePage(4)}><strong>4.</strong> <span className="d-none d-sm-block">Cost</span></a>
-				<a onClick={() => changePage(5)}><strong>5.</strong> <span className="d-none d-sm-block">Other</span></a>
-				<span><strong>6.</strong> <span className="d-none d-sm-block">Publish</span></span>
+				<a onClick={() => changePage(1)}><strong>1.</strong> <span className="d-none d-sm-inline">General*</span></a>
+				<a onClick={() => changePage(2)}><strong>2.</strong> <span className="d-none d-sm-inline">Getting In</span></a>
+				<a onClick={() => changePage(3)}><strong>3.</strong> <span className="d-none d-sm-inline">Accommodation</span></a>
+				<a onClick={() => changePage(4)}><strong>4.</strong> <span className="d-none d-sm-inline">Cost</span></a>
+				<a onClick={() => changePage(5)}><strong>5.</strong> <span className="d-none d-sm-inline">Other</span></a>
+				<span><strong>6.</strong> <span className="d-none d-sm-inline">Publish</span></span>
 			</div>
 		</div>
 
