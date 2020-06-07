@@ -43,7 +43,7 @@ export const months: month[] = [
 export interface AppliedFilter {
 	title: string;
 	id: number | string;
-	type: 'rating' | 'climbingType' | 'grade' | 'search' | 'month' | 'soloFriendly' | 'noCar';
+	type: 'rating' | 'climbingType' | 'grade' | 'search' | 'month' | 'soloFriendly' | 'noCar' | 'mapFilter';
 }
 
 export class FilterParams {
@@ -61,8 +61,8 @@ export class FilterParams {
 	northEast = {lat: 90, lng: 180};
 	southWest = {lat: -90, lng: -180};
 	center = {lat: -3.745, lng: -38.523};
-	sort: any;
 	zoom: number = 0;
+	sort: any;
 
 	constructor(copy?: FilterParams | null) {
 		if (copy) {
@@ -106,6 +106,12 @@ export class FilterParams {
 			case 'soloFriendly':
 				this.soloFriendlyFilter = false;
 				break;		
+			case 'mapFilter':
+				this.northEast = {lat: 90, lng: 180};
+				this.southWest = {lat: -90, lng: -180};
+				this.center = {lat: -3.745, lng: -38.523};
+				this.zoom = 0;
+				break;
 			default:
 				break;
 		}
@@ -138,6 +144,11 @@ export class FilterParams {
 		this.soloFriendlyFilter === true && filters.push({title: 'Solo Traveler Friendly', id: 'soloFriendly', type: 'soloFriendly'});
 
 		this.noCarFilter === true && filters.push({title: 'No Car Needed', id: 'noCar', type: 'noCar'});
+
+		if (this.northEast.lat !== 90 || this.northEast.lng !== 180) {
+			// map is being filtered;
+			filters.push({title: 'Map Filter', id: 'mapFilter', type: 'mapFilter'});
+		}
 
 		return filters;
 	}
