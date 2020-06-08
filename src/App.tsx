@@ -14,6 +14,7 @@ import ResetPass from './components/ResetPass';
 import Profile from './components/Profile';
 import {Login} from './components/Login';
 import {ProvideAuth} from './common/useAuth';
+import Terms from './components/Terms';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
 					<Route path='/location/:slug' component={LocationComponent} />
 					<Route path='/resetpass' component={ResetPass} />
 					<Route path='/profile' component={Profile} />
+					<Route path='/terms' component={Terms} />
 					<Route path='/login' component={Login} />
 					<Route path='/signup' component={Login} />
 					<Route component={Error} />

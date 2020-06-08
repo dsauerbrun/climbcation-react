@@ -32,7 +32,7 @@ function Header() {
 		<Navbar className="navbar home navbar-inverse" expand="lg">
 			{isMobile && <div>
 				<Link className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} to="/home">
-				<img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
+					<img src={headerLogo} style={{width: 'inherit'}} alt="logo"/>
 				</Link>
 				<Navbar.Toggle aria-controls="basic-navbar-nav" bsPrefix="mobile-toggler navbar-toggler" />
 				<Navbar.Collapse id="basic-navbar-nav">
@@ -47,6 +47,7 @@ function Header() {
 							<li role="separator" className="divider"></li>
 							<li><Link to="/new-location">Submit a New Location</Link></li>
 							<li><Link to="/about">What is Climbcation?</Link></li>
+							<li><Link to="/terms">Terms/Policies</Link></li>
 							<li><a href="mailto:info@climbcation.com">Email Me!</a></li>
 							<li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
 							<li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
@@ -66,7 +67,9 @@ function Header() {
 					<Link to="/new-location">Submit a New Location</Link>
 				</Col>
 				<Col md={2} className="nav-link text">
-					<Link to="/about">What is Climbcation?</Link>
+					<Link to="/about">About</Link>
+					<span> | </span>
+					<Link to="/terms">Terms/Policies</Link>
 				</Col>
 				<Col md={4} className="nav-link">
 					<Link className="navbar-logo" to="/home">
