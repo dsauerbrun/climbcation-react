@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Col from 'react-bootstrap/Col';
-import {Row, Dropdown, Navbar} from 'react-bootstrap';
+import {Row, Dropdown, Navbar, Toast} from 'react-bootstrap';
 import {authContext, User} from './useAuth';
 import './header.scss';
 import headerLogo from '../images/climbcation-header-logo.png';
@@ -9,12 +9,14 @@ import {
 } from "react-router-dom";
 import {LoginModal} from '../components/Login';
 import { useMediaQuery } from 'react-responsive'
+import axios from 'axios';
 
 
 function Header() {
 	const auth = useContext(authContext);
 	let user: User = auth.user;
 	let [openLogin, setOpenLogin] = useState(false);
+	let [showToast, setShowToast] = useState(false);
 	let [openSignUp, setOpenSignUp] = useState(false);
 	const isMobile = useMediaQuery({ maxWidth: 767 })
 	let showSignUp = () => {
@@ -27,8 +29,20 @@ function Header() {
 		setOpenSignUp(false);
 	}
 
+	let deleteAccount = async () => {
+		try {
+			await auth.deleteAccount();
+			setShowToast(true);
+		} catch (err) {
+			alert('Failed to delete account, please contact info@climbcation.com');
+		}
+	}
+
 	return (
 		<>
+		<Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide style={{position: 'fixed', zIndex: 1000, top: 40, right: 20}} >
+			<Toast.Body>Your account has been successfully deleted!</Toast.Body>
+		</Toast>
 		<Navbar className="navbar home navbar-inverse" expand="lg">
 			{isMobile && <div>
 				<Link className="navbar-brand" style={{width: '80%', padding: '5px 15px', cursor: 'pointer'}} to="/home">
@@ -41,6 +55,7 @@ function Header() {
 							<li role="separator" className="divider"></li>
 							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => auth.resetPassword(user.email)}>Change Password</a></li>
 							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
+							<li role="presentation" ><div className="anchor" onClick={() => deleteAccount()}>Delete Account</div></li>
 							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
 							<li><div className="anchor" onClick={() => showLogin()} style={{display: 'inline'}}>Login</div> / <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</div></li>
 							}
@@ -86,6 +101,7 @@ function Header() {
 								<Dropdown.Menu>
 									<Dropdown.Item onClick={() => auth.resetPassword(user.email)}>Change Password</Dropdown.Item>
 									<Dropdown.Item as={Link} to="/profile">Change Username</Dropdown.Item>
+									<Dropdown.Item className="anchor" onClick={() => deleteAccount()}>Delete Account</Dropdown.Item>
 									<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
 								</Dropdown.Menu>	
 							</Dropdown>

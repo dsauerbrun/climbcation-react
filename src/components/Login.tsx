@@ -37,7 +37,9 @@ export function Login(props) {
 	};
     
     function changeFormAlerts(obj) {
-        setFormAlerts({...obj, ...formAlerts});
+        setFormAlerts((current) => {
+            return {...current, ...obj};
+        });
     }
 	let getState = () => {
 		return encodeURIComponent(window.location.href);
@@ -50,10 +52,10 @@ export function Login(props) {
 			await auth.login(username, password);
             successCallback && successCallback();
 		} catch (err) {
-			if (err.status === 400) {
-				changeFormAlerts({authError: 'Invalid Username or Password'});
+			if (err.response.status === 400) {
+                changeFormAlerts({authError: 'Invalid Username or Password'});
 			} else {
-				changeFormAlerts({authError: `Unknown Error: ${err.data}`});
+				changeFormAlerts({authError: `Unknown Error: ${err.response.data}`});
 			}
 		}
     }
@@ -107,7 +109,7 @@ export function Login(props) {
     return (
         <>
         <div id="loginModal" className="login-modal" >
-        {formAlerts.authError && <div className="alert alert-warning alert-dismissable">
+        {formAlerts.authError !== null && <div className="alert alert-warning alert-dismissable">
             <button type="button" className="close" onClick={() => changeFormAlerts({authError: null})}>&times;</button>
             <div>{formAlerts.authError}</div>
         </div>}

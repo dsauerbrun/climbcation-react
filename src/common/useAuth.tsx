@@ -18,6 +18,7 @@ export interface Auth {
     changeUsername: Function;
     resetPassword: Function;
     changePassword: Function;
+    deleteAccount: Function;
 }
 
 export default function useProvideAuth(): Auth {
@@ -59,7 +60,7 @@ export default function useProvideAuth(): Auth {
         }
     };
   
-    const changePassword = async (password: string, id: number) => {
+    const changePassword = async (password: string, id: string) => {
         try {
             await axios.post('/api/changepassword', {password: password, id: id});
         } catch (err) {
@@ -77,7 +78,12 @@ export default function useProvideAuth(): Auth {
             throw err.response.data || 'Error changing username';
         }
     }
-  
+
+	let deleteAccount = async () => {
+        await axios.delete(`/api/user`);
+        setUser(null);
+    }
+
     useEffect(() => {
         getUser().then();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,7 +98,8 @@ export default function useProvideAuth(): Auth {
       logout,
       changeUsername,
       resetPassword,
-      changePassword
+      changePassword,
+      deleteAccount
     };
   }
 
