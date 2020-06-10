@@ -16,7 +16,7 @@ function Header() {
 	const auth = useContext(authContext);
 	let user: User = auth.user;
 	let [openLogin, setOpenLogin] = useState(false);
-	let [showToast, setShowToast] = useState(false);
+	let [showToast, setShowToast] = useState<{message: string}>();
 	let [openSignUp, setOpenSignUp] = useState(false);
 	const isMobile = useMediaQuery({ maxWidth: 767 })
 	let showSignUp = () => {
@@ -32,7 +32,16 @@ function Header() {
 	let deleteAccount = async () => {
 		try {
 			await auth.deleteAccount();
-			setShowToast(true);
+			setShowToast({message: 'Your account has been successfully deleted!'});
+		} catch (err) {
+			alert('Failed to delete account, please contact info@climbcation.com');
+		}
+	}
+
+	let changePassword = async () => {
+		try {
+			await auth.resetPassword(user.email)
+			setShowToast({message: 'Please check your email for a password change link'});
 		} catch (err) {
 			alert('Failed to delete account, please contact info@climbcation.com');
 		}
@@ -40,8 +49,8 @@ function Header() {
 
 	return (
 		<>
-		<Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} autohide style={{position: 'fixed', zIndex: 1000, top: 40, right: 20}} >
-			<Toast.Body>Your account has been successfully deleted!</Toast.Body>
+		<Toast onClose={() => setShowToast(null)} show={showToast?.message?.length > 0} delay={3000} autohide style={{position: 'fixed', zIndex: 1000, top: 40, right: 20}} >
+			<Toast.Body>{showToast?.message}</Toast.Body>
 		</Toast>
 		<Navbar className="navbar home navbar-inverse" expand="lg">
 			{isMobile && <div>
@@ -53,7 +62,7 @@ function Header() {
 						<ul className="nav navbar-nav">
 							{user?.username && <li>Welcome {user?.username}</li>}
 							<li role="separator" className="divider"></li>
-							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => auth.resetPassword(user.email)}>Change Password</a></li>
+							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => changePassword()}>Change Password</a></li>
 							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
 							<li role="presentation" ><div className="anchor" onClick={() => deleteAccount()}>Delete Account</div></li>
 							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
@@ -99,7 +108,7 @@ function Header() {
 									Welcome {user?.username}	
 								</Dropdown.Toggle>
 								<Dropdown.Menu>
-									<Dropdown.Item onClick={() => auth.resetPassword(user.email)}>Change Password</Dropdown.Item>
+									<Dropdown.Item onClick={() => changePassword()}>Change Password</Dropdown.Item>
 									<Dropdown.Item as={Link} to="/profile">Change Username</Dropdown.Item>
 									<Dropdown.Item className="anchor" onClick={() => deleteAccount()}>Delete Account</Dropdown.Item>
 									<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
