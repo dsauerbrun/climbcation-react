@@ -17,6 +17,10 @@ import { IconTooltip } from '../common/HelperComponents';
 import {Link} from 'react-router-dom';
 import loading from '../images/climbcation-loading.gif';
 import successImage from '../images/success-icon.png';
+import locationIcon from '../images/location-icon.png'
+import checkIcon from '../images/check-icon.png'
+import xIcon from '../images/x-icon.png'
+import warningIcon from '../images/warning-icon.png'
 
 interface LocationForm {
 	soloFriendly: boolean;
@@ -919,6 +923,7 @@ interface HeaderProps {
 	getMissingFields?: Function;
 }
 
+
 function NewLocationHeader({currentPage, generalComplete, gettingInComplete, accommodationComplete, costComplete, changePage}: HeaderProps) {
 	let maxPages: number = 6;
 	let progressBar: number = currentPage * 100 / maxPages; 
@@ -926,28 +931,28 @@ function NewLocationHeader({currentPage, generalComplete, gettingInComplete, acc
 	let getIconUrl = (page: number) => {
 		var url;
 		if (page === currentPage) {
-			return '/images/location-icon.png';
+			return locationIcon;
 		} else if (page > currentPage) {
 			return '';
 		} else if (page < currentPage) {
 			switch(page) {
 				case 1:
-					url = generalComplete() ? '/images/check-icon.png':'/images/x-icon.png';
+					url = generalComplete() ? checkIcon : xIcon;
 					break;
 				case 2:
-					url = gettingInComplete() ? '/images/check-icon.png':'/images/warning-icon.png';
+					url = gettingInComplete() ? checkIcon : warningIcon;
 					break;
 				case 3:
-					url = accommodationComplete() ? '/images/check-icon.png':'/images/warning-icon.png';
+					url = accommodationComplete() ? checkIcon : warningIcon;
 					break;
 				case 4:
-					url = costComplete() ? '/images/check-icon.png':'/images/warning-icon.png';
+					url = costComplete() ? checkIcon : warningIcon;
 					break;
 				case 5:
-					url = '/images/check-icon.png';
+					url = checkIcon;
 					break;
 				case 6:
-					url = '/images/check-icon.png';
+					url = checkIcon;
 					break;
 			}
 			return url;
