@@ -79,7 +79,7 @@ function FilterCrumbs(props: any) {
 	}
 
 	return (
-		<div className="row bottom-padding" style={{width: '90%', margin: '0 auto', height: '45px'}}>
+		<div className="row bottom-padding" style={{width: '90%', margin: '0 auto', minHeight: '45px'}}>
 			<div className="col-md-8">
 				&nbsp;
 				{filters?.appliedFilters?.length > 0 && <button className="applied-filter" onClick={() => removeAllFilters()}>Clear All</button>}
