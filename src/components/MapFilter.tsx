@@ -255,7 +255,7 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
 
 function shouldNotUpdate(props, nextProps) {
     const [funcs, nextFuncs] = [functions(props), functions(nextProps)]
-    const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'hoveredLocation', 'options', 'latitude', 'longitude', 'zoom' )), JSON.stringify(omit(nextProps, nextFuncs, 'hoveredLocation', 'options', 'latitude', 'longitude', 'zoom')));
+    const noPropChange = isEqual(JSON.stringify(omit(props, funcs, 'options', 'latitude', 'longitude', 'zoom' )), JSON.stringify(omit(nextProps, nextFuncs, 'options', 'latitude', 'longitude', 'zoom')));
     const noFuncChange =
       funcs.length === nextFuncs.length &&
       funcs.every(fn => props[fn].toString() === nextProps[fn].toString());
