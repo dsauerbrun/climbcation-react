@@ -20,8 +20,19 @@
 
 	.location-card .location-airfare h4 {
 		font-size: 14px;
-	}
+  }
+  
+  .location-card.right-card {
+    margin-right: 0;
+  }
 
+  .location-card.left-card {
+    margin-left: 0;
+  }
+
+  .location-card {
+    margin-bottom: 10px;
+  }
 	
 
 	.full-screen {

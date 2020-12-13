@@ -204,12 +204,12 @@
 	overflow: scroll;
 	clear: both;
 	height: 80vh;
-	width: 40%;
+	max-width: 40%;
 	margin: 0px;
 	display: inline-block;
 	margin-left: 10px;
 	.locations-window {
-		min-width: 40vw;
+		min-width: 15vw;
 		clear: both;
 		.location-item {
 			max-width: 100%;
@@ -251,10 +251,15 @@
 	border-color: rgb(214,214,214);
 	border-style: solid;
 	border-width: 1px;
-  margin: 0 auto;
   margin-bottom: 1em;
   max-width: 650px;
-	
+  
+  &.left-card {
+    margin-left: auto;
+  }
+  &.right-card {
+    margin-right: auto;
+  }
 	.icon {
 		height: auto;
 		width: 25px;

@@ -34,7 +34,7 @@ export const transformQuotesToChartData = (flightQuotes, lowPrice) => {
     return data;
 }
 
-export function LocationTile(props: {location: Location, setHoveredLocation: Function, airportCode: string}) {
+export function LocationTile(props: {location: Location, setHoveredLocation: Function, airportCode: string, index?: number}) {
     let location: Location = props.location;
     let setHoveredLocation = props.setHoveredLocation;
     let airportCode = props.airportCode; 
@@ -42,7 +42,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
 
     return (
         <div className={`location-item`} onMouseEnter={() => setHoveredLocation(location)} onMouseLeave={() => setHoveredLocation(null)}>
-            <div className="location-card">
+            <div className={classNames("location-card", {'left-card': props.index % 2 === 0, 'right-card': props.index % 2 === 1})}>
                 <div className="location-card-info">
                     <div className="row">
                         <div className="col-md-8 location-list-thumb-container">
@@ -184,7 +184,7 @@ function LocationTilesContainer({setHoveredLocation, airportCode}) {
         >
             <div className="locations-window">
                 {
-                    locations?.map((location: Location) => (<LocationTile key={location.id} location={location} setHoveredLocation={setHoveredLocation} airportCode={airportCode}/>))
+                    locations?.map((location: Location, index: number) => (<LocationTile key={location.id} index={index} location={location} setHoveredLocation={setHoveredLocation} airportCode={airportCode}/>))
                 }
             </div>
         </InfiniteScroll>
