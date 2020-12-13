@@ -95,7 +95,7 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 		let presets = {
 			alpine: {climbingTypes: ['Alpine'], months: {start: 6, end: 9}, map: {zoom: 0, center: {latitude: -3.745, longitude: -38.523}, northeast: {longitude: 180, latitude: 90}, southwest: {longitude: -180, latitude: -90}} },
 			euroSport: {climbingTypes: ['Sport'], map: {zoom: 2, center: {latitude: 55.875310835696816, longitude: 11.162109375}, northeast: {longitude: 82.529296875, latitude: 71.69129271864}, southwest: {longitude: -60.205078125, latitude: 29.38217507514534}} },
-			summerNA: {months: {start: 6, end: 9}, map: {zoom: 2, center: {latitude: 46.80005944678737, longitude: -100.986328125}, northeast: {longitude: -29.619140625, latitude: 67.067433351083}, southwest: {longitude: -172.353515625, latitude: 17.30868788677006}}}
+			summerNA: {months: {start: 6, end: 8}, map: {zoom: 2, center: {latitude: 46.80005944678737, longitude: -100.986328125}, northeast: {longitude: -29.619140625, latitude: 67.067433351083}, southwest: {longitude: -172.353515625, latitude: 17.30868788677006}}}
 		}
 		
 		scroller.scrollTo('filterContainer', {
