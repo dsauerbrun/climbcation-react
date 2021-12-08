@@ -332,10 +332,12 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									</ButtonGroup>
 								</div>
 								<div className="col-md-4">
-									<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
+									{/*<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
 									<div className="airport-wrapper">
 										<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
-									</div>
+									</div>*/}
+									<label>Keyword Search</label>
+									<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
 								</div>
 								<div className="col-md-3">
 									<label>When do you want to go?</label>
@@ -381,48 +383,41 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 									}
 								</div>
 								<div className="col-md-4">
-									<label>Keyword Search</label>
-									<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
-								</div>
-								<div className="col-md-3">
-									<div className="small-toggles-flex">
-										<div>
-											<label>Rating</label>
-											<ButtonGroup className="btn-group-sm btn-group-filter">
-												<Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
-												{
-													[1,2,3].map(x => (
-														<IconTooltip
-															key={'rating'+x}
-															tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
-															dom={
-																<Button onClick={() => filterRating(x)} bsPrefix={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
-																	<span className="glyphicon glyphicon-star"></span>
-																</Button>
-															}
-														></IconTooltip>
-													))
-												}
-											</ButtonGroup>
-										</div>
-										<div>
-											<label></label>
-											<div style={{marginBottom: '5px'}}>
-												<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
-													<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
-													<div className="control__indicator"></div>
-													<span>Solo Friendly</span>
-												</label>
-											</div>
-											<div>
-												<label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
-													<input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
-													<div className="control__indicator"></div>
-													<span>No Car?</span>
-												</label>
-											</div>
-										</div>
-									</div>
+                  <div>
+                    <label>Rating</label>
+                    <ButtonGroup className="btn-group-sm btn-group-filter">
+                      <Button bsPrefix={classNames(["filter-button btn btn-lg btn-default", {active: filterState?.ratingsFilter.length === 0}])} onClick={() => filterRating('All')}>All</Button>
+                      {
+                        [1,2,3].map(x => (
+                          <IconTooltip
+                            key={'rating'+x}
+                            tooltip={x === 1 ? 'Worth a stop' : (x === 2 ? 'Worth a detour' : 'Worth its own trip')}
+                            dom={
+                              <Button onClick={() => filterRating(x)} bsPrefix={classNames(["filter-button btn btn-lg btn-default"], {active: filterState?.ratingsFilter?.find(y => x === y)})}>
+                                <span className="glyphicon glyphicon-star"></span>
+                              </Button>
+                            }
+                          ></IconTooltip>
+                        ))
+                      }
+                    </ButtonGroup>
+                  </div>
+                  <div className="col-md-3">
+                      <div style={{marginTop: '10px'}}>
+                        <label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
+                          <input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
+                          <div className="control__indicator"></div>
+                          <span>No Car?</span>
+                        </label>
+                      </div>
+                      <div>
+                        <label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
+                          <input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
+                          <div className="control__indicator"></div>
+                          <span>Solo Friendly</span>
+                        </label>
+                      </div>
+                    </div>
 									</div>
 								</div>
 							</div>
@@ -457,10 +452,12 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								</ButtonGroup>
 							</div>
 							<div className="col-md-4">
-								<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
+								{/*<label>Your Local Airport<span className="gray">(get flight prices!)</span></label>
 								<div className="airport-wrapper">
 									<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} />
-								</div>
+								</div>*/}
+								<label>Keyword Search</label>
+								<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
 							</div>
 							<div className="col-md-3">
 								<label>When do you want to go?</label>
@@ -506,11 +503,6 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 								}
 							</div>
 							<div className="col-md-4">
-								<label>Keyword Search</label>
-								<input type="text" className="form-control" placeholder="ex. beach" value={filterState?.searchFilter || ''} onChange={(e) => searchFilterChange(e)}/>
-							</div>
-							<div className="col-md-3">
-								<div className="small-toggles-flex">
 									<div>
 										<label>Rating</label>
 										<ButtonGroup className="btn-group-sm btn-group-filter">
@@ -530,24 +522,23 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 											}
 										</ButtonGroup>
 									</div>
-									<div>
-										<label></label>
-										<div style={{marginBottom: '5px'}}>
-											<label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
-												<input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
-												<div className="control__indicator"></div>
-												<span>Solo Friendly</span>
-											</label>
-										</div>
-										<div>
-											<label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
-												<input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
-												<div className="control__indicator"></div>
-												<span>No Car?</span>
-											</label>
-										</div>
-									</div>
-								</div>
+							</div>
+							<div className="col-md-3">
+                <label></label>
+                <div style={{marginRight: '5px', display: 'inline-block'}}>
+                  <label className={classNames(["control control--checkbox"],{'active': filterState?.soloFriendlyFilter})}>
+                    <input type="checkbox" name="soloFriendlyEnabled" id="soloFriendlyEnabled" checked={filterState?.soloFriendlyFilter} onChange={() => filterSoloFriendly()} />
+                    <div className="control__indicator"></div>
+                    <span>Solo Friendly</span>
+                  </label>
+                </div>
+                <div style={{display: 'inline-block'}}>
+                  <label className={classNames(["control control--checkbox"], {'active': filterState?.noCarFilter})}>
+                    <input type="checkbox" name="noCarEnabled" id="noCarEnabled" checked={filterState?.noCarFilter} onChange={() => filterNoCar()}/>
+                    <div className="control__indicator"></div>
+                    <span>No Car?</span>
+                  </label>
+                </div>
 							</div>
 						</div>
 					</div>
