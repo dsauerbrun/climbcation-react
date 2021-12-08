@@ -105,7 +105,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         let filteredFetch = await fetch('/api/filter_locations', requestOptions);
         let filtered = await filteredFetch.json() as any
         locations = filtered.paginated.map(x => new Location(x));
-        getFlightQuotes(locations.map(x => x.slug), 'LAX');
+        // getFlightQuotes(locations.map(x => x.slug), 'LAX');
         setLocations(locations);
         setUnpaginatedLocations(filtered.unpaginated);
         if (filtered.paginated.length === 0) { 
