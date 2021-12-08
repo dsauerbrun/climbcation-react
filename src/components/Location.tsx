@@ -668,7 +668,7 @@ function FlightCostComponent({location}: PropLocation) {
 					</div>
 					to {location?.airport_code})
 				</h3>
-                <div className="location-airfare">
+                {/*<div className="location-airfare">
                     {airportCode === location?.airport_code ? 
                         <div className="sorry-message">
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
@@ -706,7 +706,7 @@ function FlightCostComponent({location}: PropLocation) {
                             </div>
                         </div>
                     }
-                </div>
+                </div>*/}
 			</div>
 		</div>
 
