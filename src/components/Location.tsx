@@ -654,10 +654,10 @@ function FlightCostComponent({location}: PropLocation) {
 	}
 	
 	useEffect(() => {
-		getFlightQuotes(airportCode);
+		// getFlightQuotes(airportCode);
 	}, [location])
 	useEffect(() => {
-		getFlightQuotes(airportCode);
+		// getFlightQuotes(airportCode);
 	}, [selectedAirport])
 	return (
 		<div className="col-md-6">

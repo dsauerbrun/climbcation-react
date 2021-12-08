@@ -65,7 +65,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
       let filteredFetch = await fetch('/api/filter_locations', requestOptions);
       let filtered = await filteredFetch.json() as any
       filtered.paginated = filtered.paginated.filter(x => !locations.find(y => y.id === x.id));
-      getFlightQuotes(filtered.paginated.map(x => x.slug), selectedAirport?.iata_code);
+      // getFlightQuotes(filtered.paginated.map(x => x.slug), selectedAirport?.iata_code);
       locations = locations.concat(filtered.paginated.map(x => new Location(x)));
       setLocations(locations);
       if (filtered.paginated.length === 0) {
@@ -74,7 +74,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
   }
 
   useEffect(() => {
-      getFlightQuotes(locations.map(x => x.slug), selectedAirport?.iata_code);
+      // getFlightQuotes(locations.map(x => x.slug), selectedAirport?.iata_code);
   }, [selectedAirport])
   
   let prevFilters: FilterParams = usePrevious(filterState);
