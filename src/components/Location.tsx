@@ -770,7 +770,7 @@ function LocationComponent() {
 				</div>
 				<div className="row">
 					<CostComponent location={location} foodOptionOptions={foodOptions} saveCallback={setShowToast}></CostComponent>
-					<FlightCostComponent location={location} />
+					{/*<FlightCostComponent location={location} />*/}
 				</div>
 				<div>
 					<div className="climbcation-well well has-header">
