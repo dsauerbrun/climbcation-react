@@ -9,9 +9,15 @@ export interface ClimbingType {
 }
 
 export interface Grade {
-    type: any;
     grade: string;
     id: number;
+    //nested on the location and filter payloads only
+    type?: any;
+    //flat on get_attribute_options only, where type is absent. this split is intentional per the
+    //backend, so read climbingTypeId when the grade came from useEditables and type.id otherwise.
+    order?: number;
+    climbingType?: string;
+    climbingTypeId?: number;
 }
 
 interface FlightPrice {

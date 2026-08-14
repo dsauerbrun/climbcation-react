@@ -115,7 +115,7 @@ function NewLocation () {
 				});
 
 				let climbingTypesWithGrades = data.climbTypes?.map(climbType => {
-					let typeGrade = data.grades?.find(x => x.type.id === climbType.id)?.id;
+					let typeGrade = data.grades?.find(x => x.climbingTypeId === climbType.id)?.id;
 					let climbTypeWithGrade = {id: climbType.id, name: climbType.name, grade_id: typeGrade};
 					return climbTypeWithGrade;
 				})
@@ -744,7 +744,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 		if (typeof grade === 'string') {
 			if (grade === '') {
 				let newGrades = _.cloneDeep(selectedGrades) || [];
-				newGrades = newGrades.filter(x => x.type.id !== climbTypeId)
+				newGrades = newGrades.filter(x => x.climbingTypeId !== climbTypeId)
 				setValue([{grades: newGrades}]);
 				return;
 			}
@@ -767,7 +767,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 		let newClimbTypes = _.cloneDeep(climbTypes) || [];
 		if (newClimbTypes.find(x => x.id === climb.id)) {
 			newClimbTypes = newClimbTypes.filter(x => x.id !== climb.id);
-			let gradeToRemove = selectedGrades.find(x => x.type.id === climb.id);
+			let gradeToRemove = selectedGrades.find(x => x.climbingTypeId === climb.id);
 			gradeToRemove && toggleGrade(gradeToRemove);
 		} else {
 			newClimbTypes.push(climb);
@@ -889,7 +889,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 							<img src={climbType.url} alt="climbing type" /> 
 							<select onChange={(e) => toggleGrade(e.currentTarget.value, climbType.id)} className="form-control">
 								<option value=''>Select a grade</option>
-								{grades?.sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.type.id === climbType.id).map(grade => (
+								{grades?.sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.climbingTypeId === climbType.id).map(grade => (
 									<option key={grade.grade} value={grade.id}>{grade.grade} and above</option>
 								))}
 							</select>
