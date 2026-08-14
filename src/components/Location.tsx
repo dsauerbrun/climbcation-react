@@ -382,7 +382,8 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 			setValue([
 				{closestAccommodation: location?.closestAccommodation},
 				{accommodationNotes: location?.accommodationNotes},
-				{accommodations: accommodationOptions.filter(acc => location?.accommodations.find(x => x.id === acc.id)).map(x => JSON.stringify(x))},
+				//match on name: the location payload's accommodation id is the join row's id, not the accommodation's
+				{accommodations: accommodationOptions.filter(acc => location?.accommodations.find(x => x.name === acc.name)).map(x => JSON.stringify(x))},
 				{accommodationCosts: costsObj}
 			]);
 		}
@@ -512,7 +513,8 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 			setValue([
 				{commonExpensesNotes: location?.commonExpensesNotes},
 				{savingMoneyTips: location?.savingMoneyTips},
-				{foodOptions: foodOptionOptions.filter(food => location?.foodOptions.find(x => x.id === food.id)).map(x => JSON.stringify(x))},
+				//match on name: the location payload's food option id is the join row's id, not the food option's
+				{foodOptions: foodOptionOptions.filter(food => location?.foodOptions.find(x => x.name === food.name)).map(x => JSON.stringify(x))},
 			]);
 		}
 		setEditingCost(shouldEdit);
