@@ -50,7 +50,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
             callBack && callBack();
 			setPostingComment(false);
             clearPost();
-		} catch (err) {
+		} catch (err: any) {
 			console.log(err.response);
 			setCommentError(err.response.data);
 			setPostingComment(false);
@@ -125,7 +125,7 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
             await axios.post(`/api/posts/${post.id}`, {newContent: editedContent});
             setIsEditing(false);
             editCallback && editCallback()
-		} catch (err) {
+		} catch (err: any) {
 			console.log(err.response);
 			setCommentError(err.response.data);
 		}

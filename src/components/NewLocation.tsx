@@ -152,7 +152,7 @@ function NewLocation () {
 					setSlug(resp.data.slug);
 					setLocationId(resp.data.id);
 					setPage(page + 1);
-				} catch (err) {
+				} catch (err: any) {
 					alert(`error ${err}`);
 				}
 			}

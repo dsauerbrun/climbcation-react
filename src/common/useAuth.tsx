@@ -43,7 +43,7 @@ export default function useProvideAuth(): Auth {
         try {
             let userFetch = await axios.post('/api/signup', {email: email, username: username, password: password});
             setUser(userFetch?.data);
-        } catch (err) {
+        } catch (err: any) {
             throw err.response.data || 'Error signing up.';
         }
     };
@@ -54,7 +54,7 @@ export default function useProvideAuth(): Auth {
     const resetPassword = async (email: string): Promise<void> => {
         try {
             await axios.post('/api/resetpassword', {email: email});
-        } catch (err) {
+        } catch (err: any) {
             // eslint-disable-next-line no-throw-literal
             throw 'Error sending reset password email.';
         }
@@ -63,7 +63,7 @@ export default function useProvideAuth(): Auth {
     const changePassword = async (password: string, id: string) => {
         try {
             await axios.post('/api/changepassword', {password: password, id: id});
-        } catch (err) {
+        } catch (err: any) {
             throw err.response.data || 'Error changing password';
         }
     }
@@ -74,7 +74,7 @@ export default function useProvideAuth(): Auth {
             let newUser: User = _.cloneDeep(user);
             newUser.username = username;
             setUser(newUser)
-        } catch (err) {
+        } catch (err: any) {
             throw err.response.data || 'Error changing username';
         }
     }

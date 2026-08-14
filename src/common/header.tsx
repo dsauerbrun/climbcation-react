@@ -33,7 +33,7 @@ function Header() {
 		try {
 			await auth.deleteAccount();
 			setShowToast({message: 'Your account has been successfully deleted!'});
-		} catch (err) {
+		} catch (err: any) {
 			alert('Failed to delete account, please contact info@climbcation.com');
 		}
 	}
@@ -42,7 +42,7 @@ function Header() {
 		try {
 			await auth.resetPassword(user.email)
 			setShowToast({message: 'Please check your email for a password change link'});
-		} catch (err) {
+		} catch (err: any) {
 			alert('Failed to delete account, please contact info@climbcation.com');
 		}
 	}

@@ -17,7 +17,7 @@ function Profile () {
 		try {
 			await auth.changeUsername(data.username);
 			setFormAlerts({error: formAlerts.error, success: true});
-		} catch (err) {
+		} catch (err: any) {
 			setFormAlerts({error: err, success: formAlerts.success});
 		}
 	};

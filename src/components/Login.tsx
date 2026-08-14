@@ -51,7 +51,7 @@ export function Login(props) {
 		try {
 			await auth.login(username, password);
             successCallback && successCallback();
-		} catch (err) {
+		} catch (err: any) {
 			if (err.response.status === 400) {
                 changeFormAlerts({authError: 'Invalid Username or Password'});
 			} else {
@@ -65,7 +65,7 @@ export function Login(props) {
 		try {
 			await auth.resetPassword(username);
             successCallback && successCallback('A link to reset your password has been sent to your email!');
-		} catch (err) {
+		} catch (err: any) {
             changeFormAlerts({authError: err});
 		}
     }
@@ -75,7 +75,7 @@ export function Login(props) {
         try {
             await auth.signup(email, username, password);
             successCallback && successCallback('A link to verify your account has been sent to your email!');
-        } catch (err) {
+        } catch (err: any) {
             changeFormAlerts({authError: err});
         }
 			

@@ -127,9 +127,9 @@ function Hero({filterHook}: {filterHook: filterHook}) {
 
 			if (presetObj.climbingTypes) {
 				if (climbTypes.length === 0) {
-					let filterOptionsFetch = await fetch('/api/filters');
+					let filterOptionsFetch = await fetch('/api/filters/all');
 					let filterOptions = await filterOptionsFetch.json() as any;
-					climbTypes = filterOptions.climbTypes;
+					climbTypes = (filterOptions.climbingTypes || []).map((x: any) => ({type: x.climbingType, url: x.url}));
 				}
 
 				newFilters.climbingTypesFilter = climbTypes.filter(x => presetObj.climbingTypes.includes(x.type));

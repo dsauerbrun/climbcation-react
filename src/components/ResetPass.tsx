@@ -20,7 +20,7 @@ function ResetPass () {
 		try {
 			await auth.changePassword(data.password, queryId);
 			setFormAlerts({error: 'Password Successfully Changed!', success: true});
-		} catch (err) {
+		} catch (err: any) {
 			setFormAlerts({error: err, success: formAlerts.success});
 		}
 	};

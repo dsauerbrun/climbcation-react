@@ -855,7 +855,7 @@ export function MiscSectionComponent({location, miscSection, forceUpdate, classN
 				setOriginalBody(miscSection.body);
 				setOriginalTitle(miscSection.title);
 				setPreview(true);
-			} catch (err) {
+			} catch (err: any) {
 				alert('error submitting change')
 			}
 			setIsSaving(false);

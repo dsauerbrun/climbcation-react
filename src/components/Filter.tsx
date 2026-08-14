@@ -110,14 +110,20 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 
 	useEffect(() => {
 		async function setOptions() {
-			let filterOptionsFetch = await fetch('/api/filters');
+			let filterOptionsFetch = await fetch('/api/filters/all');
 			let filterOptions = await filterOptionsFetch.json() as any;
-			setClimbTypes(filterOptions.climbTypes);
+			setClimbTypes((filterOptions.climbingTypes || []).map((x: any) => ({type: x.climbingType, url: x.url})));
 
-			let grades: typeGrades[] = filterOptions.grades.map(function(x: any){
-				return {climbingType: x.climbing_type, grades: x.grades.map((y: any) => ({...y, climbingType: y.climbing_type, typeId: x.climb_type_id})), typeHtml: x.type_html} as typeGrades;
+			let gradesGrouped: typeGrades[] = [];
+			(filterOptions.grades || []).forEach((g: any) => {
+				let existing = gradesGrouped.find(x => x.climbingType === g.climbingType);
+				if (!existing) {
+					existing = {climbingType: g.climbingType, grades: [], typeHtml: '', order: 0};
+					gradesGrouped.push(existing);
+				}
+				existing.grades.push({id: g.id, grade: g.grade, climbingType: g.climbingType, typeId: g.climbingTypeId, order: g.order});
 			});
-			setTypeGrades(grades);
+			setTypeGrades(gradesGrouped);
 		}
 		
 		setOptions();

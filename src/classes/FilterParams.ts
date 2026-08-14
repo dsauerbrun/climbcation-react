@@ -172,24 +172,27 @@ export class FilterParams {
 				gradesObj[grade.typeId] = [grade.id];
 			}
 		})
-		
+
+		let sortArray = undefined;
+		if (this.sort?.rating) {
+			sortArray = [{sortName: 'rating', sortDirection: this.sort.rating.asc ? 'asc' : 'desc'}];
+		} else if (this.sort?.distance) {
+			sortArray = [{sortName: 'distance', sortDirection: 'asc', latlng: {latitude: this.sort.distance.latitude, longitude: this.sort.distance.longitude}}];
+		}
+
 		return {
 			filter: {
-				climbing_types: this.climbingTypesFilter.find(x => x.type === 'All') ? [] : this.climbingTypesFilter.map(x => x.type),
-				grades: gradesObj, 
-				search: this.searchFilter,
-				start_month: this.startMonth.month,
-				end_month: this.endMonth.month,
-				start_month_name: this.startMonth.name,
-				end_month_name: this.endMonth.name,
+				climbingTypes: this.climbingTypesFilter.find(x => x.type === 'All') ? [] : this.climbingTypesFilter.map(x => x.type),
+				grades: gradesObj,
+				searchQuery: this.searchFilter,
+				startMonth: this.startMonth.month,
+				endMonth: this.endMonth.month,
 				rating: this.ratingsFilter,
-				solo_friendly: this.soloFriendlyFilter,
-				no_car: this.noCarFilter,
-				date: moment().format('YYYY-MM-DD'),
-				sort: this.sort,
+				soloFriendly: this.soloFriendlyFilter,
+				noCar: this.noCarFilter,
 			},
 			mapFilter: {"northeast":{"longitude": this.northEast.lng,"latitude": this.northEast.lat},"southwest":{"longitude": this.southWest.lng,"latitude": this.southWest.lat}},
-			page: this.page 
+			sort: sortArray,
 		}
 	};
 }
