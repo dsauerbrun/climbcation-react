@@ -722,7 +722,8 @@ function LocationComponent() {
 
 	let regetPosts = () => {
 		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
-			setPosts(resp.data);
+			//already newest first from the backend
+			setPosts(resp.data.posts || []);
 		});
 	}
 
@@ -731,8 +732,8 @@ function LocationComponent() {
 		axios(`/api/location/${slug}`).then((resp) => {
 			let locationToSet = new Location(resp.data.location);
 			locationToSet.isPrimary = true;
-			locationToSet.nearby = resp.data.nearby;
-			locationToSet.miscSections = resp.data.sections;
+			locationToSet.nearby = resp.data.location.nearby;
+			locationToSet.miscSections = resp.data.location.infoSections;
 
 			setLocation(locationToSet);
 		});
