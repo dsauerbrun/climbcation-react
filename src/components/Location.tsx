@@ -99,7 +99,10 @@ function InfoHeader({location}: PropLocation) {
 									<div className={classNames("nearby-locations", {expanded: nearbyShow})}>
 										{nearbyShow && <div className="nearby-display">
 											{location.nearby?.map((nearbyLoc) => (<div className="nearby-location" key={nearbyLoc.name}>
-												<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> <span className="text-gray bold">({nearbyLoc.distance} mi away)</span>
+												<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> {/* the api sends one decimal; render whole numbers. rails truncated with to_i,
+    so round here rather than matching that exactly — the tenth stays available
+    on the payload for any other consumer that wants it. */}
+												<span className="text-gray bold">({Math.round(nearbyLoc.distance)} mi away)</span>
 												{nearbyLoc?.climbingTypes.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
 											</div>))}
 										</div>}
