@@ -33,10 +33,20 @@ export default function useProvideAuth(): Auth {
         if (user) {
             return user;
         } else {
-            let userFetch = await axios.get('/api/user');
-            let normalizedUser = normalizeUser(userFetch?.data);
-            setUser(normalizedUser);
-            return normalizedUser;
+            try {
+                let userFetch = await axios.get('/api/user');
+                let normalizedUser = normalizeUser(userFetch?.data);
+                setUser(normalizedUser);
+                return normalizedUser;
+            } catch (err: any) {
+                //being logged out is a 401 here, where rails answered 200 with an empty body.
+                //that's the ordinary anonymous case rather than a failure, so report no user
+                //instead of rejecting. anything else is a real error and still propagates.
+                if (err.response?.status === 401) {
+                    return null;
+                }
+                throw err;
+            }
         }
     }
     
@@ -47,8 +57,11 @@ export default function useProvideAuth(): Auth {
   
     const signup = async (email: string, username: string, password: string): Promise<void> => {
         try {
-            let userFetch = await axios.post('/api/signup', {email: email, username: username, password: password});
-            setUser(userFetch?.data);
+            //signup returns an empty body and deliberately does not establish a session — it
+            //sends a verification email instead. caching that empty object as the user would
+            //make getUser's `if (user)` check short-circuit forever on a hollow record, so
+            //leave the user unset and let the caller route to login.
+            await axios.post('/api/signup', {email: email, username: username, password: password});
         } catch (err: any) {
             throw err.response.data || 'Error signing up.';
         }
@@ -91,7 +104,10 @@ export default function useProvideAuth(): Auth {
     }
 
     useEffect(() => {
-        getUser().then();
+        //getUser resolves null when logged out, so this only rejects on a real network or
+        //server error. catch it so a failed session probe can't surface as an unhandled
+        //rejection on every page load.
+        getUser().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
