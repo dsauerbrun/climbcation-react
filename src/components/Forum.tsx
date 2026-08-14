@@ -60,7 +60,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     return (
         <>
         <LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
-        {!user?.user_id && <div className="text-gray">
+        {!user?.userId && <div className="text-gray">
             Please <div className="anchor" onClick={() => showLogin()} style={{display: 'inline', cursor: 'pointer'}}>Login</div> to post a comment. Don't have an account? <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline', cursor: 'pointer'}}>Signup</div> here
         </div>}
         <div className="new-post-container">
@@ -69,7 +69,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
                 {commentError}
             </div>}
             
-            {user?.user_id && <textarea 
+            {user?.userId && <textarea 
                 value={newPost} 
                 onChange={(e) => setNewPost(e.target.value)}
                 className="form-control"
@@ -152,7 +152,7 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
                 onChange={(e) => setEditedContent(e.target.value)}
                 value={editedContent}
             ></textarea>}
-            {user?.user_id === post.userId && <div className="post-actions">
+            {user?.userId === post.userId && <div className="post-actions">
                 {!isEditing && <div className="anchor" onClick={() => startEditing()}>Edit</div>}
                 {isEditing && 
                 <>

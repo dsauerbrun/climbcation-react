@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 export interface User {
     email: string;
-    user_id: number;
+    userId: number;
     username: string;
     verified: boolean;
 }
@@ -24,13 +24,19 @@ export interface Auth {
 export default function useProvideAuth(): Auth {
     const [user, setUser] = useState<User>(null);
 
+    //the session object carries userId as a string: users.id is a bigint and pg hands
+    //it back as "42". posts arrive already coerced (get_thread runs them through Number),
+    //so normalize here at the boundary and let every consumer compare with ===.
+    let normalizeUser = (data: any): User => data ? {...data, userId: Number(data.userId)} : data;
+
     let getUser = async (): Promise<User> => {
         if (user) {
             return user;
         } else {
             let userFetch = await axios.get('/api/user');
-            setUser(userFetch?.data);
-            return userFetch?.data;
+            let normalizedUser = normalizeUser(userFetch?.data);
+            setUser(normalizedUser);
+            return normalizedUser;
         }
     }
     
