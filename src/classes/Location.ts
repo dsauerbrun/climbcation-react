@@ -3,6 +3,9 @@ export interface ClimbingType {
     url: string;
     type?: string;
     id: number;
+    //get_attribute_options returns the display name here instead of name.
+    //useEditables normalizes it onto name.
+    climbingType?: string;
 }
 
 export interface Grade {
@@ -61,35 +64,37 @@ export default class Location {
     id: number;
     name: string | null = null;
     slug: string | null = null;
-    home_thumb: string | null = null;
+    homeThumbUrl: string | null = null;
+    legacyHomeThumbUrl: string | null = null;
     country: string | null = null;
-    climbing_types: ClimbingType[] = [];
-    date_range: string | null = null;
+    climbingTypes: ClimbingType[] = [];
+    dateRange: string | null = null;
     grades: Grade[] = [];
-    walking_distance: boolean | null = null;
-    closest_accommodation: string | null = null;
+    walkingDistance: boolean | null = null;
+    closestAccommodation: string | null = null;
     rating: number = 0;
-    solo_friendly: boolean | null = null;
-    airport_code: string = 'DEN';
+    soloFriendly: boolean | null = null;
+    airportCode: string = 'DEN';
     flightPrice: FlightPrice = null;
     referral: string | null = null;
     latitude: number;
     longitude: number;
-    saving_money_tips: string;
+    savingMoneyTips: string;
     isPrimary: boolean = false;
 
-    common_expenses_notes: string = null;
+    commonExpensesNotes: string = null;
     continent: string = null;
-    
+
 
     nearby: any[] = null;
-    best_transportation: Transportation = null;
+    //absent from the payload when no transportation has a cost
+    bestTransportation: Transportation = null;
     transportations: Transportation[] = [];
-    getting_in_notes: string = null;
-    accommodation_notes: string = null;
+    gettingInNotes: string = null;
+    accommodationNotes: string = null;
     accommodations: Accommodation[] = [];
     active: boolean;
-    food_options: FoodOption[] = [];
+    foodOptions: FoodOption[] = [];
     miscSections: MiscSection[] = [];
 
     constructor(locationObj: any) {
@@ -97,19 +102,26 @@ export default class Location {
         this.id = locationObj.id;
         this.name = locationObj.name;
         this.slug = locationObj.slug;
-        this.home_thumb = locationObj.home_thumb;
+        this.homeThumbUrl = locationObj.homeThumbUrl;
+        this.legacyHomeThumbUrl = locationObj.legacyHomeThumbUrl;
         this.country = locationObj.country;
-        this.climbing_types = locationObj.climbing_types;
-        this.date_range = locationObj.date_range;
+        this.climbingTypes = locationObj.climbingTypes;
+        this.dateRange = locationObj.dateRange;
         this.grades = locationObj.grades;
-        this.walking_distance = locationObj.walking_distance;
-        this.closest_accommodation = locationObj.closest_accommodation;
+        this.walkingDistance = locationObj.walkingDistance;
+        this.closestAccommodation = locationObj.closestAccommodation;
         this.rating = locationObj.rating;
-        this.solo_friendly = locationObj.solo_friendly;
-        this.airport_code = locationObj.airport_code;
-        this.best_transportation = locationObj.best_transportation;
+        this.soloFriendly = locationObj.soloFriendly;
+        this.airportCode = locationObj.airportCode;
+        this.bestTransportation = locationObj.bestTransportation;
         this.transportations = locationObj.transportations;
-        this.getting_in_notes = locationObj.getting_in_notes;
+        this.gettingInNotes = locationObj.gettingInNotes;
+    }
+
+    get homeThumb(): string | null {
+        //legacy first: every record predating the bun admin uploader only resolves through the
+        //paperclip-style legacy path, so it is the one that resolves for the current dataset.
+        return this.legacyHomeThumbUrl || this.homeThumbUrl;
     }
 
     ratingName() {
@@ -117,7 +129,7 @@ export default class Location {
     }
 
     noCarNeeded() {
-        return this.walking_distance && (this.closest_accommodation === '<1 mile' || this.closest_accommodation === '1-2 miles')
+        return this.walkingDistance && (this.closestAccommodation === '<1 mile' || this.closestAccommodation === '1-2 miles')
     }
 
     get lowestPrice() {

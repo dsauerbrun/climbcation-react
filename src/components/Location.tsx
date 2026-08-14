@@ -100,7 +100,7 @@ function InfoHeader({location}: PropLocation) {
 										{nearbyShow && <div className="nearby-display">
 											{location.nearby?.map((nearbyLoc) => (<div className="nearby-location" key={nearbyLoc.name}>
 												<Link to={`/location/${nearbyLoc.slug}`}>{ nearbyLoc.name }</Link> <span className="text-gray bold">({nearbyLoc.distance} mi away)</span>
-												{nearbyLoc?.climbing_types.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
+												{nearbyLoc?.climbingTypes.map(nearbyType => (<img key={nearbyType.url} src={nearbyType.url} className="icon" alt="climbing type"/>))}
 											</div>))}
 										</div>}
 										<a className="toggle" onClick={() => setNearbyShow(!nearbyShow)}>{ nearbyShow? '[-] Hide Nearby Locations':'[+] Show Nearby Locations' }</a>
@@ -108,7 +108,7 @@ function InfoHeader({location}: PropLocation) {
 								</div>
 							</div>
 							<div className="location-photo well climbcation-well">
-								{location?.home_thumb !== '/images/original/missing.png' ? (<img src={ location?.home_thumb } alt="location thumbnail"/>) :
+								{location?.homeThumb !== '/images/original/missing.png' ? (<img src={ location?.homeThumb } alt="location thumbnail"/>) :
 								(<h3 className="text-center">
 									<strong>Image Coming Soon</strong>
 								</h3>)}
@@ -118,17 +118,17 @@ function InfoHeader({location}: PropLocation) {
 								<div className="row">
 									<div className="col-md-4 col-xs-4">
 										<label>What should I climb?</label>
-										{location?.climbing_types?.map(climbing_type => (<img key={climbing_type?.name} src={ climbing_type?.url } title={ climbing_type?.name } className="icon" alt="climbing type"/>))}
+										{location?.climbingTypes?.map(climbing_type => (<img key={climbing_type?.name} src={ climbing_type?.url } title={ climbing_type?.name } className="icon" alt="climbing type"/>))}
 									</div>
 									<div className="col-md-4 col-xs-4">
 										<label>When Should I go?</label>
-										<p className="text-gray info-text">{ location?.date_range }</p>
+										<p className="text-gray info-text">{ location?.dateRange }</p>
 									</div>
 									<div className="col-md-4 col-xs-4">
 										<label>Solo Traveler Friendly?</label>
 										{
-											location?.solo_friendly === null ? (<p className="text-gray info-text">Maybe <IconTooltip tooltip={"We're not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one"} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>) : (
-											<p className="text-gray info-text" >{location?.solo_friendly ? 'Yes' : 'No'} <IconTooltip tooltip={location?.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>)
+											location?.soloFriendly === null ? (<p className="text-gray info-text">Maybe <IconTooltip tooltip={"We're not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one"} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>) : (
+											<p className="text-gray info-text" >{location?.soloFriendly ? 'Yes' : 'No'} <IconTooltip tooltip={location?.soloFriendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} /></p>)
 										}
 									</div>
 								</div>
@@ -210,9 +210,9 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 				if (response.status === 200) {
 					axios.get('/api/location/' + location?.slug).then(function(response) {
 						location.transportations = response?.data?.location?.transportations;
-						location.getting_in_notes = response.data.location.getting_in_notes;
-						location.best_transportation = response.data.location.best_transportation;
-						location.walking_distance = response.data.location.walking_distance;
+						location.gettingInNotes = response.data.location.gettingInNotes;
+						location.bestTransportation = response.data.location.bestTransportation;
+						location.walkingDistance = response.data.location.walkingDistance;
 						setEditingGettingIn(false);
 						saveCallback && saveCallback(true);
 					});
@@ -224,11 +224,11 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 	const toggleEdit = (shouldEdit: boolean) => {
 		if (shouldEdit) {
 			let filteredTransportationOptions = transportationOptions?.filter(x => location?.transportations.find(y => y.id === x.id));
-			let walkingDistanceSet = location?.walking_distance === null ? 'null' : (location?.walking_distance ? 'true' : 'false');
+			let walkingDistanceSet = location?.walkingDistance === null ? 'null' : (location?.walkingDistance ? 'true' : 'false');
 			setValue([
 				{walking_distance: walkingDistanceSet},
 				{transportations: filteredTransportationOptions?.map(x => JSON.stringify(x))},
-				{gettingInNotes: location?.getting_in_notes}
+				{gettingInNotes: location?.gettingInNotes}
 			]);
 		}
 		setEditingGettingIn(shouldEdit);
@@ -236,7 +236,7 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 
 	useEffect(() => {
 		let filteredTransportationOptions = transportationOptions?.filter(x => location?.transportations.find(y => y.id === x.id));
-		let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.best_transportation.id);
+		let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.bestTransportation.id);
 		setValue([
 			{bestTransportation: JSON.stringify(bestTransportation)},
 		])
@@ -244,7 +244,7 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 
 	useEffect(() => {
 		setValue([
-			{bestTransportationCost: bestTransportationCost || location?.best_transportation?.cost},
+			{bestTransportationCost: bestTransportationCost || location?.bestTransportation?.cost},
 		])
 	}, [bestTransportation])
 
@@ -255,9 +255,9 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 					<h3 className="inline">Getting In</h3>
 					<span className="text-button" onClick={() => toggleEdit(true)}>Edit Category</span>
 				</div>
-				{location?.walking_distance === null ? (<p className="text-gray info-text">We're not sure if you need a car/motorbike upon arrival to get to where you need.(eg. crag, food, camping, etc...) Have you been here? Please edit this section if you can help us out!</p>) :
+				{location?.walkingDistance === null ? (<p className="text-gray info-text">We're not sure if you need a car/motorbike upon arrival to get to where you need.(eg. crag, food, camping, etc...) Have you been here? Please edit this section if you can help us out!</p>) :
 				(<p className="text-gray info-text">
-					Upon arrival, you <strong>{location?.walking_distance ? 'can' : 'cannot'} {location?.walking_distance && <IconTooltip tooltip={'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} />}</strong> get to where you need without a car/motorbike. (eg. crag, shelter, food)
+					Upon arrival, you <strong>{location?.walkingDistance ? 'can' : 'cannot'} {location?.walkingDistance && <IconTooltip tooltip={'May include alternative methods of transportation such as hitchhiking if there is a strong hitchhiking culture in the area.'} dom={<i className="glyphicon glyphicon-info-sign"></i>} />}</strong> get to where you need without a car/motorbike. (eg. crag, shelter, food)
 				</p>)}
 				<div className="info-container">
 					<div>
@@ -268,13 +268,13 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 					</div>
 					<div>
 						<label className="text-center">Best Transportation Option</label>
-						<h4 className="text-center text-gray">{location?.best_transportation.name}</h4>
-						<h5 className="text-center text-gray">{location?.best_transportation.cost !== '-1' ? location?.best_transportation.cost : ''}</h5>
+						<h4 className="text-center text-gray">{location?.bestTransportation.name}</h4>
+						<h5 className="text-center text-gray">{location?.bestTransportation.cost !== '-1' ? location?.bestTransportation.cost : ''}</h5>
 					</div>
 				</div>
 				<label>Any additional tips about getting around {location?.name}?</label>
 				<p className="text-gray info-text preserve-line-breaks">
-					<Linkify>{location?.getting_in_notes || 'No Details Available'}</Linkify>
+					<Linkify>{location?.gettingInNotes || 'No Details Available'}</Linkify>
 				</p>
 			</div>
 			
@@ -380,8 +380,8 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 		if (shouldEdit) {
 			let costsObj = {Hotel: location?.accommodations.find(x => x.name === 'Hotel')?.cost, Hostel: location?.accommodations.find(x => x.name === 'Hostel')?.cost, Camping: location?.accommodations.find(x => x.name === 'Camping')?.cost};
 			setValue([
-				{closestAccommodation: location?.closest_accommodation},
-				{accommodationNotes: location?.accommodation_notes},
+				{closestAccommodation: location?.closestAccommodation},
+				{accommodationNotes: location?.accommodationNotes},
 				{accommodations: accommodationOptions.filter(acc => location?.accommodations.find(x => x.id === acc.id)).map(x => JSON.stringify(x))},
 				{accommodationCosts: costsObj}
 			]);
@@ -420,9 +420,9 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 					<h3 className="inline">Accommodation</h3>
 					<span className="text-button" onClick={() => toggleEdit(true)}>Edit Category</span>
 				</div>
-				{!location?.closest_accommodation ? 
+				{!location?.closestAccommodation ? 
 				(<p className="text-gray info-text">We're not sure how close the accommodation is from the crags... have you been here? Please edit this section if you can help us out!</p>) :
-				(<p className="text-gray info-text">Closest accommodation is <strong>{location?.closest_accommodation}</strong> from the crags.</p>)
+				(<p className="text-gray info-text">Closest accommodation is <strong>{location?.closestAccommodation}</strong> from the crags.</p>)
 				}
 				<div className="info-container">
 					{location?.accommodations?.map(accommodation => (<div key={`accomdisplay${accommodation.id}`} className="accommodation-info-section">
@@ -432,7 +432,7 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 					</div>))}
 				</div>
 				<label>Any additional tips for staying in {location?.name}?</label>
-				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.accommodation_notes || 'No Details Available'}</Linkify></p>
+				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.accommodationNotes || 'No Details Available'}</Linkify></p>
 			</div>
 			<div className="well climbcation-well" style={{display: editingAccommodation ? '' : 'none'}}>
 				<form onSubmit={handleSubmit(onSubmit)}>
@@ -510,18 +510,18 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 	const toggleEdit = (shouldEdit: boolean) => {
 		if (shouldEdit) {
 			setValue([
-				{commonExpensesNotes: location?.common_expenses_notes},
-				{savingMoneyTips: location?.saving_money_tips},
-				{foodOptions: foodOptionOptions.filter(food => location?.food_options.find(x => x.id === food.id)).map(x => JSON.stringify(x))},
+				{commonExpensesNotes: location?.commonExpensesNotes},
+				{savingMoneyTips: location?.savingMoneyTips},
+				{foodOptions: foodOptionOptions.filter(food => location?.foodOptions.find(x => x.id === food.id)).map(x => JSON.stringify(x))},
 			]);
 		}
 		setEditingCost(shouldEdit);
 	}
 
 	useEffect(() => {
-		let farmerMarketCost = (!currentFoodCostValues || !currentFoodCostValues["Farmer's Market"] || currentFoodCostValues["Farmer's Market"] === "") ? location?.food_options?.find(x => x.name === "Farmer's Market")?.cost : currentFoodCostValues["Farmer's Market"];
-		let restaurantCost = (!currentFoodCostValues || !currentFoodCostValues["Restaurant"] || currentFoodCostValues["Restaurant"] === "") ? location?.food_options?.find(x => x.name === "Restaurant")?.cost : currentFoodCostValues["Restaurant"];
-		let groceryCost = (!currentFoodCostValues || !currentFoodCostValues["Grocery"] || currentFoodCostValues["Grocery"] === "") ? location?.food_options?.find(x => x.name === "Grocery")?.cost : currentFoodCostValues["Grocery"];
+		let farmerMarketCost = (!currentFoodCostValues || !currentFoodCostValues["Farmer's Market"] || currentFoodCostValues["Farmer's Market"] === "") ? location?.foodOptions?.find(x => x.name === "Farmer's Market")?.cost : currentFoodCostValues["Farmer's Market"];
+		let restaurantCost = (!currentFoodCostValues || !currentFoodCostValues["Restaurant"] || currentFoodCostValues["Restaurant"] === "") ? location?.foodOptions?.find(x => x.name === "Restaurant")?.cost : currentFoodCostValues["Restaurant"];
+		let groceryCost = (!currentFoodCostValues || !currentFoodCostValues["Grocery"] || currentFoodCostValues["Grocery"] === "") ? location?.foodOptions?.find(x => x.name === "Grocery")?.cost : currentFoodCostValues["Grocery"];
 		let costsObj = {"Farmer's Market": farmerMarketCost, Grocery: groceryCost, Restaurant: restaurantCost};
 
 		setValue([
@@ -561,15 +561,15 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 				</div>
 				<label>Food options (cost per meal)</label>
 				<div className="info-container">
-					{location?.food_options?.map(food_option => (<div key={food_option.id}>
+					{location?.foodOptions?.map(food_option => (<div key={food_option.id}>
 						<h3 className="text-gray text-center">{food_option.name}</h3>
 						<h4 className="text-gray text-center">{food_option.cost}</h4>
 					</div>))}
 				</div>
 				<label>Any other common expenses in {location?.name}?</label>
-				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.common_expenses_notes || 'No Details Available'}</Linkify></p>
+				<p className="text-gray info-text preserve-line-breaks" ><Linkify>{location?.commonExpensesNotes || 'No Details Available'}</Linkify></p>
 				<label>Any tips on saving money around {location?.name}?</label>
-				<p className="text-gray info-text preserve-line-breaks"><Linkify>{location?.saving_money_tips || 'No Details Available'}</Linkify></p>
+				<p className="text-gray info-text preserve-line-breaks"><Linkify>{location?.savingMoneyTips || 'No Details Available'}</Linkify></p>
 			</div>
 			<div className="well climbcation-well" style={{display: editingCost ? '' : 'none'}}>
 				<form onSubmit={handleSubmit(onSubmit)}>
@@ -666,10 +666,10 @@ function FlightCostComponent({location}: PropLocation) {
 					<div className="airport-wrapper inline">
 						<AirportAutocomplete selectedAirport={selectedAirport} setSelectedAirport={setSelectedAirport} style={{display: 'inline-block'}}/>
 					</div>
-					to {location?.airport_code})
+					to {location?.airportCode})
 				</h3>
                 {/*<div className="location-airfare">
-                    {airportCode === location?.airport_code ? 
+                    {airportCode === location?.airportCode ? 
                         <div className="sorry-message">
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
@@ -678,7 +678,7 @@ function FlightCostComponent({location}: PropLocation) {
                     (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
-                            <a href={location?.referral} target="_blank" rel="noopener noreferrer">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
+                            <a href={location?.referral} target="_blank" rel="noopener noreferrer">One Way cost from {airportCode} to {location?.airportCode}<img src={skyscannerLogo} alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
                             <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)} >
@@ -692,7 +692,7 @@ function FlightCostComponent({location}: PropLocation) {
                     </>
                     : 
                     <div className="sorry-message">
-                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airport_code }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
+                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airportCode }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
                     </div>))}
                     {
                         lowPrice?.cost !== 999999999999999999999999 && <div>
@@ -788,7 +788,7 @@ function LocationComponent() {
 					<div className="row">
 						<div className="col-md-8">
 							<div className="well location-posts-container">	
-								<PostInput threadId={posts && posts[0]?.forum_thread_id} slug={location?.slug} callBack={regetPosts} />
+								<PostInput threadId={posts && posts[0]?.forumThreadId} slug={location?.slug} callBack={regetPosts} />
 								<Thread posts={posts} editCallback={regetPosts} />
 							</div>
 						</div>

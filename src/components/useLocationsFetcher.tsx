@@ -24,17 +24,6 @@ interface fetcherParam {
     setFilterState: Function
 }
 
-function mapApiLocation(loc: any) {
-  return {
-    ...loc,
-    home_thumb: loc.legacyHomeThumbUrl || loc.homeThumbUrl,
-    climbing_types: loc.climbingTypes,
-    date_range: loc.dateRange,
-    walking_distance: loc.walkingDistance,
-    solo_friendly: loc.soloFriendly,
-  };
-}
-
 function buildFilterUrl(filterUrlObject: any, cursor?: string): string {
   const params = new URLSearchParams();
   params.set('filter', JSON.stringify(filterUrlObject.filter));
@@ -73,7 +62,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
       let filteredFetch = await fetch(url);
       let filtered = await filteredFetch.json() as any;
       let newLocs = (filtered.locations || []).filter(x => !locations.find(y => y.id === x.id));
-      locations = locations.concat(newLocs.map(x => new Location(mapApiLocation(x))));
+      locations = locations.concat(newLocs.map(x => new Location(x)));
       setLocations(locations);
       setCursor(filtered.cursor || null);
       if (!filtered.cursor || newLocs.length === 0) {
@@ -108,7 +97,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         const url = buildFilterUrl(filterState?.filterUrlObject);
         let filteredFetch = await fetch(url);
         let filtered = await filteredFetch.json() as any;
-        locations = (filtered.locations || []).map(x => new Location(mapApiLocation(x)));
+        locations = (filtered.locations || []).map(x => new Location(x));
         setLocations(locations);
         setUnpaginatedLocations(filtered.mapLocations || []);
         setCursor(filtered.cursor || null);
