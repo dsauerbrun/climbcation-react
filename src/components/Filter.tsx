@@ -233,7 +233,7 @@ function Filter({setLargeMapEnabled, largeMapEnabled, hoveredLocation, mobileMap
 	}
 
 	const getFilterGradeType = (climbTypeName: string): grade | undefined | null => {
-		let foundGradeFilter = filterState && filterState.gradesFilter?.sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.climbingType === climbTypeName);
+		let foundGradeFilter = filterState && [...(filterState.gradesFilter ?? [])].sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.climbingType === climbTypeName);
 		return foundGradeFilter;
 	}
 

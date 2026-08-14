@@ -135,7 +135,7 @@ export class FilterParams {
 
 		let climbingGradeTypes = [...new Set<number>(this.gradesFilter.map(x => x.typeId))];
 		climbingGradeTypes.forEach(typeId => {
-			let gradeToApply = this.gradesFilter.sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.typeId === typeId);
+			let gradeToApply = [...this.gradesFilter].sort((a,b) => a.order > b.order ? -1 : 1).find(x => x.typeId === typeId);
 			filters.push({title: `${gradeToApply.climbingType}: ${gradeToApply.grade}`, id: gradeToApply.id, type: 'grade'});
 		})
 

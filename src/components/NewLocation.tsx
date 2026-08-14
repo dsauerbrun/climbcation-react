@@ -896,7 +896,11 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 							<img src={climbType.url} alt="climbing type" /> 
 							<select onChange={(e) => toggleGrade(e.currentTarget.value, climbType.id)} className="form-control">
 								<option value=''>Select a grade</option>
-								{grades?.sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.climbingTypeId === climbType.id).map(grade => (
+									{/* the id-ascending sort intentionally overrides the order the api sends.
+									    get_attribute_options returns grades order DESC for rails parity, but this
+									    dropdown has always rendered id ASC and that is the order users expect. copy
+									    before sorting so the shared useEditables array is not reordered in place. */}
+									{[...(grades ?? [])].sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.climbingTypeId === climbType.id).map(grade => (
 									<option key={grade.grade} value={grade.id}>{grade.grade} and above</option>
 								))}
 							</select>
