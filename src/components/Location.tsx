@@ -236,7 +236,7 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 
 	useEffect(() => {
 		let filteredTransportationOptions = transportationOptions?.filter(x => location?.transportations.find(y => y.id === x.id));
-		let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.bestTransportation.id);
+		let bestTransportation = filteredTransportationOptions?.find(x => x.id === location?.bestTransportation?.id);
 		setValue([
 			{bestTransportation: JSON.stringify(bestTransportation)},
 		])
@@ -268,8 +268,8 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 					</div>
 					<div>
 						<label className="text-center">Best Transportation Option</label>
-						<h4 className="text-center text-gray">{location?.bestTransportation.name}</h4>
-						<h5 className="text-center text-gray">{location?.bestTransportation.cost !== '-1' ? location?.bestTransportation.cost : ''}</h5>
+						<h4 className="text-center text-gray">{location?.bestTransportation?.name}</h4>
+						<h5 className="text-center text-gray">{location?.bestTransportation?.cost !== '-1' ? location?.bestTransportation?.cost : ''}</h5>
 					</div>
 				</div>
 				<label>Any additional tips about getting around {location?.name}?</label>
