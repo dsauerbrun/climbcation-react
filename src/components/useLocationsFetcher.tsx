@@ -99,7 +99,12 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         let filtered = await filteredFetch.json() as any;
         locations = (filtered.locations || []).map(x => new Location(x));
         setLocations(locations);
-        setUnpaginatedLocations(filtered.mapLocations || []);
+        //null mapLocations means "you already hold the full map set", not "the set is empty".
+        //this path never sends a cursor so it should always be populated, but don't wipe the
+        //markers if that ever stops being true.
+        if (filtered.mapLocations) {
+          setUnpaginatedLocations(filtered.mapLocations);
+        }
         setCursor(filtered.cursor || null);
         if (!filtered.cursor || locations.length === 0) {
           setNoMoreLocations(true);
