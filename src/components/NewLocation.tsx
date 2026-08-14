@@ -110,18 +110,18 @@ function NewLocation () {
 				setShowError(true);
 			} else if (!isSubmitting) {
 				let accommodationsWithRanges = data.accommodations?.map(accommodation => {
-					let accommodationWithRange = {id: accommodation.id, name: accommodation.name, cost: data.accommodationCosts && data.accommodationCosts[accommodation.name]};
+					let accommodationWithRange = {id: accommodation.id, cost: data.accommodationCosts && data.accommodationCosts[accommodation.name]};
 					return accommodationWithRange;
 				});
 
 				let climbingTypesWithGrades = data.climbTypes?.map(climbType => {
 					let typeGrade = data.grades?.find(x => x.climbingTypeId === climbType.id)?.id;
-					let climbTypeWithGrade = {id: climbType.id, name: climbType.name, grade_id: typeGrade};
+					let climbTypeWithGrade = {id: climbType.id, gradeId: typeGrade};
 					return climbTypeWithGrade;
 				})
 
 				let foodOptionsWithCosts = data.foodOptions?.map(foodOption => {
-					let foodOptionWithCost = {id: foodOption.id, name: foodOption.name, cost: data.foodOptionCosts && data.foodOptionCosts[foodOption.name]}
+					let foodOptionWithCost = {id: foodOption.id, cost: data.foodOptionCosts && data.foodOptionCosts[foodOption.name]}
 					return foodOptionWithCost;
 				})
 
@@ -129,31 +129,38 @@ function NewLocation () {
 					name: data.name,
 					country: data.country,
 					airport: data.airport?.iata_code,
-					months: data.months,
-					accommodations: accommodationsWithRanges || [],
+					rating: data.rating,
+					soloFriendly: data.soloFriendly,
+					months: data.months?.map(month => ({id: month.id})) || [],
 					climbingTypes: climbingTypesWithGrades || [],
 					sections: data.miscSections || [],
-					closestAccommodation: data.closestAccommodation,
-					foodOptionDetails: foodOptionsWithCosts || [],
-					soloFriendly: data.soloFriendly,
-					rating: data.rating,
-					transportations: data.transportations?.map(x => x.id) || [],
-					bestTransportationId: data.bestTransportation?.id,
-					bestTransportationCost: data.bestTransportationCost,
-					walkingDistance: data.walkingDistance,
-					gettingInNotes: data.gettingInNotes,
-					accommodationNotes: data.accommodationNotes,
-					commonExpensesNotes: data.commonExpensesNotes,
-					savingMoneyTips: data.savingMoneyTips  
+					accommodations: {
+						accommodations: accommodationsWithRanges || [],
+						accommodationNotes: data.accommodationNotes,
+						closestAccommodation: data.closestAccommodation
+					},
+					foodOptions: {
+						foodOptionDetails: foodOptionsWithCosts || [],
+						commonExpensesNotes: data.commonExpensesNotes,
+						savingMoneyTips: data.savingMoneyTips
+					},
+					gettingIn: {
+						transportations: data.transportations?.map(x => x.id) || [],
+						bestTransportationCost: data.bestTransportationCost,
+						bestTransportationId: data.bestTransportation?.id,
+						gettingInNotes: data.gettingInNotes,
+						walkingDistance: data.walkingDistance
+					}
 				};
 
 				try {
-					let resp = await axios.post(`/api/submit_new_location`, reqObj);
+					let resp = await axios.post(`/api/locations/submit_new_location`, reqObj);
 					setSlug(resp.data.slug);
 					setLocationId(resp.data.id);
 					setPage(page + 1);
 				} catch (err: any) {
-					alert(`error ${err}`);
+					//backend returns a plain-text body on 400, not json
+					alert(`error ${err.response?.data || err}`);
 				}
 			}
 		}
