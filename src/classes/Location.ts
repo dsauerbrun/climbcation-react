@@ -23,6 +23,19 @@ interface FlightPrice {
     slug: string;
 }
 
+interface HasThumbUrls {
+    homeThumbUrl?: string | null;
+    legacyHomeThumbUrl?: string | null;
+}
+
+//legacy first: every record predating the bun admin uploader only resolves through the
+//paperclip-style legacy path. swaps to homeThumbUrl-first once the uploader key mismatch is fixed
+//backend side, so the fallback stays either way. takes a plain object rather than using the Location
+//getter, since nearby locations come through as plain objects that carry the same url pair.
+export function getHomeThumb(location: HasThumbUrls): string | null {
+    return location?.legacyHomeThumbUrl || location?.homeThumbUrl || null;
+}
+
 export function getRatingName(rating: number): string {
     if (rating === 1) {
         return 'Worth a Stop.';
@@ -119,9 +132,7 @@ export default class Location {
     }
 
     get homeThumb(): string | null {
-        //legacy first: every record predating the bun admin uploader only resolves through the
-        //paperclip-style legacy path, so it is the one that resolves for the current dataset.
-        return this.legacyHomeThumbUrl || this.homeThumbUrl;
+        return getHomeThumb(this);
     }
 
     ratingName() {

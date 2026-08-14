@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState} from 'react';
 import { isEqual, omit, functions } from 'lodash';
 import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
-import Location from '../classes/Location';
+import Location, { getHomeThumb } from '../classes/Location';
 import {Link} from 'react-router-dom';
 
   Map.defaultProps = {
@@ -213,7 +213,7 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
                                 <Link to={`/location/${ tooltipLocation?.slug }}`}>
-                                    <img className="location-list-thumb" src={tooltipLocation?.homeThumb} alt="location thumbnail" />	
+                                    <img className="location-list-thumb" src={getHomeThumb(tooltipLocation)} alt="location thumbnail" />
                                     <div className="location-list-thumb-title">
                                         <h3 className="text-gray">{ tooltipLocation?.name }</h3>
                                     </div>
