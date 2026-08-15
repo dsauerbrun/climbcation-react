@@ -25,6 +25,14 @@ import loading from '../images/climbcation-loading.gif';
 import NotFound from './NotFound';
 
 
+//these endpoints answer with a plain-text body on a handled failure, but a 500 or a dropped
+//connection carries nothing useful, so fall back to a generic line rather than rendering
+//"undefined" or an empty alert at the user.
+function submitErrorMessage(err: any): string {
+	let body = err?.response?.data;
+	return typeof body === 'string' && body ? body : 'Your changes could not be saved. Please try again.';
+}
+
 interface PropLocation {
 	location: Location;
 	transportationOptions?: TransportationOption[];
@@ -193,6 +201,7 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 	let { register, handleSubmit, watch, formState, setValue } = useForm<GettingInForm>({});
 	let { isSubmitting } = formState
 	let [editingGettingIn, setEditingGettingIn] = useState<boolean>(false);
+	let [submitError, setSubmitError] = useState<string>(null);
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let walkingDistance = watch('walking_distance');
 	let transportations: string[] = watch('transportations');
@@ -201,27 +210,29 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 
 	const onSubmit = async (data) => {
 		if (!isSubmitting) {
-			
-			axios.post('/api/locations/' + location?.id +'/gettingin',
-				{location: {
-					walkingDistance: data.walking_distance === '' ? null : (data.walking_distance === 'true' ? true : false),
-					transportations: data.transportations?.map(x => JSON.parse(x).id),
-					bestTransportationCost: data.bestTransportationCost,
-					bestTransportationId: data.bestTransportation && data.bestTransportation !== '' && JSON.parse(data.bestTransportation)?.id,
-					gettingInNotes: data.gettingInNotes
-				}} 
-			).then(function(response) {
-				if (response.status === 200) {
-					axios.get('/api/location/' + location?.slug).then(function(response) {
-						location.transportations = response?.data?.location?.transportations;
-						location.gettingInNotes = response.data.location.gettingInNotes;
-						location.bestTransportation = response.data.location.bestTransportation;
-						location.walkingDistance = response.data.location.walkingDistance;
-						setEditingGettingIn(false);
-						saveCallback && saveCallback(true);
-					});
-				}
-			});
+			setSubmitError(null);
+			try {
+				await axios.post('/api/locations/' + location?.id +'/gettingin',
+					{location: {
+						walkingDistance: data.walking_distance === '' ? null : (data.walking_distance === 'true' ? true : false),
+						transportations: data.transportations?.map(x => JSON.parse(x).id),
+						bestTransportationCost: data.bestTransportationCost,
+						bestTransportationId: data.bestTransportation && data.bestTransportation !== '' && JSON.parse(data.bestTransportation)?.id,
+						gettingInNotes: data.gettingInNotes
+					}}
+				);
+				let response = await axios.get('/api/location/' + location?.slug);
+				location.transportations = response?.data?.location?.transportations;
+				location.gettingInNotes = response.data.location.gettingInNotes;
+				location.bestTransportation = response.data.location.bestTransportation;
+				location.walkingDistance = response.data.location.walkingDistance;
+				setEditingGettingIn(false);
+				saveCallback && saveCallback(true);
+			} catch (err: any) {
+				//leave the form open and still populated so the edit isn't lost. previously this
+				//rejected unhandled and the form closed as though the change had been saved.
+				setSubmitError(submitErrorMessage(err));
+			}
 		}
 	};
 
@@ -292,6 +303,10 @@ function GettingIn({location, transportationOptions, saveCallback}: PropLocation
 							<button className="btn btn-sm btn-climbcation submit-button" disabled={isSubmitting}>Submit Changes</button>
 						</div>
 					</div>
+					{submitError && <div className="alert alert-danger alert-dismissable">
+						<button type="button" className="close" onClick={() => setSubmitError(null)}>&times;</button>
+						{submitError}
+					</div>}
 					<div className="row">
 						<div className="col-md-8">
 							<label>Upon arrival, can you reliably get to where you need without a car/motorbike?(eg. crag, camping, food, etc...)</label>
@@ -375,6 +390,7 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 	let { register, handleSubmit, watch, formState, setValue } = useForm<AccommodationForm>({});
 	let {isSubmitting} = formState
 	let [editingAccommodation, setEditingAccommodation] = useState<boolean>(false);
+	let [submitError, setSubmitError] = useState<string>(null);
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let accommodations: string[] = watch('accommodations');
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -403,18 +419,21 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 				newObj.cost = data.accommodationCosts[x.name];
 				return newObj;
 			});
-			axios.post('/api/locations/' + location?.id +'/accommodations',
-				{location: {
-					accommodationNotes: data.accommodationNotes,
-					closestAccommodation: data.closestAccommodation,
-					accommodations: mappedAccommodations	
-				}} 
-			).then(function(response) {
-				if (response.status === 200) {
-						setEditingAccommodation(false);
-						saveCallback && saveCallback(true);
-				}
-			});
+			setSubmitError(null);
+			try {
+				await axios.post('/api/locations/' + location?.id +'/accommodations',
+					{location: {
+						accommodationNotes: data.accommodationNotes,
+						closestAccommodation: data.closestAccommodation,
+						accommodations: mappedAccommodations
+					}}
+				);
+				setEditingAccommodation(false);
+				saveCallback && saveCallback(true);
+			} catch (err: any) {
+				//leave the form open and still populated so the edit isn't lost.
+				setSubmitError(submitErrorMessage(err));
+			}
 		}
 	};
 
@@ -448,6 +467,10 @@ function Accommodations({location, accommodationOptions, saveCallback}: PropLoca
 							<button className="btn btn-sm btn-climbcation submit-button" disabled={isSubmitting}>Submit Changes</button>
 						</div>
 					</div>
+					{submitError && <div className="alert alert-danger alert-dismissable">
+						<button type="button" className="close" onClick={() => setSubmitError(null)}>&times;</button>
+						{submitError}
+					</div>}
 					<div className="row">
 						<div className="col-md-8">
 							<label>How close is the closest accommodation to the crag(s)?</label>
@@ -509,6 +532,7 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 	let { register, handleSubmit, watch, formState, setValue } = useForm<CostForm>({});
 	let {isSubmitting} = formState
 	let [editingCost, setEditingCost] = useState<boolean>(false);
+	let [submitError, setSubmitError] = useState<string>(null);
 	let selectedFoodOptions: string[] = watch('foodOptions');
 	let currentFoodCostValues = watch('foodOptionCosts');
 
@@ -544,18 +568,21 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 				newObj.cost = data.foodOptionCosts[x.name];
 				return newObj;
 			});
-			axios.post('/api/locations/' + location?.id +'/foodoptions',
-				{location: {
-					savingMoneyTips: data.savingMoneyTips,
-					commonExpensesNotes: data.commonExpensesNotes,
-					foodOptionDetails: mappedFoodOptions	
-				}} 
-			).then(function(response) {
-				if (response.status === 200) {
-						setEditingCost(false);
-						saveCallback && saveCallback(true);
-				}
-			});
+			setSubmitError(null);
+			try {
+				await axios.post('/api/locations/' + location?.id +'/foodoptions',
+					{location: {
+						savingMoneyTips: data.savingMoneyTips,
+						commonExpensesNotes: data.commonExpensesNotes,
+						foodOptionDetails: mappedFoodOptions
+					}}
+				);
+				setEditingCost(false);
+				saveCallback && saveCallback(true);
+			} catch (err: any) {
+				//leave the form open and still populated so the edit isn't lost.
+				setSubmitError(submitErrorMessage(err));
+			}
 		}
 	};
 	return (
@@ -586,6 +613,10 @@ function CostComponent({location, foodOptionOptions, saveCallback}: PropLocation
 							<button className="btn btn-sm btn-climbcation submit-button" disabled={isSubmitting}>Submit Changes</button>
 						</div>
 					</div>
+					{submitError && <div className="alert alert-danger alert-dismissable">
+						<button type="button" className="close" onClick={() => setSubmitError(null)}>&times;</button>
+						{submitError}
+					</div>}
 					<div className="row">
 						<div className="col-md-5">
 							<label>What food options are available in {location?.name}?</label>
