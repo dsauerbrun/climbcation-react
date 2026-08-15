@@ -321,12 +321,19 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 	let user: User = auth.user;
 	let [emailThankYou, setEmailThankYou] = useState(false);
 	let [submitterEmail, setSubmitterEmail] = useState<string>();
+	let [emailError, setEmailError] = useState<string>(null);
 
-	let submitEmail = () => {
-		axios.post('api/locations/' + locationId + '/email', {email: submitterEmail})
-			.then(function(response) {
-				setEmailThankYou(true);
-			})
+	let submitEmail = async () => {
+		setEmailError(null);
+		try {
+			await axios.post('api/locations/' + locationId + '/email', {email: submitterEmail});
+			setEmailThankYou(true);
+		} catch (err: any) {
+			//don't show the thank-you on a failure — it told the submitter we had their address
+			//when we didn't, and the rejection went unhandled on top of that.
+			let body = err?.response?.data;
+			setEmailError(typeof body === 'string' && body ? body : 'We could not save your email address. Please try again.');
+		}
 	}
 
 	useEffect(() => {
@@ -354,6 +361,10 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 				{emailThankYou && <label className="col-md-4 email-prompt">
 					Thank you!
 				</label>}
+				{emailError && <div className="alert alert-danger alert-dismissable col-md-12">
+					<button type="button" className="close" onClick={() => setEmailError(null)}>&times;</button>
+					{emailError}
+				</div>}
 			</div>}
 			<div className="row bottom-padding">
 				<h4 className="col-md-12">Forget some information? Just click on the preview link and edit your location page there!</h4>
