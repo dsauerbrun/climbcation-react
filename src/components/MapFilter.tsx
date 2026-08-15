@@ -212,7 +212,7 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
                     <div className="location-card-info">
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
-                                <Link to={`/location/${ tooltipLocation?.slug }}`}>
+                                <Link to={`/location/${ tooltipLocation?.slug }`}>
                                     <img className="location-list-thumb" src={getHomeThumb(tooltipLocation)} alt="location thumbnail" />
                                     <div className="location-list-thumb-title">
                                         <h3 className="text-gray">{ tooltipLocation?.name }</h3>
