@@ -22,6 +22,7 @@ import { transformQuotesToChartData } from './LocationsTilesContainer';
 import Toast from 'react-bootstrap/Toast';
 import skyscannerLogo from '../images/skyscannerinline.png';
 import loading from '../images/climbcation-loading.gif';
+import NotFound from './NotFound';
 
 
 interface PropLocation {
@@ -720,6 +721,7 @@ function FlightCostComponent({location}: PropLocation) {
 function LocationComponent() {
 	let {slug} = useParams();
 	let [location, setLocation] = useState<Location>();
+	let [notFound, setNotFound] = useState<boolean>(false);
 	let [posts, setPosts] = useState<Post[]>([]);
 	let forceUpdate = useForceUpdate();
 	let {accommodations, foodOptions, transportations} = useEditables();
@@ -729,11 +731,14 @@ function LocationComponent() {
 		axios(`/api/threads/${slug}?destination_category=true`).then((resp) => {
 			//already newest first from the backend
 			setPosts(resp.data.posts || []);
+		}).catch(() => {
+			setPosts([]);
 		});
 	}
 
 
 	useEffect(() => {
+		setNotFound(false);
 		axios(`/api/location/${slug}`).then((resp) => {
 			let locationToSet = new Location(resp.data.location);
 			locationToSet.isPrimary = true;
@@ -741,6 +746,12 @@ function LocationComponent() {
 			locationToSet.miscSections = resp.data.location.infoSections;
 
 			setLocation(locationToSet);
+		}).catch(() => {
+			//the api answers 400 for a slug that doesn't exist. without this the rejection went
+			//unhandled and the page still rendered its full chrome around an undefined location,
+			//which reads as a real destination with blank fields — including asserting "Solo
+			//Traveler Friendly? No", since `undefined === null` is false and falls to the no branch.
+			setNotFound(true);
 		});
 		regetPosts();
 	// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -759,6 +770,10 @@ function LocationComponent() {
 			location?.miscSections.push({title: '', body: ''});
 			forceUpdate();
 		}
+	}
+
+	if (notFound) {
+		return <NotFound />;
 	}
 
 	return (
