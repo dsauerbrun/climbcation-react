@@ -73,7 +73,6 @@ function Header() {
 							<li><Link to="/about">What is Climbcation?</Link></li>
 							<li><Link to="/terms">Terms/Policies</Link></li>
 							<li><a href="mailto:info@climbcation.com">Email Me!</a></li>
-							<li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
 							<li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
 						</ul>
 
@@ -120,7 +119,6 @@ function Header() {
 				</Col>
 				<Col md={2} className="nav-link text">
 					<a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'sub'}}><span className="glyphicon glyphicon-envelope"></span></a>
-					<a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a>
 					<div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
 				</Col>
 			</Row>
