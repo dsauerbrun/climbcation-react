@@ -19,6 +19,10 @@ export interface LocationsFetch {
 }
 
 let reloadTimeout: number = null;
+//mirrors the page size the filter endpoint applies. a short page is the only reliable
+//end-of-results signal: the api returns a cursor for every page, including the last one,
+//so the cursor alone never goes falsy and can't be used to detect exhaustion.
+const LOCATIONS_PAGE_SIZE = 10;
 interface fetcherParam {
     filterState: FilterParams,
     setFilterState: Function
@@ -65,7 +69,7 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
       locations = locations.concat(newLocs.map(x => new Location(x)));
       setLocations(locations);
       setCursor(filtered.cursor || null);
-      if (!filtered.cursor || newLocs.length === 0) {
+      if (!filtered.cursor || newLocs.length === 0 || (filtered.locations || []).length < LOCATIONS_PAGE_SIZE) {
           setNoMoreLocations(true);
       }
   }
@@ -106,7 +110,11 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
           setUnpaginatedLocations(filtered.mapLocations);
         }
         setCursor(filtered.cursor || null);
-        if (!filtered.cursor || locations.length === 0) {
+        //a result set shorter than a full page means there is nothing after it. without this
+        //the loader stayed visible forever on any small result set: the cursor kept hasMore
+        //true, and too few results to scroll meant InfiniteScroll never fired next() to
+        //discover the end.
+        if (!filtered.cursor || locations.length < LOCATIONS_PAGE_SIZE) {
           setNoMoreLocations(true);
         }
       }, filterTimeout);
