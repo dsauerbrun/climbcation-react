@@ -123,7 +123,7 @@ export function Login(props) {
             <div className="row">
                 <div className="col-md-12">
                     <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                        <a href={`${process.env.REACT_APP_API_ORIGIN}/auth/google?state=${getState()}`} target="_self">
                             <div className="google-btn">
                                 <div className="google-icon-wrapper">
                                     <img className="google-icon-svg" alt="google icon" src={googleIcon}/>
@@ -185,7 +185,7 @@ export function Login(props) {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                        <a href={`${process.env.REACT_APP_API_ORIGIN}/auth/google?state=${getState()}`} target="_self">
                             <div className="google-btn">
                             <div className="google-icon-wrapper">
                                 <img className="google-icon-svg" src={googleIcon} alt="google sign in logo" />
