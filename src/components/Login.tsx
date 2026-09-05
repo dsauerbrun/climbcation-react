@@ -122,9 +122,6 @@ export function Login(props) {
             <div className="row">
                 <div className="col-md-12">
                     <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                            Sign In with Facebook
-                        </a>
                         <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
                             <div className="google-btn">
                                 <div className="google-icon-wrapper">
@@ -187,9 +184,6 @@ export function Login(props) {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                            Sign Up with Facebook
-                        </a>
                         <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
                             <div className="google-btn">
                             <div className="google-icon-wrapper">
