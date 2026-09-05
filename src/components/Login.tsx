@@ -4,6 +4,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { authContext } from '../common/useAuth';
 import { useForm } from "react-hook-form";
 import {
+    useHistory,
     useRouteMatch
 } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
@@ -226,6 +227,23 @@ export function Login(props) {
             </div>}
         </div>
         </>
+    );
+}
+
+export function LoginPage() {
+    let history = useHistory();
+    return (
+        <div className="profile-form">
+            <div className="climbcation-well well reset-form">
+                <Login successCallback={(toastMessage: string = null) => {
+                    //signin calls back with no message; reset-password and sign-up call back
+                    //with one. only an actual login should take the user off this page.
+                    if (!toastMessage) {
+                        history.push('/');
+                    }
+                }} />
+            </div>
+        </div>
     );
 }
 
