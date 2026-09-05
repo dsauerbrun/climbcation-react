@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import Toast from 'react-bootstrap/Toast';
+import googleIcon from '../images/google-icon.svg';
 
 interface LoginForm {
     email: string;
@@ -125,7 +126,7 @@ export function Login(props) {
                         <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
                             <div className="google-btn">
                                 <div className="google-icon-wrapper">
-                                    <img className="google-icon-svg" alt="google icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                                    <img className="google-icon-svg" alt="google icon" src={googleIcon}/>
                                 </div>
                                 <p className="btn-text"><b>Sign In with Google</b></p>
                             </div>
@@ -187,7 +188,7 @@ export function Login(props) {
                         <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
                             <div className="google-btn">
                             <div className="google-icon-wrapper">
-                                <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="google sign in logo" />
+                                <img className="google-icon-svg" src={googleIcon} alt="google sign in logo" />
                             </div>
                             <p className="btn-text"><b>Sign Up with Google</b></p>
                             </div>
