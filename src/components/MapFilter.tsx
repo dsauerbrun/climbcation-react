@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState} from 'react';
 import { isEqual, omit, functions } from 'lodash';
 import { IconTooltip } from '../common/HelperComponents';
 import classNames from 'classnames';
-import Location from '../classes/Location';
+import Location, { getHomeThumb } from '../classes/Location';
 import {Link} from 'react-router-dom';
 
   Map.defaultProps = {
@@ -212,8 +212,8 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
                     <div className="location-card-info">
                         <div className="row">
                             <div className="col-md-8 location-list-thumb-container">
-                                <Link to={`/location/${ tooltipLocation?.slug }}`}>
-                                    <img className="location-list-thumb" src={tooltipLocation?.home_thumb} alt="location thumbnail" />	
+                                <Link to={`/location/${ tooltipLocation?.slug }`}>
+                                    <img className="location-list-thumb" src={getHomeThumb(tooltipLocation)} alt="location thumbnail" />
                                     <div className="location-list-thumb-title">
                                         <h3 className="text-gray">{ tooltipLocation?.name }</h3>
                                     </div>
@@ -223,13 +223,13 @@ function Map({ options, latitude, longitude, zoom, markers, onMount, className, 
                             <div className="col-md-4 location-card-attributes">
                                 <div className="col-xs-12 col-md-12">
                                     <label>Climbing Types</label>
-                                    {tooltipLocation?.climbing_types?.map(type => (
+                                    {tooltipLocation?.climbingTypes?.map(type => (
                                         <img src={ type?.url } className='icon' title={ type?.name } alt={type?.name} key={type?.name} />
                                     ))}
                                 </div>
                                 <div className="col-xs-12 col-md-12">
                                     <label>Best Seasons</label>
-                                    <p className="text-gray info-text">{ tooltipLocation?.date_range}</p>
+                                    <p className="text-gray info-text">{ tooltipLocation?.dateRange}</p>
                                 </div>
                                 <div className="col-xs-12 col-md-12">
                                     <label>Rating</label>

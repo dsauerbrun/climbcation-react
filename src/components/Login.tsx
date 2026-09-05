@@ -4,10 +4,12 @@ import React, { useContext, useState, useEffect } from 'react';
 import { authContext } from '../common/useAuth';
 import { useForm } from "react-hook-form";
 import {
+    useHistory,
     useRouteMatch
 } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import Toast from 'react-bootstrap/Toast';
+import googleIcon from '../images/google-icon.svg';
 
 interface LoginForm {
     email: string;
@@ -51,7 +53,7 @@ export function Login(props) {
 		try {
 			await auth.login(username, password);
             successCallback && successCallback();
-		} catch (err) {
+		} catch (err: any) {
 			if (err.response.status === 400) {
                 changeFormAlerts({authError: 'Invalid Username or Password'});
 			} else {
@@ -65,7 +67,7 @@ export function Login(props) {
 		try {
 			await auth.resetPassword(username);
             successCallback && successCallback('A link to reset your password has been sent to your email!');
-		} catch (err) {
+		} catch (err: any) {
             changeFormAlerts({authError: err});
 		}
     }
@@ -75,7 +77,7 @@ export function Login(props) {
         try {
             await auth.signup(email, username, password);
             successCallback && successCallback('A link to verify your account has been sent to your email!');
-        } catch (err) {
+        } catch (err: any) {
             changeFormAlerts({authError: err});
         }
 			
@@ -121,13 +123,10 @@ export function Login(props) {
             <div className="row">
                 <div className="col-md-12">
                     <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                            Sign In with Facebook
-                        </a>
-                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                        <a href={`${process.env.REACT_APP_API_ORIGIN}/auth/google?state=${getState()}`} target="_self">
                             <div className="google-btn">
                                 <div className="google-icon-wrapper">
-                                    <img className="google-icon-svg" alt="google icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                                    <img className="google-icon-svg" alt="google icon" src={googleIcon}/>
                                 </div>
                                 <p className="btn-text"><b>Sign In with Google</b></p>
                             </div>
@@ -186,13 +185,10 @@ export function Login(props) {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="external-sign-in">
-                        <a href={`https://www.climbcation.com/auth/facebook?state=${getState()}`} className="fb connect" target="_self">
-                            Sign Up with Facebook
-                        </a>
-                        <a href={`https://www.climbcation.com/auth/google_oauth2?state=${getState()}`} target="_self">
+                        <a href={`${process.env.REACT_APP_API_ORIGIN}/auth/google?state=${getState()}`} target="_self">
                             <div className="google-btn">
                             <div className="google-icon-wrapper">
-                                <img className="google-icon-svg" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="google sign in logo" />
+                                <img className="google-icon-svg" src={googleIcon} alt="google sign in logo" />
                             </div>
                             <p className="btn-text"><b>Sign Up with Google</b></p>
                             </div>
@@ -226,6 +222,23 @@ export function Login(props) {
             </div>}
         </div>
         </>
+    );
+}
+
+export function LoginPage() {
+    let history = useHistory();
+    return (
+        <div className="profile-form">
+            <div className="climbcation-well well reset-form">
+                <Login successCallback={(toastMessage: string = null) => {
+                    //signin calls back with no message; reset-password and sign-up call back
+                    //with one. only an actual login should take the user off this page.
+                    if (!toastMessage) {
+                        history.push('/');
+                    }
+                }} />
+            </div>
+        </div>
     );
 }
 

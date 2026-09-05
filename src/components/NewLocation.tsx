@@ -110,18 +110,18 @@ function NewLocation () {
 				setShowError(true);
 			} else if (!isSubmitting) {
 				let accommodationsWithRanges = data.accommodations?.map(accommodation => {
-					let accommodationWithRange = {id: accommodation.id, name: accommodation.name, cost: data.accommodationCosts && data.accommodationCosts[accommodation.name]};
+					let accommodationWithRange = {id: accommodation.id, cost: data.accommodationCosts && data.accommodationCosts[accommodation.name]};
 					return accommodationWithRange;
 				});
 
 				let climbingTypesWithGrades = data.climbTypes?.map(climbType => {
-					let typeGrade = data.grades?.find(x => x.type.id === climbType.id)?.id;
-					let climbTypeWithGrade = {id: climbType.id, name: climbType.name, grade_id: typeGrade};
+					let typeGrade = data.grades?.find(x => x.climbingTypeId === climbType.id)?.id;
+					let climbTypeWithGrade = {id: climbType.id, gradeId: typeGrade};
 					return climbTypeWithGrade;
 				})
 
 				let foodOptionsWithCosts = data.foodOptions?.map(foodOption => {
-					let foodOptionWithCost = {id: foodOption.id, name: foodOption.name, cost: data.foodOptionCosts && data.foodOptionCosts[foodOption.name]}
+					let foodOptionWithCost = {id: foodOption.id, cost: data.foodOptionCosts && data.foodOptionCosts[foodOption.name]}
 					return foodOptionWithCost;
 				})
 
@@ -129,31 +129,38 @@ function NewLocation () {
 					name: data.name,
 					country: data.country,
 					airport: data.airport?.iata_code,
-					months: data.months,
-					accommodations: accommodationsWithRanges || [],
+					rating: data.rating,
+					soloFriendly: data.soloFriendly,
+					months: data.months?.map(month => ({id: month.id})) || [],
 					climbingTypes: climbingTypesWithGrades || [],
 					sections: data.miscSections || [],
-					closestAccommodation: data.closestAccommodation,
-					foodOptionDetails: foodOptionsWithCosts || [],
-					soloFriendly: data.soloFriendly,
-					rating: data.rating,
-					transportations: data.transportations?.map(x => x.id) || [],
-					bestTransportationId: data.bestTransportation?.id,
-					bestTransportationCost: data.bestTransportationCost,
-					walkingDistance: data.walkingDistance,
-					gettingInNotes: data.gettingInNotes,
-					accommodationNotes: data.accommodationNotes,
-					commonExpensesNotes: data.commonExpensesNotes,
-					savingMoneyTips: data.savingMoneyTips  
+					accommodations: {
+						accommodations: accommodationsWithRanges || [],
+						accommodationNotes: data.accommodationNotes,
+						closestAccommodation: data.closestAccommodation
+					},
+					foodOptions: {
+						foodOptionDetails: foodOptionsWithCosts || [],
+						commonExpensesNotes: data.commonExpensesNotes,
+						savingMoneyTips: data.savingMoneyTips
+					},
+					gettingIn: {
+						transportations: data.transportations?.map(x => x.id) || [],
+						bestTransportationCost: data.bestTransportationCost,
+						bestTransportationId: data.bestTransportation?.id,
+						gettingInNotes: data.gettingInNotes,
+						walkingDistance: data.walkingDistance
+					}
 				};
 
 				try {
-					let resp = await axios.post(`/api/submit_new_location`, reqObj);
+					let resp = await axios.post(`/api/locations/submit_new_location`, reqObj);
 					setSlug(resp.data.slug);
 					setLocationId(resp.data.id);
 					setPage(page + 1);
-				} catch (err) {
-					alert(`error ${err}`);
+				} catch (err: any) {
+					//backend returns a plain-text body on 400, not json
+					alert(`error ${err.response?.data || err}`);
 				}
 			}
 		}
@@ -314,12 +321,19 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 	let user: User = auth.user;
 	let [emailThankYou, setEmailThankYou] = useState(false);
 	let [submitterEmail, setSubmitterEmail] = useState<string>();
+	let [emailError, setEmailError] = useState<string>(null);
 
-	let submitEmail = () => {
-		axios.post('api/locations/' + locationId + '/email', {email: submitterEmail})
-			.then(function(response) {
-				setEmailThankYou(true);
-			})
+	let submitEmail = async () => {
+		setEmailError(null);
+		try {
+			await axios.post('api/locations/' + locationId + '/email', {email: submitterEmail});
+			setEmailThankYou(true);
+		} catch (err: any) {
+			//don't show the thank-you on a failure — it told the submitter we had their address
+			//when we didn't, and the rejection went unhandled on top of that.
+			let body = err?.response?.data;
+			setEmailError(typeof body === 'string' && body ? body : 'We could not save your email address. Please try again.');
+		}
 	}
 
 	useEffect(() => {
@@ -347,6 +361,10 @@ function SuccessSection({locationName, locationId, register, setValue, getValues
 				{emailThankYou && <label className="col-md-4 email-prompt">
 					Thank you!
 				</label>}
+				{emailError && <div className="alert alert-danger alert-dismissable col-md-12">
+					<button type="button" className="close" onClick={() => setEmailError(null)}>&times;</button>
+					{emailError}
+				</div>}
 			</div>}
 			<div className="row bottom-padding">
 				<h4 className="col-md-12">Forget some information? Just click on the preview link and edit your location page there!</h4>
@@ -744,7 +762,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 		if (typeof grade === 'string') {
 			if (grade === '') {
 				let newGrades = _.cloneDeep(selectedGrades) || [];
-				newGrades = newGrades.filter(x => x.type.id !== climbTypeId)
+				newGrades = newGrades.filter(x => x.climbingTypeId !== climbTypeId)
 				setValue([{grades: newGrades}]);
 				return;
 			}
@@ -767,7 +785,7 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 		let newClimbTypes = _.cloneDeep(climbTypes) || [];
 		if (newClimbTypes.find(x => x.id === climb.id)) {
 			newClimbTypes = newClimbTypes.filter(x => x.id !== climb.id);
-			let gradeToRemove = selectedGrades.find(x => x.type.id === climb.id);
+			let gradeToRemove = selectedGrades.find(x => x.climbingTypeId === climb.id);
 			gradeToRemove && toggleGrade(gradeToRemove);
 		} else {
 			newClimbTypes.push(climb);
@@ -889,7 +907,11 @@ function GeneralSection({locationName, register, setValue, getValues, watch, mon
 							<img src={climbType.url} alt="climbing type" /> 
 							<select onChange={(e) => toggleGrade(e.currentTarget.value, climbType.id)} className="form-control">
 								<option value=''>Select a grade</option>
-								{grades?.sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.type.id === climbType.id).map(grade => (
+									{/* the id-ascending sort intentionally overrides the order the api sends.
+									    get_attribute_options returns grades order DESC for rails parity, but this
+									    dropdown has always rendered id ASC and that is the order users expect. copy
+									    before sorting so the shared useEditables array is not reordered in place. */}
+									{[...(grades ?? [])].sort((a, b) => a.id > b.id ? 1 : -1).filter(grade => grade.climbingTypeId === climbType.id).map(grade => (
 									<option key={grade.grade} value={grade.id}>{grade.grade} and above</option>
 								))}
 							</select>

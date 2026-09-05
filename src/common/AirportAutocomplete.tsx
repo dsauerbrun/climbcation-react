@@ -46,10 +46,10 @@ export default function AirportAutocomplete(props: any) {
 	getOptionSelected: (option: airport, value: airport) => {
 		return option.iata_code === value.iata_code;
 	},
-	onChange: (event: ChangeEvent<{}>, value: airport | null, reason: string): void => {
+	onChange: ((event: ChangeEvent<{}>, value: airport | null): void => {
 		localStorage.setItem('airport', JSON.stringify(value));
 		setSelectedAirport(value)
-	},
+	}) as any,
     filterOptions: (options: airport[], {inputValue}) => {
         let airport = inputValue.toLowerCase();
         let matchingAirports: airport[] = allAirports.filter(x => x.iata_code.toLowerCase() === airport || x.name.toLowerCase().includes(airport) || x.keywords?.toLowerCase().includes(airport) || x.municipality?.toLowerCase().includes(airport));

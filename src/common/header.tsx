@@ -33,16 +33,20 @@ function Header() {
 		try {
 			await auth.deleteAccount();
 			setShowToast({message: 'Your account has been successfully deleted!'});
-		} catch (err) {
+		} catch (err: any) {
 			alert('Failed to delete account, please contact info@climbcation.com');
 		}
+	}
+
+	let logout = async () => {
+		await auth.logout();
 	}
 
 	let changePassword = async () => {
 		try {
 			await auth.resetPassword(user.email)
 			setShowToast({message: 'Please check your email for a password change link'});
-		} catch (err) {
+		} catch (err: any) {
 			alert('Failed to delete account, please contact info@climbcation.com');
 		}
 	}
@@ -65,7 +69,7 @@ function Header() {
 							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => changePassword()}>Change Password</a></li>
 							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
 							<li role="presentation" ><div className="anchor" onClick={() => deleteAccount()}>Delete Account</div></li>
-							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
+							<li role="presentation" ><div className="anchor" onClick={() => logout()}>Logout</div></li></> :
 							<li><div className="anchor" onClick={() => showLogin()} style={{display: 'inline'}}>Login</div> / <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</div></li>
 							}
 							<li role="separator" className="divider"></li>
@@ -73,8 +77,6 @@ function Header() {
 							<li><Link to="/about">What is Climbcation?</Link></li>
 							<li><Link to="/terms">Terms/Policies</Link></li>
 							<li><a href="mailto:info@climbcation.com">Email Me!</a></li>
-							<li><a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a></li>
-							<li><a href="https://www.facebook.com/climbcation"><div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div></a></li>
 						</ul>
 
 				</Navbar.Collapse>
@@ -111,7 +113,7 @@ function Header() {
 									<Dropdown.Item onClick={() => changePassword()}>Change Password</Dropdown.Item>
 									<Dropdown.Item as={Link} to="/profile">Change Username</Dropdown.Item>
 									<Dropdown.Item className="anchor" onClick={() => deleteAccount()}>Delete Account</Dropdown.Item>
-									<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
+									<Dropdown.Item onClick={() => logout()}>Logout</Dropdown.Item>
 								</Dropdown.Menu>	
 							</Dropdown>
 						:
@@ -120,8 +122,6 @@ function Header() {
 				</Col>
 				<Col md={2} className="nav-link text">
 					<a href="mailto:info@climbcation.com" style={{fontSize: '18px', verticalAlign: 'sub'}}><span className="glyphicon glyphicon-envelope"></span></a>
-					<a href="https://www.instagram.com/climbcation/?ref=badge" className="contact-link"><img className="instagram-badge" src="//badges.instagram.com/static/images/ig-badge-24.png" alt="Instagram" /></a>
-					<div className="fb-like display-inline-block contact-link" data-href="https://www.facebook.com/climbcation" data-width="20" data-layout="button" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
 				</Col>
 			</Row>
 			</div>}

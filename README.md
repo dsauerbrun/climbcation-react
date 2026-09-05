@@ -37,6 +37,48 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
+## Environment configuration
+
+Two committed env files supply the backend origin:
+
+| File | Used by | `REACT_APP_API_ORIGIN` |
+|------|---------|------------------------|
+| `.env.development` | `npm start` | `https://localhost:3000` |
+| `.env.production` | `npm run build` | `https://www.climbcation.com` |
+
+CRA picks the file automatically from the command you run — there is no runtime switch and
+nothing to set by hand.
+
+Both files are committed on purpose. They hold no secrets, and the app needs the same values on
+every machine. For a local override that should not be committed, use `.env.development.local`;
+`.gitignore` already excludes every `*.local` variant.
+
+### Adding a variable
+
+Only names beginning with `REACT_APP_` are exposed to the app — CRA ignores anything else. Read
+them as `process.env.REACT_APP_WHATEVER`.
+
+**The value is substituted at build time, not read at runtime.** Editing an env file therefore
+has no effect on an already-running dev server: you must stop and re-run `npm start`. Source
+edits still hot-reload as usual, so a stale env is easy to miss — the variable comes through as
+`undefined` while the rest of your change appears to have taken.
+
+### Why the dev origin is not the dev server
+
+Most API calls use relative paths (`/api/...`) and go through the dev proxy configured by
+`"proxy"` in `package.json`, which forwards them to the backend. That works because they are
+XHRs.
+
+`REACT_APP_API_ORIGIN` exists for the cases that cannot use the proxy — currently the Google
+sign-in links in `src/components/Login.tsx`. Starting OAuth is a full-page navigation rather
+than an XHR, and the proxy deliberately does not forward navigation requests: it serves
+`index.html` instead, so the browser would land on the app's 404 page. Those links must point
+at the backend's own origin.
+
+Because the browser then talks to the backend directly rather than through the proxy, it meets
+the backend's self-signed certificate. Visit <https://localhost:3000> once and accept the
+warning, or the navigation will fail.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).

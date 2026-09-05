@@ -17,7 +17,16 @@ export interface TransportationOption extends Transportation {
 export interface Month {
 	id: number;
 	name: string;
-	number: number;
+	numericalValue: number;
+}
+
+//get_attribute_options returns the climbing type display name under climbingType rather than name,
+//unlike the location and filter payloads which use name. this split is intentional and permanent per
+//the backend, not a bug awaiting a fix, so normalize it here and let the rest of the app read name.
+//the grades on this endpoint are deliberately flat (climbingType/climbingTypeId) where those other
+//two payloads nest type:{id,name,url} — that one is consumed as-is, no normalization.
+function normalizeClimbingTypes(climbingTypes: any[]): ClimbingType[] {
+	return climbingTypes?.map(climbingType => ({...climbingType, name: climbingType.name ?? climbingType.climbingType}));
 }
 
 
@@ -34,7 +43,7 @@ export function useEditables() {
 	let populateEditables = () => {
 		axios.get('/api/get_attribute_options').then(function(data){
 			var respData = data.data
-			setEditables({climbingTypes: respData.climbing_types, months: respData.months, grades: respData.grades, accommodations: respData.accommodations, foodOptions: respData.food_options, transportations: respData.transportations})
+			setEditables({climbingTypes: normalizeClimbingTypes(respData.climbingTypes), months: respData.months, grades: respData.grades, accommodations: respData.accommodations, foodOptions: respData.foodOptions, transportations: respData.transportations})
 		});
     }
     

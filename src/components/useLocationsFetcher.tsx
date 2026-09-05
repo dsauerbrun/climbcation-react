@@ -24,10 +24,20 @@ interface fetcherParam {
     setFilterState: Function
 }
 
+function buildFilterUrl(filterUrlObject: any, cursor?: string): string {
+  const params = new URLSearchParams();
+  params.set('filter', JSON.stringify(filterUrlObject.filter));
+  params.set('mapFilter', JSON.stringify(filterUrlObject.mapFilter));
+  if (filterUrlObject.sort) params.set('sort', JSON.stringify(filterUrlObject.sort));
+  if (cursor) params.set('cursor', cursor);
+  return '/api/filter/locations?' + params.toString();
+}
+
 function useLocationsFetcher({filterState, setFilterState}: fetcherParam): LocationsFetch {
   let [locations, setLocations] = useState<Location[]>([]);
   let [unpaginatedLocations, setUnpaginatedLocations] = useState<any[]>([]);
   let [noMoreLocations, setNoMoreLocations] = useState<boolean>(false);
+  let [cursor, setCursor] = useState<string>(null);
 	let storedIataCode = localStorage.getItem('airport') &&  localStorage.getItem('airport') !== 'null' ? JSON.parse(localStorage.getItem('airport'))?.iata_code : 'DEN';
 	let [selectedAirport, setSelectedAirport] = useState<airport>(allAirports.find(x => x.iata_code === storedIataCode) || allAirports[0]);
   let forceUpdate = useForceUpdate();
@@ -45,30 +55,21 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
   }
 
   async function nextLocations() {
-      if (noMoreLocations || locations.length === 0) {
+      if (noMoreLocations || locations.length === 0 || !cursor) {
           return;
       }
-      setFilterState((current) => {
-          let newFilters: FilterParams = new FilterParams(current);
-          newFilters.page = newFilters.page + 1;
-
-          return newFilters;
-      });
-      filterState.page = filterState.page + 1;
-      let objectBody = {...filterState?.filterUrlObject};
-      const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(objectBody)
-          
-      };
-      let filteredFetch = await fetch('/api/filter_locations', requestOptions);
-      let filtered = await filteredFetch.json() as any
-      filtered.paginated = filtered.paginated.filter(x => !locations.find(y => y.id === x.id));
-      // getFlightQuotes(filtered.paginated.map(x => x.slug), selectedAirport?.iata_code);
-      locations = locations.concat(filtered.paginated.map(x => new Location(x)));
+      const url = buildFilterUrl(filterState?.filterUrlObject, cursor);
+      let filteredFetch = await fetch(url);
+      let filtered = await filteredFetch.json() as any;
+      let newLocs = (filtered.locations || []).filter(x => !locations.find(y => y.id === x.id));
+      locations = locations.concat(newLocs.map(x => new Location(x)));
       setLocations(locations);
-      if (filtered.paginated.length === 0) {
+      setCursor(filtered.cursor || null);
+      //hasMore is the end-of-results signal. the cursor can't answer it — the api returns one
+      //on every page including the last — but it's still what requests the page after this.
+      //the dedupe check stays independent of it: a page of entirely duplicate ids leaves
+      //nothing to append no matter what hasMore says.
+      if (!filtered.hasMore || !filtered.cursor || newLocs.length === 0) {
           setNoMoreLocations(true);
       }
   }
@@ -76,12 +77,13 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
   useEffect(() => {
       // getFlightQuotes(locations.map(x => x.slug), selectedAirport?.iata_code);
   }, [selectedAirport])
-  
+
   let prevFilters: FilterParams = usePrevious(filterState);
   useEffect(() => {
     async function reloadLocations() {
       setLocations([]);
       setNoMoreLocations(false);
+      setCursor(null);
       setFilterState((current) => {
         let newFilters: FilterParams = new FilterParams(current);
         newFilters.page = 1;
@@ -90,28 +92,30 @@ function useLocationsFetcher({filterState, setFilterState}: fetcherParam): Locat
         return newFilters;
       });
       filterState.page = 1;
-      let objectBody = {...filterState?.filterUrlObject};
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(objectBody)
-      };
       if (reloadTimeout) {
         window.clearTimeout(reloadTimeout);
       }
 
       let filterTimeout = filterState.searchFilter !== prevFilters?.searchFilter ? 500 : 200;
       reloadTimeout = window.setTimeout(async () => {
-        let filteredFetch = await fetch('/api/filter_locations', requestOptions);
-        let filtered = await filteredFetch.json() as any
-        locations = filtered.paginated.map(x => new Location(x));
-        // getFlightQuotes(locations.map(x => x.slug), 'LAX');
+        const url = buildFilterUrl(filterState?.filterUrlObject);
+        let filteredFetch = await fetch(url);
+        let filtered = await filteredFetch.json() as any;
+        locations = (filtered.locations || []).map(x => new Location(x));
         setLocations(locations);
-        setUnpaginatedLocations(filtered.unpaginated);
-        if (filtered.paginated.length === 0) { 
+        //null mapLocations means "you already hold the full map set", not "the set is empty".
+        //this path never sends a cursor so it should always be populated, but don't wipe the
+        //markers if that ever stops being true.
+        if (filtered.mapLocations) {
+          setUnpaginatedLocations(filtered.mapLocations);
+        }
+        setCursor(filtered.cursor || null);
+        //hasMore comes back on this path too, and is false for an empty result set, so it
+        //covers the no-results case on its own.
+        if (!filtered.hasMore || !filtered.cursor) {
           setNoMoreLocations(true);
         }
-      }, filterTimeout);            
+      }, filterTimeout);
     }
 
     reloadLocations();

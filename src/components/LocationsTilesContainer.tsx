@@ -47,7 +47,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                     <div className="row">
                         <div className="col-md-8 location-list-thumb-container">
                             <Link to={"/location/" + location.slug }>
-                                <img className="location-list-thumb" src={ location.home_thumb || '' } alt="location thumbnail" />	
+                                <img className="location-list-thumb" src={ location?.homeThumb || '' } alt="location thumbnail" />	
                                 <div className="location-list-thumb-title">
                                     <h3 className="text-gray">{ location.name }</h3>
                                     <h5><strong>{ location.country }</strong></h5>
@@ -58,12 +58,12 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                             <div className="col-xs-6 col-md-12">
                                 <label>Climbing Types</label>
                                 {
-                                    location.climbing_types.map(x => (<img alt="climbing type {x.name}" key={x.name} className="icon" title={x.name} src={x.url} />))
+                                    location.climbingTypes.map(x => (<img alt="climbing type {x.name}" key={x.name} className="icon" title={x.name} src={x.url} />))
                                 }
                             </div>
                             <div className="col-xs-6 col-md-12">
                                 <label>Best Seasons</label>
-                                <p className="text-gray info-text">{ location.date_range }</p>
+                                <p className="text-gray info-text">{ location.dateRange }</p>
                             </div>
                             <div className="col-xs-6 col-md-12">
                                 <label>Climbing Difficulty</label>
@@ -106,17 +106,17 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                             <div className="col-xs-6 col-md-7" style={{float: 'left'}}>
                                 <label>Solo Friendly</label>
                                 <IconTooltip
-                                    tooltip={location.solo_friendly === null ? 'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one' : (location.solo_friendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.')}
-                                    dom={location.solo_friendly === null ? 
+                                    tooltip={location.soloFriendly === null ? 'We\'re not sure if this place is solo friendly. Email info@climbcation.com if you can help us out with this one' : (location.soloFriendly ? 'You should be able to find partners easily if you\'re traveling solo.' : 'You may have trouble finding partners if you are traveling solo.')}
+                                    dom={location.soloFriendly === null ? 
                                     <p className="text-gray info-text" style={{marginBottom: '0'}}>Maybe <i className="glyphicon glyphicon-info-sign"></i></p> 
-                                    :  <p className="text-gray info-text" style={{marginBottom: '0'}}>{location.solo_friendly ? 'Yes' : 'No'} <i className="glyphicon glyphicon-info-sign"></i></p>}
+                                    :  <p className="text-gray info-text" style={{marginBottom: '0'}}>{location.soloFriendly ? 'Yes' : 'No'} <i className="glyphicon glyphicon-info-sign"></i></p>}
                                 ></IconTooltip>
                             </div>
                         </div>
                     </div>
                 </div>
                 {/*<div className="location-airfare">
-                    {airportCode === location?.airport_code ? 
+                    {airportCode === location?.airportCode ? 
                         <div className="sorry-message">
                             <h4>This Destination's airport is the same as the one you are flying out of.</h4>
                         </div>
@@ -125,7 +125,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                     (transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice).length ? 
                     <>
                         <div>
-                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airport_code}<img src={skyscannerLogo} alt="skyscanner" /></a>
+                            <a href={location?.referral} target="_blank">One Way cost from {airportCode} to {location?.airportCode}<img src={skyscannerLogo} alt="skyscanner" /></a>
                         </div>
                         <ResponsiveContainer width="95%" height={125}>
                             <LineChart data={transformQuotesToChartData(location?.flightPrice?.quotes, lowPrice)}>
@@ -139,7 +139,7 @@ export function LocationTile(props: {location: Location, setHoveredLocation: Fun
                     </>
                     : 
                     <div className="sorry-message">
-                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airport_code }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
+                        <h4>We're sorry, we couldn't find any flight information from {airportCode} to { location.airportCode }.</h4><br /><h5>You may have better luck searching with a bigger airport or for specific dates on your preferred airline's website.</h5>
                     </div>))}
                     {
                         lowPrice?.cost !== 999999999999999999999999 && <div>

@@ -50,7 +50,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
             callBack && callBack();
 			setPostingComment(false);
             clearPost();
-		} catch (err) {
+		} catch (err: any) {
 			console.log(err.response);
 			setCommentError(err.response.data);
 			setPostingComment(false);
@@ -60,7 +60,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
     return (
         <>
         <LoginModal showLoginModal={openLogin} setShowLoginModal={setOpenLogin} signUpEnabled={openSignUp} setSignUpEnabled={setOpenSignUp} />
-        {!user?.user_id && <div className="text-gray">
+        {!user?.userId && <div className="text-gray">
             Please <div className="anchor" onClick={() => showLogin()} style={{display: 'inline', cursor: 'pointer'}}>Login</div> to post a comment. Don't have an account? <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline', cursor: 'pointer'}}>Signup</div> here
         </div>}
         <div className="new-post-container">
@@ -69,7 +69,7 @@ export function PostInput({threadId, slug, callBack}: {threadId: number; slug?: 
                 {commentError}
             </div>}
             
-            {user?.user_id && <textarea 
+            {user?.userId && <textarea 
                 value={newPost} 
                 onChange={(e) => setNewPost(e.target.value)}
                 className="form-control"
@@ -125,7 +125,7 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
             await axios.post(`/api/posts/${post.id}`, {newContent: editedContent});
             setIsEditing(false);
             editCallback && editCallback()
-		} catch (err) {
+		} catch (err: any) {
 			console.log(err.response);
 			setCommentError(err.response.data);
 		}
@@ -135,7 +135,7 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
         <div className="post">
             <div className="post-title">
                 <div className="user">{post.username}</div>
-                <div className="time">{moment().diff(moment(post.created_at), 'days') > 6 ? moment(post.created_at).format('MMM D, YYYY') : moment(post.created_at).fromNow()}</div>
+                <div className="time">{moment().diff(moment(post.createdAt), 'days') > 6 ? moment(post.createdAt).format('MMM D, YYYY') : moment(post.createdAt).fromNow()}</div>
             </div>
             {!isEditing && <p className="post-content preserve-line-breaks">
                 <Linkify>{post.content}</Linkify>
@@ -152,7 +152,7 @@ export function PostComponent({post, editCallback}: {post: Post, editCallback?: 
                 onChange={(e) => setEditedContent(e.target.value)}
                 value={editedContent}
             ></textarea>}
-            {user?.user_id === post.user_id && <div className="post-actions">
+            {user?.userId === post.userId && <div className="post-actions">
                 {!isEditing && <div className="anchor" onClick={() => startEditing()}>Edit</div>}
                 {isEditing && 
                 <>

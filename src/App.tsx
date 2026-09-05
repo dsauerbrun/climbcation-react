@@ -12,9 +12,11 @@ import NewLocation from './components/NewLocation';
 import LocationComponent from './components/Location';
 import ResetPass from './components/ResetPass';
 import Profile from './components/Profile';
-import {Login} from './components/Login';
+import {Login, LoginPage} from './components/Login';
 import {ProvideAuth} from './common/useAuth';
 import Terms from './components/Terms';
+import NotFound from './components/NotFound';
+import Verify from './components/Verify';
 
 
 function App() {
@@ -32,9 +34,10 @@ function App() {
 					<Route path='/resetpass' component={ResetPass} />
 					<Route path='/profile' component={Profile} />
 					<Route path='/terms' component={Terms} />
-					<Route path='/login' component={Login} />
+					<Route path='/login' component={LoginPage} />
 					<Route path='/signup' component={Login} />
-					<Route component={Error} />
+					<Route path='/verify' component={Verify} />
+					<Route component={NotFound} />
 				</Switch>
 			</ProvideAuth>
 		</div>
