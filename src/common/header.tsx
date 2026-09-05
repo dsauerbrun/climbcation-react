@@ -38,6 +38,10 @@ function Header() {
 		}
 	}
 
+	let logout = async () => {
+		await auth.logout();
+	}
+
 	let changePassword = async () => {
 		try {
 			await auth.resetPassword(user.email)
@@ -65,7 +69,7 @@ function Header() {
 							{user?.username ? <><li role="presentation" ><a href="home" role="menuitem" onClick={() => changePassword()}>Change Password</a></li>
 							<li role="presentation" ><Link to="/profile">Change Username</Link></li>
 							<li role="presentation" ><div className="anchor" onClick={() => deleteAccount()}>Delete Account</div></li>
-							<li role="presentation" ><a href="/api/user/logout" target="_self">Logout</a></li></> :
+							<li role="presentation" ><div className="anchor" onClick={() => logout()}>Logout</div></li></> :
 							<li><div className="anchor" onClick={() => showLogin()} style={{display: 'inline'}}>Login</div> / <div className="anchor" onClick={() => showSignUp()} style={{display: 'inline'}}>Signup</div></li>
 							}
 							<li role="separator" className="divider"></li>
@@ -110,7 +114,7 @@ function Header() {
 									<Dropdown.Item onClick={() => changePassword()}>Change Password</Dropdown.Item>
 									<Dropdown.Item as={Link} to="/profile">Change Username</Dropdown.Item>
 									<Dropdown.Item className="anchor" onClick={() => deleteAccount()}>Delete Account</Dropdown.Item>
-									<Dropdown.Item href="/api/user/logout" target="_self">Logout</Dropdown.Item>
+									<Dropdown.Item onClick={() => logout()}>Logout</Dropdown.Item>
 								</Dropdown.Menu>	
 							</Dropdown>
 						:

@@ -67,7 +67,14 @@ export default function useProvideAuth(): Auth {
         }
     };
   
-    const logout = () => {
+    const logout = async (): Promise<void> => {
+        try {
+            await axios.post('/api/user/logout');
+        } catch(err) {
+            console.error('failed to logout')
+        } finally {
+            window.location.reload();
+        }
     };
   
     const resetPassword = async (email: string): Promise<void> => {
